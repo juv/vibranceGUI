@@ -6,8 +6,8 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using ATI.ADL;
 
 namespace vibrance.GUI
 {
@@ -43,17 +43,52 @@ namespace vibrance.GUI
             }
         }
 
+        private bool IsAmd()
+        {
+            if (ADL.ADL_Main_Control_Create != null)
+            {
+                int adl = ADL.ADL_Main_Control_Create(ADL.ADL_Main_Memory_Alloc, 1);
+                if (ADL.ADL_SUCCESS == adl)
+                {
+                    if (ADL.ADL_Main_Control_Destroy != null)
+                    {
+                        ADL.ADL_Main_Control_Destroy();
+                    }
+
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            int vibranceIngameLevel = VibranceProxy.NVAPI_MAX_LEVEL, vibranceWindowsLevel = VibranceProxy.NVAPI_DEFAULT_LEVEL, refreshRate = 5000;
-            bool keepActive = false, multipleMonitors = false;
+            bool keepActive = false;
+            bool multipleMonitors = false;
 
-            this.Invoke((MethodInvoker)delegate
+            if (IsAmd())
+            {
+                v = new AmdVibranceProxy(multipleMonitors);
+            }
+            else
+            {
+                v = new NvidiaVibranceProxy(multipleMonitors);
+            }
+
+            this.Invoke(new Action(() =>
+            {
+                trackBarWindowsLevel.Maximum = v.NVAPI_MAX_LEVEL;
+                trackBarIngameLevel.Maximum = v.NVAPI_MAX_LEVEL;
+            }));
+
+            int vibranceIngameLevel = v.NVAPI_MAX_LEVEL, vibranceWindowsLevel = v.NVAPI_DEFAULT_LEVEL, refreshRate = 5000;
+
+            this.Invoke((MethodInvoker) delegate
             {
                 readVibranceSettings(out vibranceIngameLevel, out vibranceWindowsLevel, out keepActive, out refreshRate, out multipleMonitors);
             });
 
-            v = new VibranceProxy(multipleMonitors);
             if (v.vibranceInfo.isInitialized)
             {
                 backgroundWorker.ReportProgress(1);
@@ -278,7 +313,7 @@ namespace vibrance.GUI
             registryController = new RegistryController();
             this.checkBoxAutostart.Checked = registryController.isProgramRegistered(appName);
 
-            SettingsController settingsController = new SettingsController();
+            SettingsController settingsController = new SettingsController(v);
             settingsController.readVibranceSettings(out vibranceIngameLevel, out vibranceWindowsLevel, out keepActive, out refreshRate, out multipleMonitors);
 
             labelWindowsLevel.Text = "" + vibranceWindowsLevel;
@@ -292,7 +327,7 @@ namespace vibrance.GUI
 
         private void saveVibranceSettings(int ingameLevel, int windowsLevel, bool keepActive, int refreshRate, bool multipleMonitors)
         {
-            SettingsController settingsController = new SettingsController();
+            SettingsController settingsController = new SettingsController(v);
             settingsController.setVibranceSettings("activeValue", ingameLevel.ToString());
             settingsController.setVibranceSettings("inactiveValue", windowsLevel.ToString());
             settingsController.setVibranceSettings("keepActive", keepActive.ToString());

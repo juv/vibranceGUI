@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Management;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using ATI.ADL;
 
 namespace vibrance.GUI
 {
@@ -121,9 +122,9 @@ namespace vibrance.GUI
     }
 
 
-
-    public class VibranceProxy
+    public class NvidiaVibranceProxy : VibranceProxy
     {
+        #region dll imports
         [DllImport(
             "vibranceDLL.dll",
             EntryPoint = "?initializeLibrary@vibrance@vibranceDLL@@QAE_NXZ",
@@ -183,30 +184,10 @@ namespace vibrance.GUI
 
         [DllImport(
             "vibranceDLL.dll",
-            EntryPoint = "?isCsgoActive@vibrance@vibranceDLL@@QAE_NPAPAUHWND__@@@Z",
-            CallingConvention = CallingConvention.StdCall,
-            CharSet = CharSet.Auto)]
-        static extern bool isCsgoActive(ref IntPtr hwnd);
-
-        [DllImport(
-            "vibranceDLL.dll",
-            EntryPoint = "?isCsgoStarted@vibrance@vibranceDLL@@QAE_NPAPAUHWND__@@@Z",
-            CallingConvention = CallingConvention.StdCall,
-            CharSet = CharSet.Ansi)]
-        static extern bool isCsgoStarted(ref IntPtr hwnd);
-
-        [DllImport(
-            "vibranceDLL.dll",
             EntryPoint = "?equalsDVCLevel@vibrance@vibranceDLL@@QAE_NHH@Z",
             CallingConvention = CallingConvention.StdCall,
             CharSet = CharSet.Auto)]
         static extern bool equalsDVCLevel([In] int defaultHandle, [In] int level);
-
-        [DllImport("user32.dll", CharSet = CharSet.Ansi)]
-        static extern int GetWindowTextLength([In] IntPtr hWnd);
-
-        [DllImport("user32.dll", CharSet = CharSet.Ansi)]
-        static extern int GetWindowTextA([In] IntPtr hWnd, [In, Out] StringBuilder lpString, [In] int nMaxCount);
 
         [DllImport("user32.dll")]
         static extern bool EnumDisplayDevices(string lpDevice, uint iDevNum, ref DISPLAY_DEVICE lpDisplayDevice, uint dwFlags);
@@ -217,59 +198,567 @@ namespace vibrance.GUI
             CallingConvention = CallingConvention.StdCall,
             CharSet = CharSet.Ansi)]
         static extern int getAssociatedNvidiaDisplayHandle(string deviceName, [In] int length);
+        #endregion
+
+        public NvidiaVibranceProxy(bool multipleMonitors) 
+            : base(multipleMonitors)
+        {
+            NVAPI_MAX_PHYSICAL_GPUS = 64;
+            NVAPI_MAX_LEVEL = 63;
+            NVAPI_DEFAULT_LEVEL = 0;
+        }
+
+        protected override void InitGrakaSettings()
+        {
+            vibranceInfo = new VIBRANCE_INFO();
+            bool ret = initializeLibrary();
+            int[] gpuHandles = new int[NVAPI_MAX_PHYSICAL_GPUS];
+            enumeratePhsyicalGPUs(gpuHandles);
+            vibranceInfo.activeOutput = getActiveOutputs(gpuHandles);
+
+            StringBuilder buffer = new StringBuilder(64);
+            char[] sz = new char[64];
+            getGpuName(gpuHandles, buffer);
+            vibranceInfo.szGpuName = buffer.ToString();
+            vibranceInfo.defaultHandle = enumerateNvidiaDisplayHandle();
+
+            if (_multipleMonitors)
+            {
+                adjustMultipleMonitorsSetting(_multipleMonitors);
+            }
+
+            NV_DISPLAY_DVC_INFO info = new NV_DISPLAY_DVC_INFO();
+            if (getDVCInfo(ref info, vibranceInfo.defaultHandle))
+            {
+                if (info.currentLevel != NVAPI_DEFAULT_LEVEL)
+                {
+                    setDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault);
+                }
+            }
+
+            vibranceInfo.isInitialized = true;
+        }
+
+        protected override int GetDisplayHandle()
+        {
+            return enumerateNvidiaDisplayHandle();
+        }
+
+        public override void handleDVC()
+        {
+            bool isChanged = false;
+            while (vibranceInfo.shouldRun)
+            {
+                IntPtr hwnd = IntPtr.Zero;
+                if (isCsgoStarted(ref hwnd) && hwnd != IntPtr.Zero)
+                {
+                    if (isCsgoActive(ref hwnd))
+                    {
+                        int nLen = GetWindowTextLength(hwnd);
+                        if (nLen > 0)
+                        {
+                            int length = GetWindowTextLength(hwnd);
+                            StringBuilder sb = new StringBuilder(length + 1);
+                            GetWindowTextA(hwnd, sb, sb.Capacity);
+
+                            if (sb != null && sb.ToString().Equals(NVAPI_GLOBAL_OFFENSIVE_WINDOW_NAME))
+                            {
+                                if (!equalsDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingActive))
+                                {
+                                    setDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingActive);
+                                    isChanged = true;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (isChanged && !vibranceInfo.keepActive)
+                        {
+                            setDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault);
+                            isChanged = false;
+                        }
+                    }
+                }
+                else
+                {
+                    if (isChanged || !equalsDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault))
+                    {
+                        setDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault);
+                        isChanged = false;
+                    }
+
+                }
+                System.Threading.Thread.Sleep(vibranceInfo.sleepInterval);
+            }
+            handleDVCExit();
+        }
+
+        public override bool unloadLibraryEx()
+        {
+            return unloadLibrary();
+        }
+
+        public override void handleDVCExit()
+        {
+            if (!equalsDVCLevel(vibranceInfo.defaultHandle, NVAPI_DEFAULT_LEVEL))
+                setDVCLevel(vibranceInfo.defaultHandle, NVAPI_DEFAULT_LEVEL);
+        }
+    }
+
+    public class AmdVibranceProxy : VibranceProxy
+    {
+        public AmdVibranceProxy(bool multipleMonitors)
+            : base(multipleMonitors)
+        {
+            NVAPI_MAX_PHYSICAL_GPUS = 64;
+            NVAPI_MAX_LEVEL = 200;
+            NVAPI_DEFAULT_LEVEL = 100;
+        }
+
+        private int GetCurrentSaturation()
+        {
+            int ADLRet = -1;
+            int NumberOfAdapters = 0;
+            int NumberOfDisplays = 0;
+            int iAdapterIndex = 0;
+
+            if (ADL.ADL_Main_Control_Create != null)
+                ADLRet = ADL.ADL_Main_Control_Create(ADL.ADL_Main_Memory_Alloc, 1);
+            if (ADL.ADL_SUCCESS == ADLRet)
+            {
+                if (null != ADL.ADL_Adapter_NumberOfAdapters_Get)
+                    ADL.ADL_Adapter_NumberOfAdapters_Get(ref NumberOfAdapters);
+                if (NumberOfAdapters > 0)
+                {
+                    // Get OS adpater info from ADL
+                    ADLAdapterInfoArray OSAdapterInfoData;
+                    OSAdapterInfoData = new ADLAdapterInfoArray();
+
+                    if (null != ADL.ADL_Adapter_AdapterInfo_Get)
+                    {
+                        IntPtr AdapterBuffer = IntPtr.Zero;
+                        int size = Marshal.SizeOf(OSAdapterInfoData);
+                        AdapterBuffer = Marshal.AllocCoTaskMem((int)size);
+                        Marshal.StructureToPtr(OSAdapterInfoData, AdapterBuffer, false);
+
+                        if (ADL.ADL_Adapter_AdapterInfo_Get != null)
+                        {
+                            ADLRet = ADL.ADL_Adapter_AdapterInfo_Get(AdapterBuffer, size);
+                            if (ADLRet == ADL.ADL_SUCCESS)
+                            {
+                                OSAdapterInfoData = (ADLAdapterInfoArray)Marshal.PtrToStructure(AdapterBuffer, OSAdapterInfoData.GetType());
+                                int IsActive = 0;
+
+                                for (int i = 0; i < NumberOfAdapters; i++)
+                                {
+                                    // Check if the adapter is active
+                                    iAdapterIndex = OSAdapterInfoData.ADLAdapterInfo[i].AdapterIndex;
+
+                                    if (null != ADL.ADL_Adapter_Active_Get)
+                                        ADLRet = ADL.ADL_Adapter_Active_Get(OSAdapterInfoData.ADLAdapterInfo[i].AdapterIndex, ref IsActive);
+
+                                    if (ADL.ADL_SUCCESS == ADLRet)
+                                    {
+                                        // Obtain information about displays
+                                        ADLDisplayInfo oneDisplayInfo = new ADLDisplayInfo();
+
+                                        if (null != ADL.ADL_Display_DisplayInfo_Get)
+                                        {
+                                            IntPtr DisplayBuffer = IntPtr.Zero;
+                                            int j = 0;
+
+                                            // Force the display detection and get the Display Info. Use 0 as last parameter to NOT force detection
+                                            ADLRet = ADL.ADL_Display_DisplayInfo_Get(OSAdapterInfoData.ADLAdapterInfo[i].AdapterIndex, ref NumberOfDisplays, out DisplayBuffer, 1);
+                                            if (ADL.ADL_SUCCESS == ADLRet)
+                                            {
+                                                List<ADLDisplayInfo> DisplayInfoData;
+                                                DisplayInfoData = new List<ADLDisplayInfo>();
+                                                for (j = 0; j < NumberOfDisplays; j++)
+                                                {
+                                                    oneDisplayInfo = (ADLDisplayInfo)Marshal.PtrToStructure(new IntPtr(DisplayBuffer.ToInt64() + j * Marshal.SizeOf(oneDisplayInfo)), oneDisplayInfo.GetType());
+                                                    DisplayInfoData.Add(oneDisplayInfo);
+                                                }
+
+                                                for (j = 0; j < NumberOfDisplays; j++)
+                                                {
+                                                    int InfoValue = DisplayInfoData[j].DisplayID.DisplayLogicalIndex;
+                                                    if (InfoValue != -1)
+                                                    {
+                                                        int iCurrent = 0;
+                                                        int iDefault = 0;
+                                                        int iMin = 0;
+                                                        int iMax = 0;
+                                                        int iStep = 0;
+                                                        int successful = ADL.ADL_Display_Color_Get(iAdapterIndex, InfoValue, ADL.ADL_DISPLAY_COLOR_SATURATION, ref iCurrent, ref iDefault, ref iMin, ref iMax, ref iStep);
+                                                        
+                                                        return iCurrent;
+                                                    }
+                                                }
+                                            }
+                                            // Release the memory for the DisplayInfo structure
+                                            if (IntPtr.Zero != DisplayBuffer)
+                                                Marshal.FreeCoTaskMem(DisplayBuffer);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        // Release the memory for the AdapterInfo structure
+                        if (IntPtr.Zero != AdapterBuffer)
+                            Marshal.FreeCoTaskMem(AdapterBuffer);
+                    }
+                }
+                if (null != ADL.ADL_Main_Control_Destroy)
+                    ADL.ADL_Main_Control_Destroy();
+            }
+            else
+            {
+                MessageBox.Show("ADL_Main_Control_Create() returned error code " + ADLRet.ToString() + "\nCheck if ADL is properly installed!\n");
+            }
+
+            return -1;
+        }
+
+        private void SetSaturation(int saturation)
+        {
+            int ADLRet = -1;
+            int NumberOfAdapters = 0;
+            int NumberOfDisplays = 0;
+            int iAdapterIndex = 0;
+
+            if (ADL.ADL_Main_Control_Create != null)
+                ADLRet = ADL.ADL_Main_Control_Create(ADL.ADL_Main_Memory_Alloc, 1);
+            if (ADL.ADL_SUCCESS == ADLRet)
+            {
+                if (null != ADL.ADL_Adapter_NumberOfAdapters_Get)
+                    ADL.ADL_Adapter_NumberOfAdapters_Get(ref NumberOfAdapters);
+                if (NumberOfAdapters > 0)
+                {
+                    // Get OS adpater info from ADL
+                    ADLAdapterInfoArray OSAdapterInfoData;
+                    OSAdapterInfoData = new ADLAdapterInfoArray();
+
+                    if (null != ADL.ADL_Adapter_AdapterInfo_Get)
+                    {
+                        IntPtr AdapterBuffer = IntPtr.Zero;
+                        int size = Marshal.SizeOf(OSAdapterInfoData);
+                        AdapterBuffer = Marshal.AllocCoTaskMem((int)size);
+                        Marshal.StructureToPtr(OSAdapterInfoData, AdapterBuffer, false);
+
+                        if (ADL.ADL_Adapter_AdapterInfo_Get != null)
+                        {
+                            ADLRet = ADL.ADL_Adapter_AdapterInfo_Get(AdapterBuffer, size);
+                            if (ADLRet == ADL.ADL_SUCCESS)
+                            {
+                                OSAdapterInfoData = (ADLAdapterInfoArray)Marshal.PtrToStructure(AdapterBuffer, OSAdapterInfoData.GetType());
+                                int IsActive = 0;
+
+                                for (int i = 0; i < NumberOfAdapters; i++)
+                                {
+                                    // Check if the adapter is active
+                                    iAdapterIndex = OSAdapterInfoData.ADLAdapterInfo[i].AdapterIndex;
+
+                                    if (null != ADL.ADL_Adapter_Active_Get)
+                                        ADLRet = ADL.ADL_Adapter_Active_Get(OSAdapterInfoData.ADLAdapterInfo[i].AdapterIndex, ref IsActive);
+
+                                    if (ADL.ADL_SUCCESS == ADLRet)
+                                    {
+                                        // Obtain information about displays
+                                        ADLDisplayInfo oneDisplayInfo = new ADLDisplayInfo();
+
+                                        if (null != ADL.ADL_Display_DisplayInfo_Get)
+                                        {
+                                            IntPtr DisplayBuffer = IntPtr.Zero;
+                                            int j = 0;
+
+                                            // Force the display detection and get the Display Info. Use 0 as last parameter to NOT force detection
+                                            ADLRet = ADL.ADL_Display_DisplayInfo_Get(OSAdapterInfoData.ADLAdapterInfo[i].AdapterIndex, ref NumberOfDisplays, out DisplayBuffer, 1);
+                                            if (ADL.ADL_SUCCESS == ADLRet)
+                                            {
+                                                List<ADLDisplayInfo> DisplayInfoData;
+                                                DisplayInfoData = new List<ADLDisplayInfo>();
+                                                for (j = 0; j < NumberOfDisplays; j++)
+                                                {
+                                                    oneDisplayInfo = (ADLDisplayInfo)Marshal.PtrToStructure(new IntPtr(DisplayBuffer.ToInt64() + j * Marshal.SizeOf(oneDisplayInfo)), oneDisplayInfo.GetType());
+                                                    DisplayInfoData.Add(oneDisplayInfo);
+                                                }
+
+                                                for (j = 0; j < NumberOfDisplays; j++)
+                                                {
+                                                    int InfoValue = DisplayInfoData[j].DisplayID.DisplayLogicalIndex;
+                                                    if (InfoValue != -1)
+                                                    {
+                                                        ADL.ADL_Display_Color_Set(iAdapterIndex, InfoValue, ADL.ADL_DISPLAY_COLOR_SATURATION, saturation);
+                                                    }
+                                                }
+                                            }
+                                            // Release the memory for the DisplayInfo structure
+                                            if (IntPtr.Zero != DisplayBuffer)
+                                                Marshal.FreeCoTaskMem(DisplayBuffer);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        // Release the memory for the AdapterInfo structure
+                        if (IntPtr.Zero != AdapterBuffer)
+                            Marshal.FreeCoTaskMem(AdapterBuffer);
+                    }
+                }
+                if (null != ADL.ADL_Main_Control_Destroy)
+                    ADL.ADL_Main_Control_Destroy();
+            }
+            else
+            {
+                MessageBox.Show("ADL_Main_Control_Create() returned error code " + ADLRet.ToString() + "\nCheck if ADL is properly installed!\n");
+            }
+        }
+
+        int getActiveOutputs()
+        {
+            int ADLRet = -1;
+            int NumberOfAdapters = 0;
+            int NumberOfDisplays = 0;
+            int iAdapterIndex = 0;
+
+            if (ADL.ADL_Main_Control_Create != null)
+                ADLRet = ADL.ADL_Main_Control_Create(ADL.ADL_Main_Memory_Alloc, 1);
+            if (ADL.ADL_SUCCESS == ADLRet)
+            {
+                if (null != ADL.ADL_Adapter_NumberOfAdapters_Get)
+                    ADL.ADL_Adapter_NumberOfAdapters_Get(ref NumberOfAdapters);
+                if (NumberOfAdapters > 0)
+                {
+                    // Get OS adpater info from ADL
+                    ADLAdapterInfoArray OSAdapterInfoData;
+                    OSAdapterInfoData = new ADLAdapterInfoArray();
+
+                    if (null != ADL.ADL_Adapter_AdapterInfo_Get)
+                    {
+                        IntPtr AdapterBuffer = IntPtr.Zero;
+                        int size = Marshal.SizeOf(OSAdapterInfoData);
+                        AdapterBuffer = Marshal.AllocCoTaskMem((int)size);
+                        Marshal.StructureToPtr(OSAdapterInfoData, AdapterBuffer, false);
+
+                        if (ADL.ADL_Adapter_AdapterInfo_Get != null)
+                        {
+                            ADLRet = ADL.ADL_Adapter_AdapterInfo_Get(AdapterBuffer, size);
+                            if (ADLRet == ADL.ADL_SUCCESS)
+                            {
+                                OSAdapterInfoData = (ADLAdapterInfoArray)Marshal.PtrToStructure(AdapterBuffer, OSAdapterInfoData.GetType());
+                                int IsActive = 0;
+
+                                for (int i = 0; i < NumberOfAdapters; i++)
+                                {
+                                    // Check if the adapter is active
+                                    iAdapterIndex = OSAdapterInfoData.ADLAdapterInfo[i].AdapterIndex;
+
+                                    if (null != ADL.ADL_Adapter_Active_Get)
+                                        ADLRet = ADL.ADL_Adapter_Active_Get(OSAdapterInfoData.ADLAdapterInfo[i].AdapterIndex, ref IsActive);
+
+                                    if (ADL.ADL_SUCCESS == ADLRet)
+                                    {
+                                        // Obtain information about displays
+                                        ADLDisplayInfo oneDisplayInfo = new ADLDisplayInfo();
+
+                                        if (null != ADL.ADL_Display_DisplayInfo_Get)
+                                        {
+                                            IntPtr DisplayBuffer = IntPtr.Zero;
+                                            int j = 0;
+
+                                            // Force the display detection and get the Display Info. Use 0 as last parameter to NOT force detection
+                                            ADLRet = ADL.ADL_Display_DisplayInfo_Get(OSAdapterInfoData.ADLAdapterInfo[i].AdapterIndex, ref NumberOfDisplays, out DisplayBuffer, 1);
+                                            if (ADL.ADL_SUCCESS == ADLRet)
+                                            {
+                                                List<ADLDisplayInfo> DisplayInfoData;
+                                                DisplayInfoData = new List<ADLDisplayInfo>();
+                                                for (j = 0; j < NumberOfDisplays; j++)
+                                                {
+                                                    oneDisplayInfo = (ADLDisplayInfo)Marshal.PtrToStructure(new IntPtr(DisplayBuffer.ToInt64() + j * Marshal.SizeOf(oneDisplayInfo)), oneDisplayInfo.GetType());
+                                                    DisplayInfoData.Add(oneDisplayInfo);
+                                                }
+
+                                                for (j = 0; j < NumberOfDisplays; j++)
+                                                {
+                                                    int InfoValue = DisplayInfoData[j].DisplayID.DisplayLogicalIndex;
+                                                    if (InfoValue != -1)
+                                                    {
+                                                    }
+                                                }
+                                            }
+                                            // Release the memory for the DisplayInfo structure
+                                            if (IntPtr.Zero != DisplayBuffer)
+                                                Marshal.FreeCoTaskMem(DisplayBuffer);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        // Release the memory for the AdapterInfo structure
+                        if (IntPtr.Zero != AdapterBuffer)
+                            Marshal.FreeCoTaskMem(AdapterBuffer);
+                    }
+                }
+                if (null != ADL.ADL_Main_Control_Destroy)
+                    ADL.ADL_Main_Control_Destroy();
+            }
+            else
+            {
+                MessageBox.Show("ADL_Main_Control_Create() returned error code " + ADLRet.ToString() + "\nCheck if ADL is properly installed!\n");
+            }
+
+            return 0;
+        }
+
+        protected override void InitGrakaSettings()
+        {
+            vibranceInfo = new VIBRANCE_INFO();
+            //vibranceInfo.activeOutput = getActiveOutputs();
+
+            StringBuilder buffer = new StringBuilder(64);
+            vibranceInfo.szGpuName = buffer.ToString();
+            //vibranceInfo.defaultHandle = enumerateNvidiaDisplayHandle();
+
+            if (_multipleMonitors)
+            {
+                adjustMultipleMonitorsSetting(_multipleMonitors);
+            }
+
+            vibranceInfo.isInitialized = true;
+        }
+
+        protected override int GetDisplayHandle()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void handleDVC()
+        {
+            bool isChanged = false;
+            while (vibranceInfo.shouldRun)
+            {
+                IntPtr hwnd = IntPtr.Zero;
+                if (isCsgoStarted(ref hwnd) && hwnd != IntPtr.Zero)
+                {
+                    if (isCsgoActive(ref hwnd))
+                    {
+                        int nLen = GetWindowTextLength(hwnd);
+                        if (nLen > 0)
+                        {
+                            int length = GetWindowTextLength(hwnd);
+                            StringBuilder sb = new StringBuilder(length + 1);
+                            GetWindowTextA(hwnd, sb, sb.Capacity);
+
+                            if (sb != null && sb.ToString().Equals(NVAPI_GLOBAL_OFFENSIVE_WINDOW_NAME))
+                            {
+                                if (!SaturationAlreadySet(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingActive))
+                                {
+                                    SetSaturation(vibranceInfo.userVibranceSettingActive);
+                                    isChanged = true;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (isChanged && !vibranceInfo.keepActive)
+                        {
+                            SetSaturation(vibranceInfo.userVibranceSettingDefault);
+                            isChanged = false;
+                        }
+                    }
+                }
+                else
+                {
+                    if (isChanged || !SaturationAlreadySet(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault))
+                    {
+                        SetSaturation(vibranceInfo.userVibranceSettingDefault);
+                        isChanged = false;
+                    }
+
+                }
+                System.Threading.Thread.Sleep(vibranceInfo.sleepInterval);
+            }
+            handleDVCExit();
+
+            
+        }
+
+        private bool SaturationAlreadySet(int defaultHandle, int saturation)
+        {
+            return (saturation == this.GetCurrentSaturation());
+        }
+
+        public override bool unloadLibraryEx()
+        {
+            return true;
+        }
+
+        public override void handleDVCExit()
+        {
+            
+        }
+    }
 
 
-        public const int NVAPI_MAX_PHYSICAL_GPUS = 64;
-        public const int NVAPI_MAX_LEVEL = 63;
-        public const int NVAPI_DEFAULT_LEVEL = 0;
-        public const int NVAPI_MIN_REFRESH_RATE = 200;
-        public const int NVAPI_DEFAULT_REFRESH_RATE = 5000;
-
-        public const string NVAPI_ERROR_INIT_FAILED = "VibranceProxy failed to initialize! Read readme.txt for fix!";
-        public const string NVAPI_ERROR_GET_MONITOR_HANDLE = "Couldn't determine the monitor handle CSGO is running in. :( Using main output!";
-        public const string NVAPI_WARNING_MULTIPLE_MONITORS = "You are using multiple monitors. Start CSGO, Tab out and click ok after. Do this once then keep vibranceGUI open (means you can start and quit CSGO several times).";
-        public const string NVAPI_GLOBAL_OFFENSIVE_WINDOW_NAME = "Counter-Strike: Global Offensive";
+    public abstract class VibranceProxy
+    {
+        protected readonly bool _multipleMonitors;
+        public int NVAPI_MAX_PHYSICAL_GPUS { get; protected set; }
+        public int NVAPI_MAX_LEVEL { get; protected set; }
+        public int NVAPI_DEFAULT_LEVEL { get; protected set; }
+        public int NVAPI_MIN_REFRESH_RATE { get; private set; }
+        public int NVAPI_DEFAULT_REFRESH_RATE { get; private set; }
+        public string NVAPI_ERROR_INIT_FAILED { get; private set; }
+        public string NVAPI_ERROR_GET_MONITOR_HANDLE { get; private set; }
+        public string NVAPI_WARNING_MULTIPLE_MONITORS { get; private set; }
+        public string NVAPI_GLOBAL_OFFENSIVE_WINDOW_NAME { get; private set; }
 
         public VIBRANCE_INFO vibranceInfo;
 
+        [DllImport("user32.dll", CharSet = CharSet.Ansi)]
+        protected static extern int GetWindowTextLength([In] IntPtr hWnd);
+
+        [DllImport("user32.dll", CharSet = CharSet.Ansi)]
+        protected static extern int GetWindowTextA([In] IntPtr hWnd, [In, Out] StringBuilder lpString, [In] int nMaxCount);
+
+        [DllImport(
+            "vibranceDLL.dll",
+            //EntryPoint = "?isCsgoStarted@vibrance@vibranceDLL@@QAE_NPAPAUHWND__@@@Z",
+            CallingConvention = CallingConvention.StdCall,
+            CharSet = CharSet.Ansi)]
+        protected static extern bool isCsgoStarted(ref IntPtr hwnd);
+
+        [DllImport(
+            "vibranceDLL.dll",
+            EntryPoint = "?isCsgoActive@vibrance@vibranceDLL@@QAE_NPAPAUHWND__@@@Z",
+            CallingConvention = CallingConvention.StdCall,
+            CharSet = CharSet.Auto)]
+        protected static extern bool isCsgoActive(ref IntPtr hwnd);
+
         public VibranceProxy(bool multipleMonitors)
         {
+            _multipleMonitors = multipleMonitors;
+            NVAPI_ERROR_INIT_FAILED = "VibranceProxy failed to initialize! Read readme.txt for fix!";
+            NVAPI_ERROR_GET_MONITOR_HANDLE = "Couldn't determine the monitor handle CSGO is running in. :( Using main output!";
+            NVAPI_WARNING_MULTIPLE_MONITORS = "You are using multiple monitors. Start CSGO, Tab out and click ok after. Do this once then keep vibranceGUI open (means you can start and quit CSGO several times).";
+            NVAPI_GLOBAL_OFFENSIVE_WINDOW_NAME = "Counter-Strike: Global Offensive";
+
+            NVAPI_MIN_REFRESH_RATE = 200;
+            NVAPI_DEFAULT_REFRESH_RATE = 5000;
+
             try
             {
-                vibranceInfo = new VIBRANCE_INFO();
-                bool ret = initializeLibrary();
-                int[] gpuHandles = new int[NVAPI_MAX_PHYSICAL_GPUS];
-                enumeratePhsyicalGPUs(gpuHandles);
-                vibranceInfo.activeOutput = getActiveOutputs(gpuHandles);
-
-                StringBuilder buffer = new StringBuilder(64);
-                char[] sz = new char[64];
-                getGpuName(gpuHandles, buffer);
-                vibranceInfo.szGpuName = buffer.ToString();
-                vibranceInfo.defaultHandle = enumerateNvidiaDisplayHandle();
-
-                if (multipleMonitors)
-                {
-                    adjustMultipleMonitorsSetting(multipleMonitors);
-                }
-
-                NV_DISPLAY_DVC_INFO info = new NV_DISPLAY_DVC_INFO();
-                if (getDVCInfo(ref info, vibranceInfo.defaultHandle))
-                {
-                    if (info.currentLevel != NVAPI_DEFAULT_LEVEL)
-                    {
-                        setDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault);
-                    }
-                }
-
-                vibranceInfo.isInitialized = true;
+                InitGrakaSettings();
             }
             catch (Exception)
             {
-                MessageBox.Show(VibranceProxy.NVAPI_ERROR_INIT_FAILED);
+                MessageBox.Show(NVAPI_ERROR_INIT_FAILED);
             }
-
         }
+
+        protected abstract void InitGrakaSettings();
 
         public bool adjustMultipleMonitorsSetting(bool flag)
         {
@@ -277,7 +766,7 @@ namespace vibrance.GUI
             {
                 if (Screen.AllScreens.Length > 1)
                 {
-                    MessageBox.Show(VibranceProxy.NVAPI_WARNING_MULTIPLE_MONITORS);
+                    MessageBox.Show(NVAPI_WARNING_MULTIPLE_MONITORS);
                     int csgoHandle = getCsgoDisplayHandle();
                     if (csgoHandle != -1)
                     {
@@ -286,17 +775,19 @@ namespace vibrance.GUI
                     }
                     else
                     {
-                        MessageBox.Show(VibranceProxy.NVAPI_ERROR_GET_MONITOR_HANDLE);
-                        vibranceInfo.defaultHandle = enumerateNvidiaDisplayHandle();
+                        MessageBox.Show(NVAPI_ERROR_GET_MONITOR_HANDLE);
+                        vibranceInfo.defaultHandle = GetDisplayHandle();
                     }
                 }
             }
             else
             {
-                vibranceInfo.defaultHandle = enumerateNvidiaDisplayHandle();
+                vibranceInfo.defaultHandle = GetDisplayHandle();
             }
             return false;
         }
+
+        protected abstract int GetDisplayHandle();
 
         private int getCsgoDisplayHandle()
         {
@@ -304,12 +795,12 @@ namespace vibrance.GUI
             IntPtr hwnd = IntPtr.Zero;
             if (isCsgoStarted(ref hwnd) && hwnd != IntPtr.Zero)
             {
-                primaryScreen = System.Windows.Forms.Screen.FromHandle(hwnd);
+                primaryScreen = Screen.FromHandle(hwnd);
                 if (primaryScreen != null)
                 {
                     string deviceName = primaryScreen.DeviceName;
                     GCHandle handle = GCHandle.Alloc(deviceName, GCHandleType.Pinned);
-                    int id = getAssociatedNvidiaDisplayHandle(deviceName, deviceName.Length);
+                    int id = GetDisplayHandle();
                     handle.Free();
 
                     return id;
@@ -343,67 +834,11 @@ namespace vibrance.GUI
         {
             this.vibranceInfo.sleepInterval = interval;
         }
-        
-        public void handleDVC()
-        {
-            bool isChanged = false;
-            while (vibranceInfo.shouldRun)
-            {
-                IntPtr hwnd = IntPtr.Zero;
-                if (isCsgoStarted(ref hwnd) && hwnd != IntPtr.Zero)
-                {
-                    if (isCsgoActive(ref hwnd))
-                    {
-                        int nLen = GetWindowTextLength(hwnd);
-                        if (nLen > 0)
-                        {
-                            int length = GetWindowTextLength(hwnd);
-                            StringBuilder sb = new StringBuilder(length + 1);
-                            GetWindowTextA(hwnd, sb, sb.Capacity);
 
-                            if (sb != null && sb.ToString().Equals(VibranceProxy.NVAPI_GLOBAL_OFFENSIVE_WINDOW_NAME))
-                            {
-                                if (!equalsDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingActive))
-                                {
-                                    setDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingActive);
-                                    isChanged = true;
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (isChanged && !vibranceInfo.keepActive)
-                        {
-                            setDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault);
-                            isChanged = false;
-                        }
-                    }
-                }
-                else
-                {
-                    if (isChanged || !equalsDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault))
-                    {
-                        setDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault);
-                        isChanged = false;
-                    }
+        public abstract void handleDVC();
 
-                }
-                System.Threading.Thread.Sleep(vibranceInfo.sleepInterval);
-            }
-            handleDVCExit();
-        }
+        public abstract bool unloadLibraryEx();
 
-
-        public bool unloadLibraryEx()
-        {
-            return unloadLibrary();
-        }
-
-        public void handleDVCExit()
-        {
-            if (!equalsDVCLevel(vibranceInfo.defaultHandle, NVAPI_DEFAULT_LEVEL))
-                setDVCLevel(vibranceInfo.defaultHandle, NVAPI_DEFAULT_LEVEL);
-        }
+        public abstract void handleDVCExit();
     }
 }

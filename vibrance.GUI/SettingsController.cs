@@ -4,13 +4,19 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace vibrance.GUI
 {
 
     class SettingsController
     {
+        private readonly VibranceProxy _vibranceProxy;
+
+        public SettingsController(VibranceProxy vibranceProxy)
+        {
+            _vibranceProxy = vibranceProxy;
+        }
+
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         static extern uint GetPrivateProfileString(
            string lpAppName,
@@ -66,9 +72,9 @@ namespace vibrance.GUI
             szFilename = appdataPath + szFilename;
             if (!isFileExisting(szFilename))
             {
-                vibranceIngameLevel = VibranceProxy.NVAPI_DEFAULT_LEVEL;
-                vibranceWindowsLevel = VibranceProxy.NVAPI_DEFAULT_LEVEL;
-                refreshRate = VibranceProxy.NVAPI_DEFAULT_REFRESH_RATE;
+                vibranceIngameLevel = _vibranceProxy.NVAPI_DEFAULT_LEVEL;
+                vibranceWindowsLevel = _vibranceProxy.NVAPI_DEFAULT_LEVEL;
+                refreshRate = _vibranceProxy.NVAPI_DEFAULT_REFRESH_RATE;
                 keepActive = false;
                 multipleMonitors = false;
                 return;
@@ -128,20 +134,20 @@ namespace vibrance.GUI
             }
             catch (Exception)
             {
-                vibranceIngameLevel = VibranceProxy.NVAPI_DEFAULT_LEVEL;
-                vibranceWindowsLevel = VibranceProxy.NVAPI_DEFAULT_LEVEL;
-                refreshRate = VibranceProxy.NVAPI_DEFAULT_REFRESH_RATE;
+                vibranceIngameLevel = _vibranceProxy.NVAPI_DEFAULT_LEVEL;
+                vibranceWindowsLevel = _vibranceProxy.NVAPI_DEFAULT_LEVEL;
+                refreshRate = _vibranceProxy.NVAPI_DEFAULT_REFRESH_RATE;
                 keepActive = false;
                 multipleMonitors = false;
                 return;
             }
 
-            if (vibranceWindowsLevel < VibranceProxy.NVAPI_DEFAULT_LEVEL || vibranceWindowsLevel > VibranceProxy.NVAPI_MAX_LEVEL)
-                vibranceWindowsLevel = VibranceProxy.NVAPI_DEFAULT_LEVEL;
-            if (vibranceIngameLevel < VibranceProxy.NVAPI_DEFAULT_LEVEL || vibranceIngameLevel > VibranceProxy.NVAPI_MAX_LEVEL)
-                vibranceIngameLevel = VibranceProxy.NVAPI_MAX_LEVEL;
-            if (refreshRate < VibranceProxy.NVAPI_MIN_REFRESH_RATE)
-                refreshRate = VibranceProxy.NVAPI_DEFAULT_REFRESH_RATE;
+            if (vibranceWindowsLevel < _vibranceProxy.NVAPI_DEFAULT_LEVEL || vibranceWindowsLevel > _vibranceProxy.NVAPI_MAX_LEVEL)
+                vibranceWindowsLevel = _vibranceProxy.NVAPI_DEFAULT_LEVEL;
+            if (vibranceIngameLevel < _vibranceProxy.NVAPI_DEFAULT_LEVEL || vibranceIngameLevel > _vibranceProxy.NVAPI_MAX_LEVEL)
+                vibranceIngameLevel = _vibranceProxy.NVAPI_MAX_LEVEL;
+            if (refreshRate < _vibranceProxy.NVAPI_MIN_REFRESH_RATE)
+                refreshRate = _vibranceProxy.NVAPI_DEFAULT_REFRESH_RATE;
         }
 
         private bool isFileExisting(string szFilename)

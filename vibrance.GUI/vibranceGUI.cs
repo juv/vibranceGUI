@@ -183,7 +183,7 @@ namespace vibrance.GUI
                 }
                 else
                 {
-                    listBoxLog.Items.Add("The refresh rate must be larger than 200 ms!");
+                    listBoxLog.Items.Add("The refresh rate must be greater than 200 ms!");
                 }
             }
         }
@@ -198,7 +198,7 @@ namespace vibrance.GUI
                     settingsBackgroundWorker.RunWorkerAsync();
                 }
                 if (checkBoxKeepActive.Checked)
-                    listBoxLog.Items.Add("Vibrance level will keep active after you tabbed out.");
+                    listBoxLog.Items.Add("Vibrance stays at ingame level when tabbed out.");
             }
         }
 
@@ -212,7 +212,7 @@ namespace vibrance.GUI
                     settingsBackgroundWorker.RunWorkerAsync();
                 }
                 if (checkBoxKeepActive.Checked)
-                    listBoxLog.Items.Add("Reading monitor infos..");
+                    listBoxLog.Items.Add("Reading monitor information..");
             }
         }
 

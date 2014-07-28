@@ -32,39 +32,54 @@ namespace vibrance.GUI
         const string szKeyNameRefreshRate = "refreshRate";
         const string szKeyNameMultipleMonitors = "multipleMonitors";
 
-        public bool setVibranceSettings(string szKeyName, string value)
+        private string fileName = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToString() + "\\vibranceGUI.ini";
+
+        public bool setVibranceSettings(string ingameLevel, string windowsLevel, string keepActive, string refreshRate, string multipleMonitors)
         {
-            string szFilename = "\\vibranceGUI.ini";
-            string appdataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-
-            szFilename = appdataPath + szFilename;
-
-            if (!isFileExisting(szFilename))
+            if (!prepareFile())
             {
-                StreamWriter sw = new StreamWriter(szFilename);
+                return false;
+            }
+
+            WritePrivateProfileString(szSectionName, "activeValue", ingameLevel, fileName);
+            WritePrivateProfileString(szSectionName, "inactiveValue", windowsLevel, fileName);
+            WritePrivateProfileString(szSectionName, "keepActive", keepActive, fileName);
+            WritePrivateProfileString(szSectionName, "refreshRate", refreshRate, fileName);
+            WritePrivateProfileString(szSectionName, "multipleMonitors", multipleMonitors, fileName);
+
+            return (Marshal.GetLastWin32Error() == 0);
+        }
+
+        public bool setVibranceSetting(string szKeyName, string value)
+        {
+            if (!prepareFile())
+            {
+                return false;
+            }
+
+            WritePrivateProfileString(szSectionName, szKeyName, value.ToString(), fileName);
+
+            return (Marshal.GetLastWin32Error() == 0);
+        }
+
+        private bool prepareFile()
+        {
+            if (!isFileExisting(fileName))
+            {
+                StreamWriter sw = new StreamWriter(fileName);
                 sw.Close();
-                if (!isFileExisting(szFilename))
+                if (!isFileExisting(fileName))
                 {
                     return false;
                 }
             }
 
-            WritePrivateProfileString(szSectionName, szKeyName, value.ToString(), szFilename);
-            if (Marshal.GetLastWin32Error() == 0)
-            {
-                return true;
-            }
-            return false;
+            return true;
         }
-
 
         public void readVibranceSettings(out int vibranceIngameLevel, out int vibranceWindowsLevel, out bool keepActive, out int refreshRate, out bool multipleMonitors)
         {
-            string szFilename = "\\vibranceGUI.ini";
-            string appdataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-
-            szFilename = appdataPath + szFilename;
-            if (!isFileExisting(szFilename))
+            if (!isFileExisting(fileName))
             {
                 vibranceIngameLevel = VibranceProxy.NVAPI_DEFAULT_LEVEL;
                 vibranceWindowsLevel = VibranceProxy.NVAPI_DEFAULT_LEVEL;
@@ -83,7 +98,7 @@ namespace vibrance.GUI
                 szDefault,
                 szValueActive,
                 Convert.ToUInt32(szValueActive.Capacity),
-                szFilename);
+                fileName);
 
             StringBuilder szValueInactive = new StringBuilder(1024);
             GetPrivateProfileString(szSectionName,
@@ -91,7 +106,7 @@ namespace vibrance.GUI
                 szDefault,
                 szValueInactive,
                 Convert.ToUInt32(szValueInactive.Capacity),
-                szFilename);
+                fileName);
 
             StringBuilder szValueRefreshRate = new StringBuilder(1024);
             GetPrivateProfileString(szSectionName,
@@ -99,7 +114,7 @@ namespace vibrance.GUI
                 szDefault,
                 szValueRefreshRate,
                 Convert.ToUInt32(szValueRefreshRate.Capacity),
-                szFilename);
+                fileName);
 
 
             StringBuilder szValueKeepActive = new StringBuilder(1024);
@@ -108,7 +123,7 @@ namespace vibrance.GUI
                 szDefault,
                 szValueKeepActive,
                 Convert.ToUInt32(szValueKeepActive.Capacity),
-                szFilename);
+                fileName);
 
             StringBuilder szValueMultipleMonitors = new StringBuilder(1024);
             GetPrivateProfileString(szSectionName,
@@ -116,7 +131,7 @@ namespace vibrance.GUI
                 szDefault,
                 szValueMultipleMonitors,
                 Convert.ToUInt32(szValueMultipleMonitors.Capacity),
-                szFilename);
+                fileName);
 
             try
             {

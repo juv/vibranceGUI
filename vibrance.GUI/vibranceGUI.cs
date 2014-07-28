@@ -295,11 +295,14 @@ namespace vibrance.GUI
         private void saveVibranceSettings(int ingameLevel, int windowsLevel, bool keepActive, int refreshRate, bool multipleMonitors)
         {
             SettingsController settingsController = new SettingsController();
-            settingsController.setVibranceSettings("activeValue", ingameLevel.ToString());
-            settingsController.setVibranceSettings("inactiveValue", windowsLevel.ToString());
-            settingsController.setVibranceSettings("keepActive", keepActive.ToString());
-            settingsController.setVibranceSettings("refreshRate", refreshRate.ToString());
-            settingsController.setVibranceSettings("multipleMonitors", multipleMonitors.ToString());
+
+            settingsController.setVibranceSettings(
+                ingameLevel.ToString(),
+                windowsLevel.ToString(),
+                keepActive.ToString(),
+                refreshRate.ToString(),
+                multipleMonitors.ToString()
+            );
         }
     }
 }

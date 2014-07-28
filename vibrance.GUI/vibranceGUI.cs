@@ -223,20 +223,18 @@ namespace vibrance.GUI
             {
                 if (!autostartController.isProgramRegistered(appName))
                 {
-                    bool success = autostartController.registerProgram(appName, "\"" + Application.ExecutablePath.ToString() + "\" -minimized");
-                    if (!success)
-                        listBoxLog.Items.Add("Registering to Autostart failed!");
-                    else
+                    if (autostartController.registerProgram(appName, "\"" + Application.ExecutablePath.ToString() + "\" -minimized"))
                         listBoxLog.Items.Add("Registered to Autostart!");
+                    else
+                        listBoxLog.Items.Add("Registering to Autostart failed!");       
                 }
             }
             else
             {
-                bool success = autostartController.unregisterProgram(appName);
-                if (!success)
-                    listBoxLog.Items.Add("Unregistering from Autostart failed!");
-                else
+                if (autostartController.unregisterProgram(appName))
                     listBoxLog.Items.Add("Unregistered from Autostart!");
+                else
+                    listBoxLog.Items.Add("Unregistering from Autostart failed!");
             }
         }
 

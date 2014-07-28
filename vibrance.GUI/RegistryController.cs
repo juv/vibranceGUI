@@ -77,24 +77,5 @@ namespace vibrance.GUI
             }
             return false;
         }
-
-        /*public bool isVcInstalled()
-        {
-            try
-            {
-
-                RegistryKey vc = Registry.LocalMachine.OpenSubKey(vcKey, false);
-                Object value = vc.GetValue("Install");
-                if (value != null)
-                {
-                    return value.ToString().Equals("1");
-                }
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-            return false;
-        }*/
     }
 }

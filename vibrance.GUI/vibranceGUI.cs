@@ -111,7 +111,7 @@ namespace vibrance.GUI
 
         private void settingsBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            Thread.Sleep(10000);
+            Thread.Sleep(1000);
             int ingameLevel = 0, windowsLevel = 0, refreshRate = 0;
             bool keepActive = false, multipleMonitors = false;
             this.Invoke((MethodInvoker)delegate

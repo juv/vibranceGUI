@@ -164,23 +164,27 @@ namespace vibrance.GUI
 
         private void textBoxRefreshRate_TextChanged(object sender, EventArgs e)
         {
-            int refreshRate = -1;
-            if (!int.TryParse(textBoxRefreshRate.Text, out refreshRate))
+            if (v != null)
             {
-                textBoxRefreshRate.Text = "5000";
-            }
-            else if (refreshRate > 200)
-            {
-                v.setSleepInterval(refreshRate);
-                if (!settingsBackgroundWorker.IsBusy)
+                int refreshRate = -1;
+
+                if (!int.TryParse(textBoxRefreshRate.Text, out refreshRate))
                 {
-                    settingsBackgroundWorker.RunWorkerAsync();
+                    textBoxRefreshRate.Text = "5000";
                 }
-                listBoxLog.Items.Add("Refresh rate has been set to: " + refreshRate + " ms");
-            }
-            else
-            {
-                listBoxLog.Items.Add("The refresh rate must be larger than 200 ms!");
+                else if (refreshRate > 200)
+                {
+                    v.setSleepInterval(refreshRate);
+                    if (!settingsBackgroundWorker.IsBusy)
+                    {
+                        settingsBackgroundWorker.RunWorkerAsync();
+                    }
+                    listBoxLog.Items.Add("Refresh rate has been set to: " + refreshRate + " ms");
+                }
+                else
+                {
+                    listBoxLog.Items.Add("The refresh rate must be larger than 200 ms!");
+                }
             }
         }
 

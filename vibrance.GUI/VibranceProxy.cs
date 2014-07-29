@@ -87,7 +87,7 @@ namespace vibrance.GUI
         NVAPI_GPU_WORKSTATION_FEATURE_INCOMPLETE = -192, NVAPI_STEREO_INIT_ACTIVATION_NOT_DONE = -193, NVAPI_SYNC_NOT_ACTIVE = -194, NVAPI_SYNC_MASTER_NOT_FOUND = -195,
         NVAPI_INVALID_SYNC_TOPOLOGY = -196
     };
-
+    
     [Flags()]
     public enum DisplayDeviceStateFlags : int
     {
@@ -256,7 +256,7 @@ namespace vibrance.GUI
                 NV_DISPLAY_DVC_INFO info = new NV_DISPLAY_DVC_INFO();
                 if (getDVCInfo(ref info, vibranceInfo.defaultHandle))
                 {
-                    if (info.currentLevel != NVAPI_DEFAULT_LEVEL)
+                    if (info.currentLevel != vibranceInfo.userVibranceSettingDefault)
                     {
                         setDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault);
                     }
@@ -402,8 +402,8 @@ namespace vibrance.GUI
 
         public void handleDVCExit()
         {
-            if (!equalsDVCLevel(vibranceInfo.defaultHandle, NVAPI_DEFAULT_LEVEL))
-                setDVCLevel(vibranceInfo.defaultHandle, NVAPI_DEFAULT_LEVEL);
+            if (!equalsDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault))
+                setDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault);
         }
     }
 }

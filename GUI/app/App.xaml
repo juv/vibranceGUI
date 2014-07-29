@@ -1,0 +1,36 @@
+﻿<Application x:Class="gui.app.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:app="clr-namespace:gui.app"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:view="clr-namespace:gui.app.mvvm.view"
+             xmlns:viewmodel="clr-namespace:gui.app.mvvm.viewmodel"
+             StartupUri="mvvm/View/ShellView.xaml"
+             mc:Ignorable="d">
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/FlatSlider.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <viewmodel:ViewModelLocator x:Key="Locator"
+                                        d:IsDataSource="True" />
+
+
+
+            <DataTemplate DataType="{x:Type viewmodel:AmdViewModel}">
+                <view:AmdView />
+            </DataTemplate>
+            <Image x:Key="twitter_icon"
+                   Source="mvvm/image/Twitter_bird_icon - Kopie.png" />
+
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

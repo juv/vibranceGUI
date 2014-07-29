@@ -16,6 +16,7 @@ namespace vibrance.GUI
         private VibranceProxy v;
         private RegistryController registryController;
         private AutoResetEvent resetEvent;
+        public bool silenced = false;
         private const string appName = "vibranceGUI";
         private const string twitterLink = "https://twitter.com/juvlarN";
 
@@ -53,7 +54,7 @@ namespace vibrance.GUI
                 readVibranceSettings(out vibranceIngameLevel, out vibranceWindowsLevel, out keepActive, out refreshRate, out multipleMonitors);
             });
 
-            v = new VibranceProxy(multipleMonitors);
+            v = new VibranceProxy(multipleMonitors, silenced);
             if (v.vibranceInfo.isInitialized)
             {
                 backgroundWorker.ReportProgress(1);

@@ -268,7 +268,7 @@ namespace vibrance.GUI
             this.statusLabel.ForeColor = Color.Red;
             this.Update();
             listBoxLog.Items.Add("Initiating observer thread exit... ");
-            if (v.vibranceInfo.isInitialized)
+            if (v != null && v.vibranceInfo.isInitialized)
             {
                 v.setShouldRun(false);
                 resetEvent.WaitOne();

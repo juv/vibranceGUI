@@ -16,6 +16,7 @@ namespace vibrance.GUI
         private VibranceProxy v;
         private RegistryController registryController;
         private AutoResetEvent resetEvent;
+        public bool silenced = false;
         private const string appName = "vibranceGUI";
         private const string twitterLink = "https://twitter.com/juvlarN";
 
@@ -53,7 +54,7 @@ namespace vibrance.GUI
                 readVibranceSettings(out vibranceIngameLevel, out vibranceWindowsLevel, out keepActive, out refreshRate, out multipleMonitors);
             });
 
-            v = new VibranceProxy(multipleMonitors);
+            v = new VibranceProxy(multipleMonitors, silenced);
             if (v.vibranceInfo.isInitialized)
             {
                 backgroundWorker.ReportProgress(1);
@@ -111,7 +112,7 @@ namespace vibrance.GUI
 
         private void settingsBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            Thread.Sleep(10000);
+            Thread.Sleep(1000);
             int ingameLevel = 0, windowsLevel = 0, refreshRate = 0;
             bool keepActive = false, multipleMonitors = false;
             this.Invoke((MethodInvoker)delegate
@@ -164,23 +165,27 @@ namespace vibrance.GUI
 
         private void textBoxRefreshRate_TextChanged(object sender, EventArgs e)
         {
-            int refreshRate = -1;
-            if (!int.TryParse(textBoxRefreshRate.Text, out refreshRate))
+            if (v != null)
             {
-                textBoxRefreshRate.Text = "5000";
-            }
-            else if (refreshRate > 200)
-            {
-                v.setSleepInterval(refreshRate);
-                if (!settingsBackgroundWorker.IsBusy)
+                int refreshRate = -1;
+
+                if (!int.TryParse(textBoxRefreshRate.Text, out refreshRate))
                 {
-                    settingsBackgroundWorker.RunWorkerAsync();
+                    textBoxRefreshRate.Text = "5000";
                 }
-                listBoxLog.Items.Add("Refresh rate has been set to: " + refreshRate + " ms");
-            }
-            else
-            {
-                listBoxLog.Items.Add("The refresh rate must be larger than 200 ms!");
+                else if (refreshRate > 200)
+                {
+                    v.setSleepInterval(refreshRate);
+                    if (!settingsBackgroundWorker.IsBusy)
+                    {
+                        settingsBackgroundWorker.RunWorkerAsync();
+                    }
+                    listBoxLog.Items.Add("Refresh rate has been set to: " + refreshRate + " ms");
+                }
+                else
+                {
+                    listBoxLog.Items.Add("The refresh rate must be greater than 200 ms!");
+                }
             }
         }
 
@@ -194,7 +199,7 @@ namespace vibrance.GUI
                     settingsBackgroundWorker.RunWorkerAsync();
                 }
                 if (checkBoxKeepActive.Checked)
-                    listBoxLog.Items.Add("Vibrance level will keep active after you tabbed out.");
+                    listBoxLog.Items.Add("Vibrance stays at ingame level when tabbed out.");
             }
         }
 
@@ -208,7 +213,7 @@ namespace vibrance.GUI
                     settingsBackgroundWorker.RunWorkerAsync();
                 }
                 if (checkBoxKeepActive.Checked)
-                    listBoxLog.Items.Add("Reading monitor infos..");
+                    listBoxLog.Items.Add("Reading monitor information..");
             }
         }
 
@@ -219,20 +224,18 @@ namespace vibrance.GUI
             {
                 if (!autostartController.isProgramRegistered(appName))
                 {
-                    bool success = autostartController.registerProgram(appName, "\"" + Application.ExecutablePath.ToString() + "\" -minimized");
-                    if (!success)
-                        listBoxLog.Items.Add("Registering to Autostart failed!");
-                    else
+                    if (autostartController.registerProgram(appName, "\"" + Application.ExecutablePath.ToString() + "\" -minimized"))
                         listBoxLog.Items.Add("Registered to Autostart!");
+                    else
+                        listBoxLog.Items.Add("Registering to Autostart failed!");       
                 }
             }
             else
             {
-                bool success = autostartController.unregisterProgram(appName);
-                if (!success)
-                    listBoxLog.Items.Add("Unregistering from Autostart failed!");
-                else
+                if (autostartController.unregisterProgram(appName))
                     listBoxLog.Items.Add("Unregistered from Autostart!");
+                else
+                    listBoxLog.Items.Add("Unregistering from Autostart failed!");
             }
         }
 
@@ -293,11 +296,14 @@ namespace vibrance.GUI
         private void saveVibranceSettings(int ingameLevel, int windowsLevel, bool keepActive, int refreshRate, bool multipleMonitors)
         {
             SettingsController settingsController = new SettingsController();
-            settingsController.setVibranceSettings("activeValue", ingameLevel.ToString());
-            settingsController.setVibranceSettings("inactiveValue", windowsLevel.ToString());
-            settingsController.setVibranceSettings("keepActive", keepActive.ToString());
-            settingsController.setVibranceSettings("refreshRate", refreshRate.ToString());
-            settingsController.setVibranceSettings("multipleMonitors", multipleMonitors.ToString());
+
+            settingsController.setVibranceSettings(
+                ingameLevel.ToString(),
+                windowsLevel.ToString(),
+                keepActive.ToString(),
+                refreshRate.ToString(),
+                multipleMonitors.ToString()
+            );
         }
     }
 }

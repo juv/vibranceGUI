@@ -16,11 +16,12 @@ namespace vibrance.GUI
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             vibranceGUI vibrance = new vibranceGUI();
-            if (args.Length == 1 && "-minimized".Equals(args[0]))
+            if (args.Contains("-minimized"))
             {
                 vibrance.WindowState = FormWindowState.Minimized;
                 vibrance.ShowInTaskbar = false;
             }
+            vibrance.silenced = args.Contains("-silenced");
             Application.Run(vibrance);
         }
     }

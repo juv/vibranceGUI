@@ -232,7 +232,7 @@ namespace vibrance.GUI
 
         public VIBRANCE_INFO vibranceInfo;
 
-        public VibranceProxy(bool multipleMonitors)
+        public VibranceProxy(bool multipleMonitors, bool isSilenced = false)
         {
             try
             {
@@ -250,7 +250,7 @@ namespace vibrance.GUI
 
                 if (multipleMonitors)
                 {
-                    adjustMultipleMonitorsSetting(multipleMonitors);
+                    adjustMultipleMonitorsSetting(multipleMonitors, isSilenced);
                 }
 
                 NV_DISPLAY_DVC_INFO info = new NV_DISPLAY_DVC_INFO();
@@ -271,24 +271,24 @@ namespace vibrance.GUI
 
         }
 
-        public bool adjustMultipleMonitorsSetting(bool flag)
+        public bool adjustMultipleMonitorsSetting(bool flag, bool isSilenced = false)
         {
             if (flag)
             {
                 if (Screen.AllScreens.Length > 1)
                 {
-                    MessageBox.Show(VibranceProxy.NVAPI_WARNING_MULTIPLE_MONITORS);
-                    int csgoHandle = getCsgoDisplayHandle();
-                    if (csgoHandle != -1)
+                    if (!isSilenced)
                     {
-                        vibranceInfo.defaultHandle = csgoHandle;
-                        return true;
-                    }
-                    else
-                    {
+                        MessageBox.Show(VibranceProxy.NVAPI_WARNING_MULTIPLE_MONITORS);
+                        int csgoHandle = getCsgoDisplayHandle();
+                        if (csgoHandle != -1)
+                        {
+                            vibranceInfo.defaultHandle = csgoHandle;
+                            return true;
+                        }
                         MessageBox.Show(VibranceProxy.NVAPI_ERROR_GET_MONITOR_HANDLE);
-                        vibranceInfo.defaultHandle = enumerateNvidiaDisplayHandle();
                     }
+                    vibranceInfo.defaultHandle = enumerateNvidiaDisplayHandle();
                 }
             }
             else

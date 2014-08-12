@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace vibrance.GUI
@@ -13,6 +10,14 @@ namespace vibrance.GUI
         [STAThread]
         static void Main(string[] args)
         {
+            bool result = false;
+            Mutex mutex = new Mutex(true, "vibranceGUI~Mutex", out result);
+            if (!result)
+            {
+                MessageBox.Show("You can run vibranceGUI only once at a time!", "vibranceGUI", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             vibranceGUI vibrance = new vibranceGUI();
@@ -23,6 +28,8 @@ namespace vibrance.GUI
             }
             vibrance.silenced = args.Contains("-silenced");
             Application.Run(vibrance);
+
+            GC.KeepAlive(mutex);
         }
     }
 }

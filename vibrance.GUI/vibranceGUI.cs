@@ -92,8 +92,11 @@ namespace vibrance.GUI
 
         private void trackBarIngameLevel_Scroll(object sender, EventArgs e)
         {
+            NvidiaSettingsWrapper setting = NvidiaSettingsWrapper.find(trackBarIngameLevel.Value);
+            if (setting == null)
+                return;
             v.setVibranceIngameLevel(trackBarIngameLevel.Value);
-            labelIngameLevel.Text = "" + trackBarIngameLevel.Value;
+            labelIngameLevel.Text = setting.getPercentage;
             if (!settingsBackgroundWorker.IsBusy)
             {
                 settingsBackgroundWorker.RunWorkerAsync();
@@ -102,8 +105,11 @@ namespace vibrance.GUI
 
         private void trackBarWindowsLevel_Scroll(object sender, EventArgs e)
         {
-            v.setVibranceIngameLevel(trackBarWindowsLevel.Value);
-            labelWindowsLevel.Text = "" + trackBarWindowsLevel.Value;
+            NvidiaSettingsWrapper setting = NvidiaSettingsWrapper.find(trackBarWindowsLevel.Value);
+            if (setting == null)
+                return;
+            v.setVibranceWindowsLevel(trackBarWindowsLevel.Value);
+            labelWindowsLevel.Text = setting.getPercentage;
             if (!settingsBackgroundWorker.IsBusy)
             {
                 settingsBackgroundWorker.RunWorkerAsync();
@@ -284,8 +290,10 @@ namespace vibrance.GUI
             SettingsController settingsController = new SettingsController();
             settingsController.readVibranceSettings(out vibranceIngameLevel, out vibranceWindowsLevel, out keepActive, out refreshRate, out multipleMonitors);
 
-            labelWindowsLevel.Text = "" + vibranceWindowsLevel;
-            labelIngameLevel.Text = "" + vibranceIngameLevel;
+            //no null check needed, SettingsController will always return matching values.
+            labelWindowsLevel.Text = NvidiaSettingsWrapper.find(vibranceWindowsLevel).getPercentage;
+            labelIngameLevel.Text = NvidiaSettingsWrapper.find(vibranceIngameLevel).getPercentage;
+
             trackBarWindowsLevel.Value = vibranceWindowsLevel;
             trackBarIngameLevel.Value = vibranceIngameLevel;
             checkBoxKeepActive.Checked = keepActive;

@@ -37,6 +37,7 @@
             this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.checkBoxAutostart = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.checkBoxMonitors = new System.Windows.Forms.CheckBox();
             this.checkBoxKeepActive = new System.Windows.Forms.CheckBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.labelRefreshRate = new System.Windows.Forms.Label();
@@ -53,7 +54,6 @@
             this.twitterLabel = new System.Windows.Forms.Label();
             this.linkLabelTwitter = new System.Windows.Forms.LinkLabel();
             this.settingsBackgroundWorker = new System.ComponentModel.BackgroundWorker();
-            this.checkBoxMonitors = new System.Windows.Forms.CheckBox();
             this.contextMenuStrip.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -132,6 +132,17 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Settings";
             // 
+            // checkBoxMonitors
+            // 
+            this.checkBoxMonitors.AutoSize = true;
+            this.checkBoxMonitors.Location = new System.Drawing.Point(6, 65);
+            this.checkBoxMonitors.Name = "checkBoxMonitors";
+            this.checkBoxMonitors.Size = new System.Drawing.Size(125, 17);
+            this.checkBoxMonitors.TabIndex = 15;
+            this.checkBoxMonitors.Text = "Use multiple monitors";
+            this.checkBoxMonitors.UseVisualStyleBackColor = true;
+            this.checkBoxMonitors.CheckedChanged += new System.EventHandler(this.checkBoxMonitors_CheckedChanged);
+            // 
             // checkBoxKeepActive
             // 
             this.checkBoxKeepActive.AutoSize = true;
@@ -186,7 +197,7 @@
             // labelWindowsLevel
             // 
             this.labelWindowsLevel.AutoSize = true;
-            this.labelWindowsLevel.Location = new System.Drawing.Point(152, 22);
+            this.labelWindowsLevel.Location = new System.Drawing.Point(148, 22);
             this.labelWindowsLevel.Name = "labelWindowsLevel";
             this.labelWindowsLevel.Size = new System.Drawing.Size(0, 13);
             this.labelWindowsLevel.TabIndex = 1;
@@ -223,7 +234,7 @@
             // labelIngameLevel
             // 
             this.labelIngameLevel.AutoSize = true;
-            this.labelIngameLevel.Location = new System.Drawing.Point(153, 23);
+            this.labelIngameLevel.Location = new System.Drawing.Point(148, 23);
             this.labelIngameLevel.Name = "labelIngameLevel";
             this.labelIngameLevel.Size = new System.Drawing.Size(0, 13);
             this.labelIngameLevel.TabIndex = 10;
@@ -278,17 +289,6 @@
             // 
             this.settingsBackgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.settingsBackgroundWorker_DoWork);
             this.settingsBackgroundWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.settingsBackgroundWorker_RunWorkerCompleted);
-            // 
-            // checkBoxMonitors
-            // 
-            this.checkBoxMonitors.AutoSize = true;
-            this.checkBoxMonitors.Location = new System.Drawing.Point(6, 65);
-            this.checkBoxMonitors.Name = "checkBoxMonitors";
-            this.checkBoxMonitors.Size = new System.Drawing.Size(125, 17);
-            this.checkBoxMonitors.TabIndex = 15;
-            this.checkBoxMonitors.Text = "Use multiple monitors";
-            this.checkBoxMonitors.UseVisualStyleBackColor = true;
-            this.checkBoxMonitors.CheckedChanged += new System.EventHandler(this.checkBoxMonitors_CheckedChanged);
             // 
             // vibranceGUI
             // 

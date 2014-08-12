@@ -89,6 +89,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="RegistryController.cs" />
+    <Compile Include="NvidiaSettingsWrapper.cs" />
     <Compile Include="vibranceGUI.cs">
       <SubType>Form</SubType>
     </Compile>

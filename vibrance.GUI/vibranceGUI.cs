@@ -14,6 +14,8 @@ namespace vibrance.GUI
         public bool silenced = false;
         private const string appName = "vibranceGUI";
         private const string twitterLink = "https://twitter.com/juvlarN";
+        private const string paypalDonationLink = "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=JDQFNKNNEW356";
+
 
         public vibranceGUI()
         {
@@ -42,14 +44,14 @@ namespace vibrance.GUI
         private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             int vibranceIngameLevel = VibranceProxy.NVAPI_MAX_LEVEL, vibranceWindowsLevel = VibranceProxy.NVAPI_DEFAULT_LEVEL, refreshRate = 5000;
-            bool keepActive = false, multipleMonitors = false;
+            bool keepActive = false;
 
             this.Invoke((MethodInvoker)delegate
             {
-                readVibranceSettings(out vibranceIngameLevel, out vibranceWindowsLevel, out keepActive, out refreshRate, out multipleMonitors);
+                readVibranceSettings(out vibranceIngameLevel, out vibranceWindowsLevel, out keepActive, out refreshRate);
             });
 
-            v = new VibranceProxy(multipleMonitors, silenced);
+            v = new VibranceProxy(silenced);
             if (v.vibranceInfo.isInitialized)
             {
                 backgroundWorker.ReportProgress(1);
@@ -115,16 +117,15 @@ namespace vibrance.GUI
         {
             Thread.Sleep(1000);
             int ingameLevel = 0, windowsLevel = 0, refreshRate = 0;
-            bool keepActive = false, multipleMonitors = false;
+            bool keepActive = false;
             this.Invoke((MethodInvoker)delegate
             {
                 ingameLevel = trackBarIngameLevel.Value;
                 windowsLevel = trackBarWindowsLevel.Value;
                 keepActive = checkBoxKeepActive.Checked;
                 refreshRate = int.Parse(textBoxRefreshRate.Text);
-                multipleMonitors = checkBoxMonitors.Checked;
             });
-            saveVibranceSettings(ingameLevel, windowsLevel, keepActive, refreshRate, multipleMonitors);
+            saveVibranceSettings(ingameLevel, windowsLevel, keepActive, refreshRate);
         }
 
         private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -176,12 +177,15 @@ namespace vibrance.GUI
                 }
                 else if (refreshRate > 200)
                 {
-                    v.setSleepInterval(refreshRate);
-                    if (!settingsBackgroundWorker.IsBusy)
+                    if (v != null)
                     {
-                        settingsBackgroundWorker.RunWorkerAsync();
+                        v.setSleepInterval(refreshRate);
+                        if (!settingsBackgroundWorker.IsBusy)
+                        {
+                            settingsBackgroundWorker.RunWorkerAsync();
+                        }
+                        listBoxLog.Items.Add("Refresh rate has been set to: " + refreshRate + " ms");
                     }
-                    listBoxLog.Items.Add("Refresh rate has been set to: " + refreshRate + " ms");
                 }
                 else
                 {
@@ -201,20 +205,6 @@ namespace vibrance.GUI
                 }
                 if (checkBoxKeepActive.Checked)
                     listBoxLog.Items.Add("Vibrance stays at ingame level when tabbed out.");
-            }
-        }
-
-        private void checkBoxMonitors_CheckedChanged(object sender, EventArgs e)
-        {
-            if (v != null)
-            {
-                v.adjustMultipleMonitorsSetting(checkBoxMonitors.Checked);
-                if (!settingsBackgroundWorker.IsBusy)
-                {
-                    settingsBackgroundWorker.RunWorkerAsync();
-                }
-                if (checkBoxKeepActive.Checked)
-                    listBoxLog.Items.Add("Reading monitor information..");
             }
         }
 
@@ -259,7 +249,7 @@ namespace vibrance.GUI
                 this.trackBarIngameLevel.Enabled = flag;
                 this.textBoxRefreshRate.Enabled = flag;
                 this.checkBoxAutostart.Enabled = flag;
-                this.checkBoxMonitors.Enabled = flag;
+                //this.checkBoxMonitors.Enabled = flag;
             });
         }
 
@@ -277,13 +267,13 @@ namespace vibrance.GUI
             }
         }
 
-        private void readVibranceSettings(out int vibranceIngameLevel, out int vibranceWindowsLevel, out bool keepActive, out int refreshRate, out bool multipleMonitors)
+        private void readVibranceSettings(out int vibranceIngameLevel, out int vibranceWindowsLevel, out bool keepActive, out int refreshRate)
         {
             registryController = new RegistryController();
             this.checkBoxAutostart.Checked = registryController.isProgramRegistered(appName);
 
             SettingsController settingsController = new SettingsController();
-            settingsController.readVibranceSettings(out vibranceIngameLevel, out vibranceWindowsLevel, out keepActive, out refreshRate, out multipleMonitors);
+            settingsController.readVibranceSettings(out vibranceIngameLevel, out vibranceWindowsLevel, out keepActive, out refreshRate);
 
             //no null check needed, SettingsController will always return matching values.
             labelWindowsLevel.Text = NvidiaSettingsWrapper.find(vibranceWindowsLevel).getPercentage;
@@ -292,11 +282,10 @@ namespace vibrance.GUI
             trackBarWindowsLevel.Value = vibranceWindowsLevel;
             trackBarIngameLevel.Value = vibranceIngameLevel;
             checkBoxKeepActive.Checked = keepActive;
-            checkBoxMonitors.Checked = multipleMonitors;
             textBoxRefreshRate.Text = refreshRate.ToString();
         }
 
-        private void saveVibranceSettings(int ingameLevel, int windowsLevel, bool keepActive, int refreshRate, bool multipleMonitors)
+        private void saveVibranceSettings(int ingameLevel, int windowsLevel, bool keepActive, int refreshRate)
         {
             SettingsController settingsController = new SettingsController();
 
@@ -304,9 +293,13 @@ namespace vibrance.GUI
                 ingameLevel.ToString(),
                 windowsLevel.ToString(),
                 keepActive.ToString(),
-                refreshRate.ToString(),
-                multipleMonitors.ToString()
+                refreshRate.ToString()
             );
+        }
+
+        private void buttonPaypal_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start(vibranceGUI.paypalDonationLink);
         }
     }
 }

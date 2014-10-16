@@ -27,11 +27,10 @@ namespace vibrance.GUI
         const string szKeyNameActive = "activeValue";
         const string szKeyNameKeepActive = "keepActive";
         const string szKeyNameRefreshRate = "refreshRate";
-        const string szKeyNameMultipleMonitors = "multipleMonitors";
 
         private string fileName = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToString() + "\\vibranceGUI.ini";
 
-        public bool setVibranceSettings(string ingameLevel, string windowsLevel, string keepActive, string refreshRate, string multipleMonitors)
+        public bool setVibranceSettings(string ingameLevel, string windowsLevel, string keepActive, string refreshRate)
         {
             if (!prepareFile())
             {
@@ -42,7 +41,6 @@ namespace vibrance.GUI
             WritePrivateProfileString(szSectionName, "inactiveValue", windowsLevel, fileName);
             WritePrivateProfileString(szSectionName, "keepActive", keepActive, fileName);
             WritePrivateProfileString(szSectionName, "refreshRate", refreshRate, fileName);
-            WritePrivateProfileString(szSectionName, "multipleMonitors", multipleMonitors, fileName);
 
             return (Marshal.GetLastWin32Error() == 0);
         }
@@ -74,7 +72,7 @@ namespace vibrance.GUI
             return true;
         }
 
-        public void readVibranceSettings(out int vibranceIngameLevel, out int vibranceWindowsLevel, out bool keepActive, out int refreshRate, out bool multipleMonitors)
+        public void readVibranceSettings(out int vibranceIngameLevel, out int vibranceWindowsLevel, out bool keepActive, out int refreshRate)
         {
             if (!isFileExisting(fileName))
             {
@@ -82,7 +80,6 @@ namespace vibrance.GUI
                 vibranceWindowsLevel = VibranceProxy.NVAPI_DEFAULT_LEVEL;
                 refreshRate = VibranceProxy.NVAPI_DEFAULT_REFRESH_RATE;
                 keepActive = false;
-                multipleMonitors = false;
                 return;
             }
 
@@ -122,21 +119,12 @@ namespace vibrance.GUI
                 Convert.ToUInt32(szValueKeepActive.Capacity),
                 fileName);
 
-            StringBuilder szValueMultipleMonitors = new StringBuilder(1024);
-            GetPrivateProfileString(szSectionName,
-                szKeyNameMultipleMonitors,
-                szDefault,
-                szValueMultipleMonitors,
-                Convert.ToUInt32(szValueMultipleMonitors.Capacity),
-                fileName);
-
             try
             {
                 vibranceWindowsLevel = int.Parse(szValueInactive.ToString());
                 vibranceIngameLevel = int.Parse(szValueActive.ToString());
                 refreshRate = int.Parse(szValueRefreshRate.ToString());
                 keepActive = bool.Parse(szValueKeepActive.ToString());
-                multipleMonitors = bool.Parse(szValueMultipleMonitors.ToString());
             }
             catch (Exception)
             {
@@ -144,7 +132,6 @@ namespace vibrance.GUI
                 vibranceWindowsLevel = VibranceProxy.NVAPI_DEFAULT_LEVEL;
                 refreshRate = VibranceProxy.NVAPI_DEFAULT_REFRESH_RATE;
                 keepActive = false;
-                multipleMonitors = false;
                 return;
             }
 

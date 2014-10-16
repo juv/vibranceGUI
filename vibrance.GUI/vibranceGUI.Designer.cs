@@ -37,7 +37,6 @@
             this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.checkBoxAutostart = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.checkBoxMonitors = new System.Windows.Forms.CheckBox();
             this.checkBoxKeepActive = new System.Windows.Forms.CheckBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.labelRefreshRate = new System.Windows.Forms.Label();
@@ -51,9 +50,12 @@
             this.statusLabel = new System.Windows.Forms.Label();
             this.observerStatusLabel = new System.Windows.Forms.Label();
             this.listBoxLog = new System.Windows.Forms.ListBox();
-            this.twitterLabel = new System.Windows.Forms.Label();
+            this.labelTwitter = new System.Windows.Forms.Label();
             this.linkLabelTwitter = new System.Windows.Forms.LinkLabel();
             this.settingsBackgroundWorker = new System.ComponentModel.BackgroundWorker();
+            this.buttonPaypal = new System.Windows.Forms.Button();
+            this.labelPaypal = new System.Windows.Forms.Label();
+            this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.contextMenuStrip.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -66,7 +68,7 @@
             // notifyIcon
             // 
             this.notifyIcon.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
-            this.notifyIcon.BalloonTipText = "Running minimized!";
+            this.notifyIcon.BalloonTipText = "Running minimized... Like the program? Consider donating!";
             this.notifyIcon.BalloonTipTitle = "Vibrance Control";
             this.notifyIcon.ContextMenuStrip = this.contextMenuStrip;
             this.notifyIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon.Icon")));
@@ -119,29 +121,17 @@
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.checkBoxMonitors);
             this.groupBox1.Controls.Add(this.checkBoxKeepActive);
             this.groupBox1.Controls.Add(this.groupBox4);
             this.groupBox1.Controls.Add(this.groupBox3);
             this.groupBox1.Controls.Add(this.groupBox2);
             this.groupBox1.Controls.Add(this.checkBoxAutostart);
-            this.groupBox1.Location = new System.Drawing.Point(13, 27);
+            this.groupBox1.Location = new System.Drawing.Point(13, 82);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(397, 245);
+            this.groupBox1.Size = new System.Drawing.Size(397, 220);
             this.groupBox1.TabIndex = 15;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Settings";
-            // 
-            // checkBoxMonitors
-            // 
-            this.checkBoxMonitors.AutoSize = true;
-            this.checkBoxMonitors.Location = new System.Drawing.Point(6, 65);
-            this.checkBoxMonitors.Name = "checkBoxMonitors";
-            this.checkBoxMonitors.Size = new System.Drawing.Size(125, 17);
-            this.checkBoxMonitors.TabIndex = 15;
-            this.checkBoxMonitors.Text = "Use multiple monitors";
-            this.checkBoxMonitors.UseVisualStyleBackColor = true;
-            this.checkBoxMonitors.CheckedChanged += new System.EventHandler(this.checkBoxMonitors_CheckedChanged);
             // 
             // checkBoxKeepActive
             // 
@@ -151,6 +141,8 @@
             this.checkBoxKeepActive.Size = new System.Drawing.Size(221, 17);
             this.checkBoxKeepActive.TabIndex = 14;
             this.checkBoxKeepActive.Text = "Keep Vibrance on when CSGO is running";
+            this.toolTip.SetToolTip(this.checkBoxKeepActive, "While CSGO is running, the vibrance level will be fixed on your ingame vibrance l" +
+        "evel. Tabbing out to your Desktop will not set to windows level. ");
             this.checkBoxKeepActive.UseVisualStyleBackColor = true;
             this.checkBoxKeepActive.CheckedChanged += new System.EventHandler(this.checkBoxKeepActive_CheckedChanged);
             // 
@@ -158,7 +150,7 @@
             // 
             this.groupBox4.Controls.Add(this.labelRefreshRate);
             this.groupBox4.Controls.Add(this.textBoxRefreshRate);
-            this.groupBox4.Location = new System.Drawing.Point(198, 88);
+            this.groupBox4.Location = new System.Drawing.Point(198, 61);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(193, 72);
             this.groupBox4.TabIndex = 13;
@@ -187,7 +179,7 @@
             // 
             this.groupBox3.Controls.Add(this.labelWindowsLevel);
             this.groupBox3.Controls.Add(this.trackBarWindowsLevel);
-            this.groupBox3.Location = new System.Drawing.Point(7, 166);
+            this.groupBox3.Location = new System.Drawing.Point(7, 139);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(182, 72);
             this.groupBox3.TabIndex = 12;
@@ -215,7 +207,7 @@
             // 
             this.groupBox2.Controls.Add(this.trackBarIngameLevel);
             this.groupBox2.Controls.Add(this.labelIngameLevel);
-            this.groupBox2.Location = new System.Drawing.Point(6, 88);
+            this.groupBox2.Location = new System.Drawing.Point(6, 61);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(183, 72);
             this.groupBox2.TabIndex = 11;
@@ -242,7 +234,7 @@
             // statusLabel
             // 
             this.statusLabel.AutoSize = true;
-            this.statusLabel.Location = new System.Drawing.Point(103, 288);
+            this.statusLabel.Location = new System.Drawing.Point(103, 313);
             this.statusLabel.Name = "statusLabel";
             this.statusLabel.Size = new System.Drawing.Size(61, 13);
             this.statusLabel.TabIndex = 14;
@@ -251,7 +243,7 @@
             // observerStatusLabel
             // 
             this.observerStatusLabel.AutoSize = true;
-            this.observerStatusLabel.Location = new System.Drawing.Point(9, 288);
+            this.observerStatusLabel.Location = new System.Drawing.Point(9, 313);
             this.observerStatusLabel.Name = "observerStatusLabel";
             this.observerStatusLabel.Size = new System.Drawing.Size(87, 13);
             this.observerStatusLabel.TabIndex = 13;
@@ -260,19 +252,19 @@
             // listBoxLog
             // 
             this.listBoxLog.FormattingEnabled = true;
-            this.listBoxLog.Location = new System.Drawing.Point(12, 304);
+            this.listBoxLog.Location = new System.Drawing.Point(12, 329);
             this.listBoxLog.Name = "listBoxLog";
             this.listBoxLog.Size = new System.Drawing.Size(397, 225);
             this.listBoxLog.TabIndex = 12;
             // 
-            // twitterLabel
+            // labelTwitter
             // 
-            this.twitterLabel.AutoSize = true;
-            this.twitterLabel.Location = new System.Drawing.Point(10, 11);
-            this.twitterLabel.Name = "twitterLabel";
-            this.twitterLabel.Size = new System.Drawing.Size(192, 13);
-            this.twitterLabel.TabIndex = 11;
-            this.twitterLabel.Text = "Follow @juvlarN on twitter for updates: ";
+            this.labelTwitter.AutoSize = true;
+            this.labelTwitter.Location = new System.Drawing.Point(10, 11);
+            this.labelTwitter.Name = "labelTwitter";
+            this.labelTwitter.Size = new System.Drawing.Size(192, 13);
+            this.labelTwitter.TabIndex = 11;
+            this.labelTwitter.Text = "Follow @juvlarN on twitter for updates: ";
             // 
             // linkLabelTwitter
             // 
@@ -290,17 +282,49 @@
             this.settingsBackgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.settingsBackgroundWorker_DoWork);
             this.settingsBackgroundWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.settingsBackgroundWorker_RunWorkerCompleted);
             // 
+            // buttonPaypal
+            // 
+            this.buttonPaypal.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.buttonPaypal.BackColor = System.Drawing.Color.Transparent;
+            this.buttonPaypal.Image = ((System.Drawing.Image)(resources.GetObject("buttonPaypal.Image")));
+            this.buttonPaypal.Location = new System.Drawing.Point(210, 27);
+            this.buttonPaypal.Name = "buttonPaypal";
+            this.buttonPaypal.Size = new System.Drawing.Size(90, 55);
+            this.buttonPaypal.TabIndex = 16;
+            this.toolTip.SetToolTip(this.buttonPaypal, "Click here to donate to vibranceGUI through Paypal");
+            this.buttonPaypal.UseVisualStyleBackColor = false;
+            this.buttonPaypal.Click += new System.EventHandler(this.buttonPaypal_Click);
+            // 
+            // labelPaypal
+            // 
+            this.labelPaypal.AutoSize = true;
+            this.labelPaypal.Location = new System.Drawing.Point(10, 48);
+            this.labelPaypal.Name = "labelPaypal";
+            this.labelPaypal.Size = new System.Drawing.Size(183, 13);
+            this.labelPaypal.TabIndex = 17;
+            this.labelPaypal.Text = "Like the program? Consider donating:";
+            // 
+            // toolTip
+            // 
+            this.toolTip.AutoPopDelay = 5000;
+            this.toolTip.InitialDelay = 100;
+            this.toolTip.IsBalloon = true;
+            this.toolTip.ReshowDelay = 100;
+            // 
             // vibranceGUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(421, 541);
+            this.ClientSize = new System.Drawing.Size(421, 561);
+            this.Controls.Add(this.labelPaypal);
+            this.Controls.Add(this.buttonPaypal);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.statusLabel);
             this.Controls.Add(this.observerStatusLabel);
             this.Controls.Add(this.listBoxLog);
-            this.Controls.Add(this.twitterLabel);
+            this.Controls.Add(this.labelTwitter);
             this.Controls.Add(this.linkLabelTwitter);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "vibranceGUI";
             this.Text = "vibranceGUI";
@@ -342,14 +366,16 @@
         private System.Windows.Forms.Label statusLabel;
         private System.Windows.Forms.Label observerStatusLabel;
         private System.Windows.Forms.ListBox listBoxLog;
-        private System.Windows.Forms.Label twitterLabel;
+        private System.Windows.Forms.Label labelTwitter;
         private System.Windows.Forms.LinkLabel linkLabelTwitter;
         private System.ComponentModel.BackgroundWorker settingsBackgroundWorker;
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.Label labelRefreshRate;
         private System.Windows.Forms.TextBox textBoxRefreshRate;
         private System.Windows.Forms.CheckBox checkBoxKeepActive;
-        private System.Windows.Forms.CheckBox checkBoxMonitors;
+        private System.Windows.Forms.Button buttonPaypal;
+        private System.Windows.Forms.Label labelPaypal;
+        private System.Windows.Forms.ToolTip toolTip;
 
     }
 }

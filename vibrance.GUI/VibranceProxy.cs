@@ -228,7 +228,7 @@ namespace vibrance.GUI
 
         public VIBRANCE_INFO vibranceInfo;
 
-        public VibranceProxy(bool multipleMonitors, bool isSilenced = false)
+        public VibranceProxy(bool isSilenced = false)
         {
             try
             {
@@ -243,11 +243,6 @@ namespace vibrance.GUI
                 getGpuName(gpuHandles, buffer);
                 vibranceInfo.szGpuName = buffer.ToString();
                 vibranceInfo.defaultHandle = enumerateNvidiaDisplayHandle();
-
-                if (multipleMonitors)
-                {
-                    adjustMultipleMonitorsSetting(multipleMonitors, isSilenced);
-                }
 
                 NV_DISPLAY_DVC_INFO info = new NV_DISPLAY_DVC_INFO();
                 if (getDVCInfo(ref info, vibranceInfo.defaultHandle))
@@ -359,6 +354,15 @@ namespace vibrance.GUI
 
                             if (sb != null && sb.ToString().Equals(VibranceProxy.NVAPI_GLOBAL_OFFENSIVE_WINDOW_NAME))
                             {
+                                if (Screen.AllScreens.Length > 1)
+                                {
+                                    int csgoHandle = getCsgoDisplayHandle();
+                                    if (csgoHandle != -1)
+                                    {
+                                        vibranceInfo.defaultHandle = csgoHandle;
+                                    }
+                                }
+
                                 if (!equalsDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingActive))
                                 {
                                     setDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingActive);

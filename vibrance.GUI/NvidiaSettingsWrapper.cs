@@ -47,7 +47,14 @@ namespace vibrance.GUI
         {
             if (settingsList == null)
                 settingsList = generateSettingsWrapper();
-            return settingsList.Find(x => x.getValue == value);
+            NvidiaSettingsWrapper returnWrapper = settingsList.Find(x => x.getValue == value);
+
+            //some values are not stored by nvidia internally. use the value below that. 
+            if (returnWrapper == null)
+            {
+                returnWrapper = find(value + 1);
+            }
+            return returnWrapper;
         }
     }
 }

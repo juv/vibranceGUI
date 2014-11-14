@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
@@ -35,19 +37,7 @@ namespace vibrance.GUI
         public bool shouldRun;
         public bool keepActive;
         public int sleepInterval;
-
-        public VIBRANCE_INFO(bool isInitialized, int activeOutput, int defaultHandle, int userVibranceSettingDefault, int userVibranceSettingActive, String szGpuName, bool shouldRun, bool keepActive, int sleepInterval)
-        {
-            this.isInitialized = isInitialized;
-            this.activeOutput = activeOutput;
-            this.defaultHandle = defaultHandle;
-            this.userVibranceSettingActive = userVibranceSettingActive;
-            this.userVibranceSettingDefault = userVibranceSettingDefault;
-            this.szGpuName = szGpuName;
-            this.shouldRun = shouldRun;
-            this.keepActive = keepActive;
-            this.sleepInterval = sleepInterval;
-        }
+        public List<int> displayHandles;
     }
 
 
@@ -98,7 +88,6 @@ namespace vibrance.GUI
         Disconnect = 0x2000000
     }
 
-
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
     public struct DISPLAY_DEVICE
     {
@@ -137,10 +126,10 @@ namespace vibrance.GUI
 
         [DllImport(
             "vibranceDLL.dll",
-            EntryPoint = "?getActiveOutputs@vibrance@vibranceDLL@@QAEHQAPAH@Z",
+            EntryPoint = "?getActiveOutputs@vibrance@vibranceDLL@@QAEHQAPAH0@Z",
             CallingConvention = CallingConvention.StdCall,
             CharSet = CharSet.Auto)]
-        static extern int getActiveOutputs([In, Out] int[] gpuHandles);
+        static extern int getActiveOutputs([In, Out] int[] gpuHandles, [In, Out] int[] outputIds);
 
         [DllImport(
             "vibranceDLL.dll",
@@ -165,10 +154,10 @@ namespace vibrance.GUI
 
         [DllImport(
             "vibranceDLL.dll",
-            EntryPoint = "?enumerateNvidiaDisplayHandle@vibrance@vibranceDLL@@QAEHXZ",
+            EntryPoint = "?enumerateNvidiaDisplayHandle@vibrance@vibranceDLL@@QAEHH@Z",
             CallingConvention = CallingConvention.StdCall,
             CharSet = CharSet.Auto)]
-        static extern int enumerateNvidiaDisplayHandle();
+        static extern int enumerateNvidiaDisplayHandle(int index);
 
         [DllImport(
             "vibranceDLL.dll",
@@ -197,7 +186,7 @@ namespace vibrance.GUI
             CallingConvention = CallingConvention.StdCall,
             CharSet = CharSet.Auto)]
         static extern bool equalsDVCLevel([In] int defaultHandle, [In] int level);
-
+        
         [DllImport("user32.dll", CharSet = CharSet.Ansi)]
         static extern int GetWindowTextLength([In] IntPtr hWnd);
 
@@ -234,15 +223,19 @@ namespace vibrance.GUI
             {
                 vibranceInfo = new VIBRANCE_INFO();
                 bool ret = initializeLibrary();
-                int[] gpuHandles = new int[NVAPI_MAX_PHYSICAL_GPUS];
-                enumeratePhsyicalGPUs(gpuHandles);
-                vibranceInfo.activeOutput = getActiveOutputs(gpuHandles);
 
+                int[] gpuHandles = new int[NVAPI_MAX_PHYSICAL_GPUS];
+                int[] outputIds = new int[NVAPI_MAX_PHYSICAL_GPUS];
+                enumeratePhsyicalGPUs(gpuHandles);
+
+                enumerateDisplayHandles();
+               
+                vibranceInfo.activeOutput = getActiveOutputs(gpuHandles, outputIds);
                 StringBuilder buffer = new StringBuilder(64);
                 char[] sz = new char[64];
                 getGpuName(gpuHandles, buffer);
                 vibranceInfo.szGpuName = buffer.ToString();
-                vibranceInfo.defaultHandle = enumerateNvidiaDisplayHandle();
+                vibranceInfo.defaultHandle = enumerateNvidiaDisplayHandle(0);
 
                 NV_DISPLAY_DVC_INFO info = new NV_DISPLAY_DVC_INFO();
                 if (getDVCInfo(ref info, vibranceInfo.defaultHandle))
@@ -279,12 +272,12 @@ namespace vibrance.GUI
                         }
                         MessageBox.Show(VibranceProxy.NVAPI_ERROR_GET_MONITOR_HANDLE);
                     }
-                    vibranceInfo.defaultHandle = enumerateNvidiaDisplayHandle();
+                    vibranceInfo.defaultHandle = enumerateNvidiaDisplayHandle(0);
                 }
             }
             else
             {
-                vibranceInfo.defaultHandle = enumerateNvidiaDisplayHandle();
+                vibranceInfo.defaultHandle = enumerateNvidiaDisplayHandle(0);
             }
             return false;
         }
@@ -375,16 +368,16 @@ namespace vibrance.GUI
                     {
                         if (isChanged && !vibranceInfo.keepActive)
                         {
-                            setDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault);
+                            vibranceInfo.displayHandles.ForEach(handle => setDVCLevel(handle, vibranceInfo.userVibranceSettingDefault));
                             isChanged = false;
                         }
                     }
                 }
                 else
                 {
-                    if (isChanged || !equalsDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault))
+                    if (isChanged || !vibranceInfo.displayHandles.TrueForAll(handle => equalsDVCLevel(handle, vibranceInfo.userVibranceSettingDefault)))
                     {
-                        setDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault);
+                        vibranceInfo.displayHandles.ForEach(handle => setDVCLevel(handle, vibranceInfo.userVibranceSettingDefault));
                         isChanged = false;
                     }
 
@@ -402,8 +395,21 @@ namespace vibrance.GUI
 
         public void handleDVCExit()
         {
-            if (!equalsDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault))
-                setDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault);
+            if (!vibranceInfo.displayHandles.TrueForAll(handle => equalsDVCLevel(handle, vibranceInfo.userVibranceSettingDefault)))
+                vibranceInfo.displayHandles.ForEach(handle => setDVCLevel(handle, vibranceInfo.userVibranceSettingDefault));
+        }
+
+        private void enumerateDisplayHandles()
+        {
+            for (int i = 0, displayHandle = 0; displayHandle != -1; i++)
+            {
+                if (vibranceInfo.displayHandles == null)
+                    vibranceInfo.displayHandles = new List<int>();
+
+                displayHandle = enumerateNvidiaDisplayHandle(i);
+                if (displayHandle != -1)
+                    vibranceInfo.displayHandles.Add(displayHandle);
+            }
         }
     }
 }

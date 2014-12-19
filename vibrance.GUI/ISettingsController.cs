@@ -4,6 +4,6 @@ namespace vibrance.GUI
     {
         bool setVibranceSettings(string ingameLevel, string windowsLevel, string keepActive, string refreshRate);
         bool setVibranceSetting(string szKeyName, string value);
-        void readVibranceSettings(out int vibranceIngameLevel, out int vibranceWindowsLevel, out bool keepActive, out int refreshRate);
+        void readVibranceSettings(GraphicsAdapter graphicsAdapter, out int vibranceIngameLevel, out int vibranceWindowsLevel, out bool keepActive, out int refreshRate);
     }
 }

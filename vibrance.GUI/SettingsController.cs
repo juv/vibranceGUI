@@ -72,13 +72,33 @@ namespace vibrance.GUI
             return true;
         }
 
-        public void readVibranceSettings(out int vibranceIngameLevel, out int vibranceWindowsLevel, out bool keepActive, out int refreshRate)
+        public void readVibranceSettings(GraphicsAdapter graphicsAdapter, out int vibranceIngameLevel, out int vibranceWindowsLevel, out bool keepActive, out int refreshRate)
         {
+            int defaultLevel = 0; 
+            int maxLevel = 0;
+            int defaultRefreshRate = 0;
+            int minRefreshRate = 0;
+            if (graphicsAdapter == GraphicsAdapter.NVIDIA)
+            {
+                defaultLevel = NvidiaVibranceProxy.NVAPI_DEFAULT_LEVEL;
+                maxLevel = NvidiaVibranceProxy.NVAPI_MAX_LEVEL;
+                defaultRefreshRate = NvidiaVibranceProxy.NVAPI_DEFAULT_REFRESH_RATE;
+                minRefreshRate = NvidiaVibranceProxy.NVAPI_MIN_REFRESH_RATE;
+            }
+            else if (graphicsAdapter == GraphicsAdapter.AMD)
+            {
+                defaultLevel = AmdVibranceProxy.NVAPI_DEFAULT_LEVEL;
+                maxLevel = AmdVibranceProxy.NVAPI_MAX_LEVEL;
+                defaultRefreshRate = AmdVibranceProxy.NVAPI_DEFAULT_REFRESH_RATE;
+                minRefreshRate = AmdVibranceProxy.NVAPI_MIN_REFRESH_RATE;
+            }
+
+
             if (!isFileExisting(fileName))
             {
-                vibranceIngameLevel = NvidiaVibranceProxy.NVAPI_DEFAULT_LEVEL;
-                vibranceWindowsLevel = NvidiaVibranceProxy.NVAPI_DEFAULT_LEVEL;
-                refreshRate = NvidiaVibranceProxy.NVAPI_DEFAULT_REFRESH_RATE;
+                vibranceIngameLevel = defaultLevel;
+                vibranceWindowsLevel = defaultLevel;
+                refreshRate = defaultRefreshRate;
                 keepActive = false;
                 return;
             }
@@ -128,19 +148,19 @@ namespace vibrance.GUI
             }
             catch (Exception)
             {
-                vibranceIngameLevel = NvidiaVibranceProxy.NVAPI_DEFAULT_LEVEL;
-                vibranceWindowsLevel = NvidiaVibranceProxy.NVAPI_DEFAULT_LEVEL;
-                refreshRate = NvidiaVibranceProxy.NVAPI_DEFAULT_REFRESH_RATE;
+                vibranceIngameLevel = defaultLevel;
+                vibranceWindowsLevel = defaultLevel;
+                refreshRate = defaultRefreshRate;
                 keepActive = false;
                 return;
             }
 
-            if (vibranceWindowsLevel < NvidiaVibranceProxy.NVAPI_DEFAULT_LEVEL || vibranceWindowsLevel > NvidiaVibranceProxy.NVAPI_MAX_LEVEL)
-                vibranceWindowsLevel = NvidiaVibranceProxy.NVAPI_DEFAULT_LEVEL;
-            if (vibranceIngameLevel < NvidiaVibranceProxy.NVAPI_DEFAULT_LEVEL || vibranceIngameLevel > NvidiaVibranceProxy.NVAPI_MAX_LEVEL)
-                vibranceIngameLevel = NvidiaVibranceProxy.NVAPI_MAX_LEVEL;
-            if (refreshRate < NvidiaVibranceProxy.NVAPI_MIN_REFRESH_RATE)
-                refreshRate = NvidiaVibranceProxy.NVAPI_DEFAULT_REFRESH_RATE;
+            if (vibranceWindowsLevel < defaultLevel || vibranceWindowsLevel > maxLevel)
+                vibranceWindowsLevel = defaultLevel;
+            if (vibranceIngameLevel < defaultLevel || vibranceIngameLevel > maxLevel)
+                vibranceIngameLevel = maxLevel;
+            if (refreshRate < minRefreshRate)
+                refreshRate = defaultRefreshRate;
         }
 
         private bool isFileExisting(string szFilename)

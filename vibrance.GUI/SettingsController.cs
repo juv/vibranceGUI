@@ -6,7 +6,7 @@ using System.Text;
 namespace vibrance.GUI
 {
 
-    class SettingsController
+    class SettingsController : ISettingsController
     {
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         static extern uint GetPrivateProfileString(
@@ -76,9 +76,9 @@ namespace vibrance.GUI
         {
             if (!isFileExisting(fileName))
             {
-                vibranceIngameLevel = VibranceProxy.NVAPI_DEFAULT_LEVEL;
-                vibranceWindowsLevel = VibranceProxy.NVAPI_DEFAULT_LEVEL;
-                refreshRate = VibranceProxy.NVAPI_DEFAULT_REFRESH_RATE;
+                vibranceIngameLevel = NvidiaVibranceProxy.NVAPI_DEFAULT_LEVEL;
+                vibranceWindowsLevel = NvidiaVibranceProxy.NVAPI_DEFAULT_LEVEL;
+                refreshRate = NvidiaVibranceProxy.NVAPI_DEFAULT_REFRESH_RATE;
                 keepActive = false;
                 return;
             }
@@ -128,19 +128,19 @@ namespace vibrance.GUI
             }
             catch (Exception)
             {
-                vibranceIngameLevel = VibranceProxy.NVAPI_DEFAULT_LEVEL;
-                vibranceWindowsLevel = VibranceProxy.NVAPI_DEFAULT_LEVEL;
-                refreshRate = VibranceProxy.NVAPI_DEFAULT_REFRESH_RATE;
+                vibranceIngameLevel = NvidiaVibranceProxy.NVAPI_DEFAULT_LEVEL;
+                vibranceWindowsLevel = NvidiaVibranceProxy.NVAPI_DEFAULT_LEVEL;
+                refreshRate = NvidiaVibranceProxy.NVAPI_DEFAULT_REFRESH_RATE;
                 keepActive = false;
                 return;
             }
 
-            if (vibranceWindowsLevel < VibranceProxy.NVAPI_DEFAULT_LEVEL || vibranceWindowsLevel > VibranceProxy.NVAPI_MAX_LEVEL)
-                vibranceWindowsLevel = VibranceProxy.NVAPI_DEFAULT_LEVEL;
-            if (vibranceIngameLevel < VibranceProxy.NVAPI_DEFAULT_LEVEL || vibranceIngameLevel > VibranceProxy.NVAPI_MAX_LEVEL)
-                vibranceIngameLevel = VibranceProxy.NVAPI_MAX_LEVEL;
-            if (refreshRate < VibranceProxy.NVAPI_MIN_REFRESH_RATE)
-                refreshRate = VibranceProxy.NVAPI_DEFAULT_REFRESH_RATE;
+            if (vibranceWindowsLevel < NvidiaVibranceProxy.NVAPI_DEFAULT_LEVEL || vibranceWindowsLevel > NvidiaVibranceProxy.NVAPI_MAX_LEVEL)
+                vibranceWindowsLevel = NvidiaVibranceProxy.NVAPI_DEFAULT_LEVEL;
+            if (vibranceIngameLevel < NvidiaVibranceProxy.NVAPI_DEFAULT_LEVEL || vibranceIngameLevel > NvidiaVibranceProxy.NVAPI_MAX_LEVEL)
+                vibranceIngameLevel = NvidiaVibranceProxy.NVAPI_MAX_LEVEL;
+            if (refreshRate < NvidiaVibranceProxy.NVAPI_MIN_REFRESH_RATE)
+                refreshRate = NvidiaVibranceProxy.NVAPI_DEFAULT_REFRESH_RATE;
         }
 
         private bool isFileExisting(string szFilename)

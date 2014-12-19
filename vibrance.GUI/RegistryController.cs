@@ -3,7 +3,7 @@ using System;
 
 namespace vibrance.GUI
 {
-    class RegistryController
+    class RegistryController : IRegistryController
     {
         private const string runKey = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
         private const string vcKey = "SOFTWARE\\Microsoft\\DevDiv\\VC\\Servicing\\11.0\\RuntimeMinimum";

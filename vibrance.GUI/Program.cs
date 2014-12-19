@@ -20,14 +20,32 @@ namespace vibrance.GUI
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            vibranceGUI vibrance = new vibranceGUI();
+
+            GraphicsAdapter adapter = GraphicsAdapterHelper.getAdapter();
+            Form vibranceGUI = null; 
+            if (adapter == GraphicsAdapter.AMD)
+            {
+                vibranceGUI = new AmdVibranceGUI();
+            }
+            else if (adapter == GraphicsAdapter.NVIDIA)
+            {
+                vibranceGUI = new NvidiaVibranceGUI();
+            }
+            if (vibranceGUI == null)
+            {
+                if (MessageBox.Show(
+        "Failed to determine your Graphic Adapter type (NVIDIA/AMD). Please contact @juvlarN at twitter. Press Yes to open twitter in your browser now.", "vibranceGUI Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
+                {
+                    System.Diagnostics.Process.Start("https://twitter.com/juvlarN");
+                }
+                return;
+            }
             if (args.Contains("-minimized"))
             {
-                vibrance.WindowState = FormWindowState.Minimized;
-                vibrance.ShowInTaskbar = false;
+                vibranceGUI.WindowState = FormWindowState.Minimized;
+                vibranceGUI.ShowInTaskbar = false;
             }
-            vibrance.silenced = args.Contains("-silenced");
-            Application.Run(vibrance);
+            Application.Run(vibranceGUI);
 
             GC.KeepAlive(mutex);
         }

@@ -4,68 +4,12 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
+using ATI.ADL;
 
 namespace vibrance.GUI
 {
     public class AmdVibranceProxy : IVibranceProxy
     {
-        [DllImport(
-            "vibranceDLL.dll",
-            EntryPoint = "?initializeLibrary@vibrance@vibranceDLL@@QAE_NXZ",
-            CallingConvention = CallingConvention.StdCall,
-            CharSet = CharSet.Auto)]
-        static extern bool initializeLibrary();
-
-        [DllImport(
-            "vibranceDLL.dll",
-            EntryPoint = "?unloadLibrary@vibrance@vibranceDLL@@QAE_NXZ",
-            CallingConvention = CallingConvention.StdCall,
-            CharSet = CharSet.Auto)]
-        static extern bool unloadLibrary();
-
-
-        [DllImport(
-            "vibranceDLL.dll",
-            EntryPoint = "?getActiveOutputs@vibrance@vibranceDLL@@QAEHQAPAH0@Z",
-            CallingConvention = CallingConvention.StdCall,
-            CharSet = CharSet.Auto)]
-        static extern int getActiveOutputs([In, Out] int[] gpuHandles, [In, Out] int[] outputIds);
-
-        [DllImport(
-            "vibranceDLL.dll",
-            EntryPoint = "?enumeratePhsyicalGPUs@vibrance@vibranceDLL@@QAEXQAPAH@Z",
-            CallingConvention = CallingConvention.StdCall,
-            CharSet = CharSet.Auto)]
-        static extern void enumeratePhsyicalGPUs([In, Out] int[] gpuHandles);
-
-        [DllImport(
-            "vibranceDLL.dll",
-            EntryPoint = "?getGpuName@vibrance@vibranceDLL@@QAE_NQAPAHPAD@Z",
-            CallingConvention = CallingConvention.StdCall,
-            CharSet = CharSet.Ansi)]
-        static extern bool getGpuName([In, Out] int[] gpuHandles, StringBuilder szName);
-
-        [DllImport(
-            "vibranceDLL.dll",
-            EntryPoint = "?getDVCInfo@vibrance@vibranceDLL@@QAE_NPAUNV_DISPLAY_DVC_INFO@12@H@Z",
-            CallingConvention = CallingConvention.StdCall,
-            CharSet = CharSet.Ansi)]
-        static extern bool getDVCInfo(ref NV_DISPLAY_DVC_INFO info, int defaultHandle);
-
-        [DllImport(
-            "vibranceDLL.dll",
-            EntryPoint = "?enumerateNvidiaDisplayHandle@vibrance@vibranceDLL@@QAEHH@Z",
-            CallingConvention = CallingConvention.StdCall,
-            CharSet = CharSet.Auto)]
-        static extern int enumerateNvidiaDisplayHandle(int index);
-
-        [DllImport(
-            "vibranceDLL.dll",
-            EntryPoint = "?setDVCLevel@vibrance@vibranceDLL@@QAE_NHH@Z",
-            CallingConvention = CallingConvention.StdCall,
-            CharSet = CharSet.Auto)]
-        static extern bool setDVCLevel([In] int defaultHandle, [In] int level);
-
         [DllImport(
             "vibranceDLL.dll",
             EntryPoint = "?isCsgoActive@vibrance@vibranceDLL@@QAE_NPAPAUHWND__@@@Z",
@@ -79,13 +23,6 @@ namespace vibrance.GUI
             CallingConvention = CallingConvention.StdCall,
             CharSet = CharSet.Ansi)]
         static extern bool isCsgoStarted(ref IntPtr hwnd);
-
-        [DllImport(
-            "vibranceDLL.dll",
-            EntryPoint = "?equalsDVCLevel@vibrance@vibranceDLL@@QAE_NHH@Z",
-            CallingConvention = CallingConvention.StdCall,
-            CharSet = CharSet.Auto)]
-        static extern bool equalsDVCLevel([In] int defaultHandle, [In] int level);
         
         [DllImport("user32.dll", CharSet = CharSet.Ansi)]
         static extern int GetWindowTextLength([In] IntPtr hWnd);
@@ -93,19 +30,10 @@ namespace vibrance.GUI
         [DllImport("user32.dll", CharSet = CharSet.Ansi)]
         static extern int GetWindowTextA([In] IntPtr hWnd, [In, Out] StringBuilder lpString, [In] int nMaxCount);
 
-        [DllImport(
-            "vibranceDLL.dll",
-            EntryPoint = "?getAssociatedNvidiaDisplayHandle@vibrance@vibranceDLL@@QAEHPBDH@Z",
-            CallingConvention = CallingConvention.StdCall,
-            CharSet = CharSet.Ansi)]
-        static extern int getAssociatedNvidiaDisplayHandle(string deviceName, [In] int length);
-
-
-        public const int NVAPI_MAX_PHYSICAL_GPUS = 64;
-        public const int NVAPI_MAX_LEVEL = 63;
-        public const int NVAPI_DEFAULT_LEVEL = 0;
-        public const int NVAPI_MIN_REFRESH_RATE = 200;
-        public const int NVAPI_DEFAULT_REFRESH_RATE = 5000;
+        public const int AMD_MAX_LEVEL = 63;
+        public const int AMD_DEFAULT_LEVEL = 0;
+        public const int AMD_MIN_REFRESH_RATE = 200;
+        public const int AMD_DEFAULT_REFRESH_RATE = 5000;
 
         public const string NVAPI_ERROR_INIT_FAILED = "VibranceProxy failed to initialize! Read readme.txt for fix!";
         public const string NVAPI_ERROR_GET_MONITOR_HANDLE = "Couldn't determine the monitor handle CSGO is running in. :( Using main output!";
@@ -121,19 +49,22 @@ namespace vibrance.GUI
                 vibranceInfo = new VIBRANCE_INFO();
                 bool ret = initializeLibrary();
 
-                int[] gpuHandles = new int[NVAPI_MAX_PHYSICAL_GPUS];
-                int[] outputIds = new int[NVAPI_MAX_PHYSICAL_GPUS];
-                enumeratePhsyicalGPUs(gpuHandles);
-
+                //alle display handles auslesen, damit vibrance auf allen displays angepasst wird
                 enumerateDisplayHandles();
                
-                vibranceInfo.activeOutput = getActiveOutputs(gpuHandles, outputIds);
-                StringBuilder buffer = new StringBuilder(64);
-                char[] sz = new char[64];
-                getGpuName(gpuHandles, buffer);
-                vibranceInfo.szGpuName = buffer.ToString();
-                vibranceInfo.defaultHandle = enumerateNvidiaDisplayHandle(0);
+                //vielleicht unnötig bei AMD?
+                //int[] gpuHandles = new int[NVAPI_MAX_PHYSICAL_GPUS];
+                //int[] outputIds = new int[NVAPI_MAX_PHYSICAL_GPUS];
+                //vibranceInfo.activeOutput = getActiveOutputs();
 
+                vibranceInfo.szGpuName = getGpuName();
+
+                //standard display handle (hauptmonitor in windows)
+                vibranceInfo.defaultHandle = enumerateAmdDisplayHandle(0);
+
+
+                //Wenn aktuelles Vibrance nicht den User-Settings entspricht ändern
+                //info musst du abändern, für irgendwas AMD-mäßige$
                 NV_DISPLAY_DVC_INFO info = new NV_DISPLAY_DVC_INFO();
                 if (getDVCInfo(ref info, vibranceInfo.defaultHandle))
                 {
@@ -147,7 +78,7 @@ namespace vibrance.GUI
             }
             catch (Exception)
             {
-                MessageBox.Show(NvidiaVibranceProxy.NVAPI_ERROR_INIT_FAILED);
+                MessageBox.Show(AmdVibranceProxy.NVAPI_ERROR_INIT_FAILED);
             }
 
         }
@@ -163,7 +94,7 @@ namespace vibrance.GUI
                 {
                     string deviceName = primaryScreen.DeviceName;
                     GCHandle handle = GCHandle.Alloc(deviceName, GCHandleType.Pinned);
-                    int id = getAssociatedNvidiaDisplayHandle(deviceName, deviceName.Length);
+                    int id = getAssociatedAmdDisplayHandle(deviceName, deviceName.Length);
                     handle.Free();
 
                     return id;
@@ -198,6 +129,7 @@ namespace vibrance.GUI
             this.vibranceInfo.sleepInterval = interval;
         }
         
+        //Keine Anpassung nötig, wenn andere Methoden ordentlich angepasst sind
         public void handleDVC()
         {
             bool isChanged = false;
@@ -215,7 +147,7 @@ namespace vibrance.GUI
                             StringBuilder sb = new StringBuilder(length + 1);
                             GetWindowTextA(hwnd, sb, sb.Capacity);
 
-                            if (sb != null && sb.ToString().Equals(NvidiaVibranceProxy.NVAPI_GLOBAL_OFFENSIVE_WINDOW_NAME))
+                            if (sb != null && sb.ToString().Equals(AmdVibranceProxy.NVAPI_GLOBAL_OFFENSIVE_WINDOW_NAME))
                             {
                                 if (Screen.AllScreens.Length > 1)
                                 {
@@ -276,10 +208,89 @@ namespace vibrance.GUI
                 if (vibranceInfo.displayHandles == null)
                     vibranceInfo.displayHandles = new List<int>();
 
-                displayHandle = enumerateNvidiaDisplayHandle(i);
+                displayHandle = enumerateAmdDisplayHandle(i);
                 if (displayHandle != -1)
                     vibranceInfo.displayHandles.Add(displayHandle);
             }
+        }
+
+        //TODO: AMD Anpassung. index (0 bis displayCount-1) -> Display Handle 
+        private int enumerateAmdDisplayHandle(int index)
+        {
+            return 0;
+        }
+
+
+        private bool initializeLibrary()
+        {
+            int ADLRet = -1;
+            try
+            {
+                if (null != ADL.ADL_Main_Control_Create)
+                {
+                    // Second parameter is 1: Get only the present adapters
+                    ADLRet = ADL.ADL_Main_Control_Create(ADL.ADL_Main_Memory_Alloc, 1);
+                    if (ADL.ADL_SUCCESS == ADLRet)
+                    {
+                        return true;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Error initializing AMD ADL: " + ADLRet.ToString());
+            }
+            return false;
+        }
+
+        private bool unloadLibrary()
+        {
+            if (null != ADL.ADL_Main_Control_Destroy)
+            {
+                ADL.ADL_Main_Control_Destroy();
+                return true;
+            }
+            return false;
+        }
+
+        //TODO: AMD Anpassung
+        private bool equalsDVCLevel(int handle, int level)
+        {
+            return false;
+        }
+
+        //TODO: AMD Anpassung ADL.ADL_Display_Color_Set
+        private bool setDVCLevel(int handle, int level)
+        {
+            return false;
+        }
+
+        //TODO: AMD Anpassung. Vielleicht unnötig bei AMD
+        private int getActiveOutputs(out int[] gpuHandles, out int[] outputIds)
+        {
+            gpuHandles = null;
+            outputIds = null;
+            return 0;
+
+            //return *outputIds[0];
+        }
+
+        //TODO: AMD Anpassung. DeviceName (z.B. \\.\DISPLAY1) -> Display Handle 
+        private int getAssociatedAmdDisplayHandle(string deviceName, int length)
+        {
+            return 0;
+        }
+
+        //TODO: AMD Anpassung 
+        private string getGpuName()
+        {
+            return null;
+        }
+
+        //TODO: AMD Anpassung. NV_DISPLAY_DVC_INFO ersetzen
+        private bool getDVCInfo(ref NV_DISPLAY_DVC_INFO info, int defaultHandle)
+        {
+            return false;
         }
     }
 }

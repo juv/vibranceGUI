@@ -34,7 +34,8 @@ namespace vibrance.GUI
             else if (adapter == GraphicsAdapter.UNKNOWN)
             {
                 if (MessageBox.Show(
-        "Failed to determine your Graphic Adapter type (NVIDIA/AMD). Please contact @juvlarN at twitter. Press Yes to open twitter in your browser now.", "vibranceGUI Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
+                    "Failed to determine your Graphic Adapter type (NVIDIA/AMD). Please contact @juvlarN at twitter. Press Yes to open twitter in your browser now.", 
+                    "vibranceGUI Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
                 {
                     System.Diagnostics.Process.Start("https://twitter.com/juvlarN");
                 }

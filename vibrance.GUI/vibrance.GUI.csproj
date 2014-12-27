@@ -90,6 +90,7 @@
   <ItemGroup>
     <Compile Include="AMD\ADL.cs" />
     <Compile Include="AMD\AmdVibranceProxy.cs" />
+    <Compile Include="AMD\AmdSettingsWrapper.cs" />
     <Compile Include="Definitions.cs" />
     <Compile Include="GraphicsAdapter.cs" />
     <Compile Include="IRegistryController.cs" />

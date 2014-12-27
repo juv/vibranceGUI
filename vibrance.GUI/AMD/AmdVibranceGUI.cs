@@ -8,7 +8,7 @@ namespace vibrance.GUI
 {
     public partial class AmdVibranceGUI : Form
     {
-        private NvidiaVibranceProxy v;
+        private AmdVibranceProxy v;
         private RegistryController registryController;
         private AutoResetEvent resetEvent;
         public bool silenced = false;
@@ -25,7 +25,7 @@ namespace vibrance.GUI
         private void Form1_Load(object sender, EventArgs e)
         {
             setGuiEnabledFlag(false);
-            System.Runtime.InteropServices.Marshal.PrelinkAll(typeof(NvidiaVibranceProxy));
+            System.Runtime.InteropServices.Marshal.PrelinkAll(typeof(AmdVibranceProxy));
             resetEvent = new AutoResetEvent(false);
             backgroundWorker.WorkerReportsProgress = true;
             settingsBackgroundWorker.WorkerReportsProgress = true;
@@ -43,7 +43,10 @@ namespace vibrance.GUI
 
         private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            int vibranceIngameLevel = NvidiaVibranceProxy.NVAPI_MAX_LEVEL, vibranceWindowsLevel = NvidiaVibranceProxy.NVAPI_DEFAULT_LEVEL, refreshRate = 5000;
+            int vibranceIngameLevel = AmdVibranceProxy.AMD_MAX_LEVEL;
+            int vibranceWindowsLevel = AmdVibranceProxy.AMD_DEFAULT_LEVEL;
+            int refreshRate = 5000;
+
             bool keepActive = false;
 
             this.Invoke((MethodInvoker)delegate
@@ -51,7 +54,7 @@ namespace vibrance.GUI
                 readVibranceSettings(out vibranceIngameLevel, out vibranceWindowsLevel, out keepActive, out refreshRate);
             });
 
-            v = new NvidiaVibranceProxy(silenced);
+            v = new AmdVibranceProxy(silenced);
             if (v.vibranceInfo.isInitialized)
             {
                 backgroundWorker.ReportProgress(1);
@@ -89,7 +92,7 @@ namespace vibrance.GUI
 
         private void trackBarIngameLevel_Scroll(object sender, EventArgs e)
         {
-            NvidiaSettingsWrapper setting = NvidiaSettingsWrapper.find(trackBarIngameLevel.Value);
+            AmdSettingsWrapper setting = AmdSettingsWrapper.find(trackBarIngameLevel.Value);
             if (setting == null)
                 return;
             v.setVibranceIngameLevel(trackBarIngameLevel.Value);
@@ -102,7 +105,7 @@ namespace vibrance.GUI
 
         private void trackBarWindowsLevel_Scroll(object sender, EventArgs e)
         {
-            NvidiaSettingsWrapper setting = NvidiaSettingsWrapper.find(trackBarWindowsLevel.Value);
+            AmdSettingsWrapper setting = AmdSettingsWrapper.find(trackBarWindowsLevel.Value);
             if (setting == null)
                 return;
             v.setVibranceWindowsLevel(trackBarWindowsLevel.Value);
@@ -276,8 +279,8 @@ namespace vibrance.GUI
             settingsController.readVibranceSettings(GraphicsAdapter.AMD, out vibranceIngameLevel, out vibranceWindowsLevel, out keepActive, out refreshRate);
 
             //no null check needed, SettingsController will always return matching values.
-            labelWindowsLevel.Text = NvidiaSettingsWrapper.find(vibranceWindowsLevel).getPercentage;
-            labelIngameLevel.Text = NvidiaSettingsWrapper.find(vibranceIngameLevel).getPercentage;
+            labelWindowsLevel.Text = AmdSettingsWrapper.find(vibranceWindowsLevel).getPercentage;
+            labelIngameLevel.Text = AmdSettingsWrapper.find(vibranceIngameLevel).getPercentage;
 
             trackBarWindowsLevel.Value = vibranceWindowsLevel;
             trackBarIngameLevel.Value = vibranceIngameLevel;

@@ -21,6 +21,9 @@ namespace vibrance.GUI
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             vibranceGUI vibrance = new vibranceGUI();
+            if (args.Contains("-besteastereggever")){
+                MessageBox.Show("You unlocked the secret easter egg which does absolutely nothing!", "vibranceGUI", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
             if (args.Contains("-minimized"))
             {
                 vibrance.WindowState = FormWindowState.Minimized;

@@ -13,9 +13,6 @@ namespace vibrance.GUI
         private AutoResetEvent resetEvent;
         public bool silenced = false;
         private const string appName = "vibranceGUI";
-        private const string twitterLink = "https://twitter.com/juvlarN";
-        private const string paypalDonationLink = "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=JDQFNKNNEW356";
-
 
         public vibranceGUI()
         {
@@ -36,7 +33,6 @@ namespace vibrance.GUI
             if (this.WindowState == FormWindowState.Minimized)
             {
                 this.notifyIcon.Visible = true;
-                this.notifyIcon.ShowBalloonTip(250);
                 this.Hide();
             }
         }
@@ -132,6 +128,7 @@ namespace vibrance.GUI
         {
             if (e.ProgressPercentage == 1)
             {
+            	listBoxLog.Items.Add("vibranceGUI started.");
                 listBoxLog.Items.Add("vibranceInfo.isInitialized: " + v.vibranceInfo.isInitialized);
                 listBoxLog.Items.Add("vibranceInfo.szGpuName: " + v.vibranceInfo.szGpuName);
                 listBoxLog.Items.Add("vibranceInfo.activeOutput: " + v.vibranceInfo.activeOutput);
@@ -230,15 +227,6 @@ namespace vibrance.GUI
             }
         }
 
-        private void twitterToolStripTextBox_Click(object sender, EventArgs e)
-        {
-            System.Diagnostics.Process.Start(vibranceGUI.twitterLink);
-        }
-
-        private void linkLabelTwitter_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            System.Diagnostics.Process.Start(vibranceGUI.twitterLink);
-        }
 
         private void setGuiEnabledFlag(bool flag)
         {
@@ -249,7 +237,6 @@ namespace vibrance.GUI
                 this.trackBarIngameLevel.Enabled = flag;
                 this.textBoxRefreshRate.Enabled = flag;
                 this.checkBoxAutostart.Enabled = flag;
-                //this.checkBoxMonitors.Enabled = flag;
             });
         }
 
@@ -296,10 +283,6 @@ namespace vibrance.GUI
                 refreshRate.ToString()
             );
         }
-
-        private void buttonPaypal_Click(object sender, EventArgs e)
-        {
-            System.Diagnostics.Process.Start(vibranceGUI.paypalDonationLink);
-        }
+p
     }
 }

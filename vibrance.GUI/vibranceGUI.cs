@@ -226,15 +226,6 @@ namespace vibrance.GUI
             }
         }
 
-        private void twitterToolStripTextBox_Click(object sender, EventArgs e)
-        {
-            System.Diagnostics.Process.Start(vibranceGUI.twitterLink);
-        }
-
-        private void linkLabelTwitter_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            System.Diagnostics.Process.Start(vibranceGUI.twitterLink);
-        }
 
         private void setGuiEnabledFlag(bool flag)
         {

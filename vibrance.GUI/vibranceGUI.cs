@@ -36,7 +36,6 @@ namespace vibrance.GUI
             if (this.WindowState == FormWindowState.Minimized)
             {
                 this.notifyIcon.Visible = true;
-                this.notifyIcon.ShowBalloonTip(250);
                 this.Hide();
             }
         }

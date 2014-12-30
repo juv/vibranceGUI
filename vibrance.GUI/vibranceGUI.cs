@@ -128,6 +128,7 @@ namespace vibrance.GUI
         {
             if (e.ProgressPercentage == 1)
             {
+            	listBoxLog.Items.Add("vibranceGUI started.");
                 listBoxLog.Items.Add("vibranceInfo.isInitialized: " + v.vibranceInfo.isInitialized);
                 listBoxLog.Items.Add("vibranceInfo.szGpuName: " + v.vibranceInfo.szGpuName);
                 listBoxLog.Items.Add("vibranceInfo.activeOutput: " + v.vibranceInfo.activeOutput);

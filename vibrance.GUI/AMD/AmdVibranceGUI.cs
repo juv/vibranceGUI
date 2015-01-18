@@ -92,7 +92,7 @@ namespace vibrance.GUI
 
         private void trackBarIngameLevel_Scroll(object sender, EventArgs e)
         {
-            labelIngameLevel.Text = trackBarIngameLevel.Value + "%";
+            labelIngameLevel.Text = trackBarIngameLevel.Value.ToString();
 
             if (!settingsBackgroundWorker.IsBusy)
             {
@@ -102,7 +102,7 @@ namespace vibrance.GUI
 
         private void trackBarWindowsLevel_Scroll(object sender, EventArgs e)
         {
-            labelWindowsLevel.Text = trackBarWindowsLevel.Value + "%";
+            labelWindowsLevel.Text = trackBarWindowsLevel.Value.ToString();
 
             if (!settingsBackgroundWorker.IsBusy)
             {
@@ -266,8 +266,8 @@ namespace vibrance.GUI
             keepActive = v.amdViewModel.VibranceSettingsViewModel.Model.KeepVibranceOnWhenCsGoIsStarted;
             refreshRate = v.amdViewModel.VibranceSettingsViewModel.Model.RefreshRate;
 
-            labelWindowsLevel.Text = vibranceWindowsLevel + "%";
-            labelIngameLevel.Text = vibranceIngameLevel + "%";
+            labelWindowsLevel.Text = vibranceWindowsLevel.ToString();
+            labelIngameLevel.Text = vibranceIngameLevel.ToString();
 
             trackBarWindowsLevel.Value = vibranceWindowsLevel;
             trackBarIngameLevel.Value = vibranceIngameLevel;

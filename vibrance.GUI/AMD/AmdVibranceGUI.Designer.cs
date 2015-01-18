@@ -201,6 +201,7 @@
             this.trackBarWindowsLevel.Name = "trackBarWindowsLevel";
             this.trackBarWindowsLevel.Size = new System.Drawing.Size(131, 45);
             this.trackBarWindowsLevel.TabIndex = 0;
+            this.trackBarWindowsLevel.Value = 100;
             this.trackBarWindowsLevel.Scroll += new System.EventHandler(this.trackBarWindowsLevel_Scroll);
             // 
             // groupBox2
@@ -221,6 +222,7 @@
             this.trackBarIngameLevel.Name = "trackBarIngameLevel";
             this.trackBarIngameLevel.Size = new System.Drawing.Size(131, 45);
             this.trackBarIngameLevel.TabIndex = 9;
+            this.trackBarIngameLevel.Value = 100;
             this.trackBarIngameLevel.Scroll += new System.EventHandler(this.trackBarIngameLevel_Scroll);
             // 
             // labelIngameLevel

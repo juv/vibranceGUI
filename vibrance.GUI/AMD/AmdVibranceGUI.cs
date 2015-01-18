@@ -1,14 +1,18 @@
-﻿using System;
+﻿using gui.app.gpucontroller.amd;
+using gui.app.mvvm.model;
+using gui.app.mvvm.viewmodel;
+using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace vibrance.GUI
 {
     public partial class AmdVibranceGUI : Form
     {
-        private AmdVibranceProxy v;
+        private AmdVibranceAdapter v;
         private RegistryController registryController;
         private AutoResetEvent resetEvent;
         public bool silenced = false;
@@ -20,12 +24,12 @@ namespace vibrance.GUI
         public AmdVibranceGUI()
         {
             InitializeComponent();
+            v = new AmdVibranceAdapter(silenced);
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
             setGuiEnabledFlag(false);
-            System.Runtime.InteropServices.Marshal.PrelinkAll(typeof(AmdVibranceProxy));
             resetEvent = new AutoResetEvent(false);
             backgroundWorker.WorkerReportsProgress = true;
             settingsBackgroundWorker.WorkerReportsProgress = true;
@@ -43,10 +47,7 @@ namespace vibrance.GUI
 
         private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            int vibranceIngameLevel = AmdVibranceProxy.AMD_MAX_LEVEL;
-            int vibranceWindowsLevel = AmdVibranceProxy.AMD_DEFAULT_LEVEL;
-            int refreshRate = 5000;
-
+            int vibranceIngameLevel = v.MaxLevel, vibranceWindowsLevel = v.DefaultLevel, refreshRate = 5000;
             bool keepActive = false;
 
             this.Invoke((MethodInvoker)delegate
@@ -54,19 +55,18 @@ namespace vibrance.GUI
                 readVibranceSettings(out vibranceIngameLevel, out vibranceWindowsLevel, out keepActive, out refreshRate);
             });
 
-            v = new AmdVibranceProxy(silenced);
-            if (v.vibranceInfo.isInitialized)
+            if (v.amdViewModel != null)
             {
                 backgroundWorker.ReportProgress(1);
 
                 setGuiEnabledFlag(true);
 
-                v.setShouldRun(true);
                 v.setKeepActive(keepActive);
                 v.setVibranceIngameLevel(vibranceIngameLevel);
                 v.setVibranceWindowsLevel(vibranceWindowsLevel);
                 v.setSleepInterval(refreshRate);
-                v.handleDVC();
+                v.setShouldRun(true);
+
                 bool unload = v.unloadLibraryEx();
 
                 backgroundWorker.ReportProgress(2, unload);
@@ -92,11 +92,8 @@ namespace vibrance.GUI
 
         private void trackBarIngameLevel_Scroll(object sender, EventArgs e)
         {
-            AmdSettingsWrapper setting = AmdSettingsWrapper.find(trackBarIngameLevel.Value);
-            if (setting == null)
-                return;
-            v.setVibranceIngameLevel(trackBarIngameLevel.Value);
-            labelIngameLevel.Text = setting.getPercentage;
+            labelIngameLevel.Text = trackBarIngameLevel.Value + "%";
+
             if (!settingsBackgroundWorker.IsBusy)
             {
                 settingsBackgroundWorker.RunWorkerAsync();
@@ -105,11 +102,8 @@ namespace vibrance.GUI
 
         private void trackBarWindowsLevel_Scroll(object sender, EventArgs e)
         {
-            AmdSettingsWrapper setting = AmdSettingsWrapper.find(trackBarWindowsLevel.Value);
-            if (setting == null)
-                return;
-            v.setVibranceWindowsLevel(trackBarWindowsLevel.Value);
-            labelWindowsLevel.Text = setting.getPercentage;
+            labelWindowsLevel.Text = trackBarWindowsLevel.Value + "%";
+
             if (!settingsBackgroundWorker.IsBusy)
             {
                 settingsBackgroundWorker.RunWorkerAsync();
@@ -135,21 +129,14 @@ namespace vibrance.GUI
         {
             if (e.ProgressPercentage == 1)
             {
-                listBoxLog.Items.Add("vibranceInfo.isInitialized: " + v.vibranceInfo.isInitialized);
-                listBoxLog.Items.Add("vibranceInfo.szGpuName: " + v.vibranceInfo.szGpuName);
-                listBoxLog.Items.Add("vibranceInfo.activeOutput: " + v.vibranceInfo.activeOutput);
-                listBoxLog.Items.Add("vibranceInfo.defaultHandle: " + v.vibranceInfo.defaultHandle);
+                listBoxLog.Items.Add("vibranceInfo.isInitialized: " + (v.amdViewModel != null));
 
-                listBoxLog.Items.Add("vibranceInfo.userVibranceSettingActive: " + v.vibranceInfo.userVibranceSettingActive);
-                listBoxLog.Items.Add("vibranceInfo.userVibranceSettingDefault: " + v.vibranceInfo.userVibranceSettingDefault);
+                listBoxLog.Items.Add("vibranceInfo.userVibranceSettingActive: " + v.amdViewModel.VibranceSettingsViewModel.Model.IngameVibranceLevel);
+                listBoxLog.Items.Add("vibranceInfo.userVibranceSettingDefault: " + v.amdViewModel.VibranceSettingsViewModel.Model.WindowsVibranceLevel);
                 listBoxLog.Items.Add("");
                 listBoxLog.Items.Add("");
                 this.statusLabel.Text = "Running!";
                 this.statusLabel.ForeColor = Color.Green;
-            }
-            else if (e.ProgressPercentage == 2)
-            {
-                listBoxLog.Items.Add("NVAPI Unloaded: " + e.UserState);
             }
         }
 
@@ -252,7 +239,6 @@ namespace vibrance.GUI
                 this.trackBarIngameLevel.Enabled = flag;
                 this.textBoxRefreshRate.Enabled = flag;
                 this.checkBoxAutostart.Enabled = flag;
-                //this.checkBoxMonitors.Enabled = flag;
             });
         }
 
@@ -262,7 +248,7 @@ namespace vibrance.GUI
             this.statusLabel.ForeColor = Color.Red;
             this.Update();
             listBoxLog.Items.Add("Initiating observer thread exit... ");
-            if (v != null && v.vibranceInfo.isInitialized)
+            if (v != null && v.amdViewModel != null)
             {
                 v.setShouldRun(false);
                 resetEvent.WaitOne();
@@ -275,12 +261,13 @@ namespace vibrance.GUI
             registryController = new RegistryController();
             this.checkBoxAutostart.Checked = registryController.isProgramRegistered(appName);
 
-            SettingsController settingsController = new SettingsController();
-            settingsController.readVibranceSettings(GraphicsAdapter.AMD, out vibranceIngameLevel, out vibranceWindowsLevel, out keepActive, out refreshRate);
+            vibranceIngameLevel = v.amdViewModel.VibranceSettingsViewModel.Model.IngameVibranceLevel;
+            vibranceWindowsLevel = v.amdViewModel.VibranceSettingsViewModel.Model.WindowsVibranceLevel;
+            keepActive = v.amdViewModel.VibranceSettingsViewModel.Model.KeepVibranceOnWhenCsGoIsStarted;
+            refreshRate = v.amdViewModel.VibranceSettingsViewModel.Model.RefreshRate;
 
-            //no null check needed, SettingsController will always return matching values.
-            labelWindowsLevel.Text = AmdSettingsWrapper.find(vibranceWindowsLevel).getPercentage;
-            labelIngameLevel.Text = AmdSettingsWrapper.find(vibranceIngameLevel).getPercentage;
+            labelWindowsLevel.Text = vibranceWindowsLevel + "%";
+            labelIngameLevel.Text = vibranceIngameLevel + "%";
 
             trackBarWindowsLevel.Value = vibranceWindowsLevel;
             trackBarIngameLevel.Value = vibranceIngameLevel;
@@ -290,19 +277,116 @@ namespace vibrance.GUI
 
         private void saveVibranceSettings(int ingameLevel, int windowsLevel, bool keepActive, int refreshRate)
         {
-            SettingsController settingsController = new SettingsController();
-
-            settingsController.setVibranceSettings(
-                ingameLevel.ToString(),
-                windowsLevel.ToString(),
-                keepActive.ToString(),
-                refreshRate.ToString()
-            );
+            v.amdViewModel.VibranceSettingsViewModel.Model.IngameVibranceLevel = ingameLevel;
+            v.amdViewModel.VibranceSettingsViewModel.Model.WindowsVibranceLevel = windowsLevel;
+            v.amdViewModel.VibranceSettingsViewModel.Model.KeepVibranceOnWhenCsGoIsStarted = keepActive;
+            v.amdViewModel.VibranceSettingsViewModel.Model.RefreshRate = refreshRate;
+            v.amdViewModel.VibranceSettingsViewModel.SaveVibranceSettings();
         }
 
         private void buttonPaypal_Click(object sender, EventArgs e)
         {
             System.Diagnostics.Process.Start(AmdVibranceGUI.paypalDonationLink);
+        }
+
+    }
+    
+    public class AmdVibranceAdapter
+    {
+        public AmdViewModel amdViewModel;
+
+        private bool silenced;
+
+        public AmdVibranceAdapter(bool silenced)
+        {
+            this.amdViewModel = new AmdViewModel(new AmdAdapter());
+            this.silenced = silenced;
+        }
+
+        public int DefaultLevel
+        {
+            get
+            {
+                return this.amdViewModel.MinimumVibranceLevel;
+            }
+        }
+
+        public int MaxLevel 
+        {
+            get
+            {
+                return this.amdViewModel.MaximumVibranceLevel;
+            }
+        }
+
+        public void setKeepActive(bool value)
+        {
+            this.amdViewModel.VibranceSettingsViewModel.Model.KeepVibranceOnWhenCsGoIsStarted = value;
+        }
+
+        CancellationTokenSource cancellationTokenSource;
+
+        private Task task;
+
+        public void setShouldRun(bool value)
+        {
+            if (value)
+            {
+                this.cancellationTokenSource = new CancellationTokenSource();
+                var cancellationToken = this.cancellationTokenSource.Token;
+
+                task = Task.Factory.StartNew(new Action(() =>
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    bool moreToDo = true;
+                    while (moreToDo)
+                    {
+                        this.amdViewModel.VibranceSettingsViewModel.RefreshVibranceStatus(VibranceSettingsViewModel.GetForegroundWindow());
+
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            cancellationToken.ThrowIfCancellationRequested();
+                        }
+
+                        Thread.Sleep(this.amdViewModel.VibranceSettingsViewModel.Model.RefreshRate);
+                    }
+                }), cancellationTokenSource.Token);
+            }
+            else if (this.cancellationTokenSource != null)
+            {
+                this.cancellationTokenSource.Cancel();
+
+                try
+                {
+                    task.Wait();
+                }
+                catch (Exception ex)
+                {
+                    this.amdViewModel.VibranceSettingsViewModel.ResetVibrance();
+                }
+            }
+        }
+
+        public void setSleepInterval(int refreshRate)
+        {
+            this.amdViewModel.VibranceSettingsViewModel.Model.RefreshRate = refreshRate;
+        }
+
+
+        internal void setVibranceWindowsLevel(int vibranceWindowsLevel)
+        {
+            this.amdViewModel.VibranceSettingsViewModel.Model.WindowsVibranceLevel = vibranceWindowsLevel;
+        }
+
+        internal void setVibranceIngameLevel(int vibranceIngameLevel)
+        {
+            this.amdViewModel.VibranceSettingsViewModel.Model.IngameVibranceLevel = vibranceIngameLevel;
+        }
+
+        internal bool unloadLibraryEx()
+        {
+            return false;
         }
     }
 }

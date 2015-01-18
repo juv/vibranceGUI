@@ -85,13 +85,6 @@ namespace vibrance.GUI
                 defaultRefreshRate = NvidiaVibranceProxy.NVAPI_DEFAULT_REFRESH_RATE;
                 minRefreshRate = NvidiaVibranceProxy.NVAPI_MIN_REFRESH_RATE;
             }
-            else if (graphicsAdapter == GraphicsAdapter.AMD)
-            {
-                defaultLevel = AmdVibranceProxy.AMD_DEFAULT_LEVEL;
-                maxLevel = AmdVibranceProxy.AMD_MAX_LEVEL;
-                defaultRefreshRate = AmdVibranceProxy.AMD_DEFAULT_REFRESH_RATE;
-                minRefreshRate = AmdVibranceProxy.AMD_MIN_REFRESH_RATE;
-            }
 
 
             if (!isFileExisting(fileName))

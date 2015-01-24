@@ -49,6 +49,7 @@ namespace vibrance.GUI
             this.Invoke((MethodInvoker)delegate
             {
                 readVibranceSettings(out vibranceIngameLevel, out vibranceWindowsLevel, out keepActive, out refreshRate);
+                checkBoxAutostart_CheckedChanged(null, null);
             });
 
             v = new NvidiaVibranceProxy(silenced);
@@ -213,13 +214,10 @@ namespace vibrance.GUI
             RegistryController autostartController = new RegistryController();
             if (this.checkBoxAutostart.Checked)
             {
-                if (!autostartController.isProgramRegistered(appName))
-                {
-                    if (autostartController.registerProgram(appName, "\"" + Application.ExecutablePath.ToString() + "\" -minimized"))
-                        listBoxLog.Items.Add("Registered to Autostart!");
-                    else
-                        listBoxLog.Items.Add("Registering to Autostart failed!");       
-                }
+                if (autostartController.registerProgram(appName, "\"" + Application.ExecutablePath.ToString() + "\" -minimized"))
+                    listBoxLog.Items.Add("Registered to Autostart!");
+                else
+                    listBoxLog.Items.Add("Registering to Autostart failed!");
             }
             else
             {

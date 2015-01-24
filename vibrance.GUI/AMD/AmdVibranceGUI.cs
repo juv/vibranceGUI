@@ -53,6 +53,7 @@ namespace vibrance.GUI
             this.Invoke((MethodInvoker)delegate
             {
                 readVibranceSettings(out vibranceIngameLevel, out vibranceWindowsLevel, out keepActive, out refreshRate);
+                //checkBoxAutostart_CheckedChanged(null, null);
             });
 
             if (v.amdViewModel != null)
@@ -148,11 +149,11 @@ namespace vibrance.GUI
         {
             this.Show();
 
-			this.WindowState = FormWindowState.Normal;
-			this.Visible = true;
+            this.WindowState = FormWindowState.Normal;
+            this.Visible = true;
 
-			this.Refresh();
-			this.ShowInTaskbar = true;
+            this.Refresh();
+            this.ShowInTaskbar = true;
         }
 
         private void textBoxRefreshRate_TextChanged(object sender, EventArgs e)
@@ -203,13 +204,10 @@ namespace vibrance.GUI
             RegistryController autostartController = new RegistryController();
             if (this.checkBoxAutostart.Checked)
             {
-                if (!autostartController.isProgramRegistered(appName))
-                {
-                    if (autostartController.registerProgram(appName, "\"" + Application.ExecutablePath.ToString() + "\" -minimized"))
-                        listBoxLog.Items.Add("Registered to Autostart!");
-                    else
-                        listBoxLog.Items.Add("Registering to Autostart failed!");       
-                }
+                if (autostartController.registerProgram(appName, "\"" + Application.ExecutablePath.ToString() + "\" -minimized"))
+                    listBoxLog.Items.Add("Registered to Autostart!");
+                else
+                    listBoxLog.Items.Add("Registering to Autostart failed!");
             }
             else
             {
@@ -290,7 +288,7 @@ namespace vibrance.GUI
         }
 
     }
-    
+
     public class AmdVibranceAdapter
     {
         public AmdViewModel amdViewModel;
@@ -311,7 +309,7 @@ namespace vibrance.GUI
             }
         }
 
-        public int MaxLevel 
+        public int MaxLevel
         {
             get
             {

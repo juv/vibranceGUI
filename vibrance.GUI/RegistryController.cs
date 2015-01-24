@@ -19,15 +19,23 @@ namespace vibrance.GUI
         {
             try
             {
-                if (!isProgramRegistered(appName))
+                startupKey = Registry.CurrentUser.OpenSubKey(runKey);
+                var startUpValue = startupKey.GetValue(appName);
+
+                if (startUpValue == pathToExe)
                 {
-                    startupKey = Registry.CurrentUser.OpenSubKey(runKey);
-                    if (startupKey.GetValue(appName) == null)
+                    return true;
+                }
+                else
+                {
+                    if (startUpValue != null)
                     {
-                        startupKey.Close();
-                        startupKey = Registry.CurrentUser.OpenSubKey(runKey, true);
-                        startupKey.SetValue(appName, pathToExe);
+                        unregisterProgram(appName);
                     }
+
+                    startupKey.Close();
+                    startupKey = Registry.CurrentUser.OpenSubKey(runKey, true);
+                    startupKey.SetValue(appName, pathToExe);
                 }
             }
             catch (Exception)

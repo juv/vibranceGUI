@@ -1,6 +1,8 @@
-﻿using System;
+﻿using gui.app.utils;
+using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -19,6 +21,14 @@ namespace vibrance.GUI
 
         public NvidiaVibranceGUI()
         {
+            const string nvidiaAdapterName = "nvidia.adapter.dll";
+            string resourceName = string.Format("{0}.NVIDIA.{1}", typeof(Program).Namespace, nvidiaAdapterName);
+
+            string dllPath = CommonUtils.LoadUnmanagedLibraryFromResource(
+                Assembly.GetExecutingAssembly(),
+                resourceName,
+                nvidiaAdapterName);
+
             InitializeComponent();
         }
 

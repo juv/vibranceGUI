@@ -1,5 +1,7 @@
-﻿using System;
+﻿using gui.app.utils;
+using System;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -22,7 +24,8 @@ namespace vibrance.GUI
             Application.SetCompatibleTextRenderingDefault(false);
 
             GraphicsAdapter adapter = GraphicsAdapterHelper.getAdapter();
-            Form vibranceGUI = null; 
+            Form vibranceGUI = null;
+
             if (adapter == GraphicsAdapter.AMD)
             {
                 vibranceGUI = new AmdVibranceGUI();

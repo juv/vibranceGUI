@@ -20,19 +20,8 @@ namespace vibrance.GUI
             try
             {
                 startupKey = Registry.CurrentUser.OpenSubKey(runKey);
-                var startUpValue = startupKey.GetValue(appName);
-
-                if (startUpValue == pathToExe)
+                if (startupKey.GetValue(appName) == null)
                 {
-                    return true;
-                }
-                else
-                {
-                    if (startUpValue != null)
-                    {
-                        unregisterProgram(appName);
-                    }
-
                     startupKey.Close();
                     startupKey = Registry.CurrentUser.OpenSubKey(runKey, true);
                     startupKey.SetValue(appName, pathToExe);
@@ -80,6 +69,33 @@ namespace vibrance.GUI
                 return false;
             }
             return false;
+        }
+
+        public bool isStartupPathUnchanged(string appName, string pathToExe)
+        {
+            try
+            {
+                startupKey = Registry.CurrentUser.OpenSubKey(runKey);
+                if (startupKey == null)
+                {
+                    return false;
+                }
+
+                string startUpValue = startupKey.GetValue(appName).ToString();
+                if (startUpValue == pathToExe)
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            finally
+            {
+                startupKey.Close();
+            }
         }
     }
 }

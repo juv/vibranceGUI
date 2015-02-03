@@ -28,7 +28,7 @@ namespace vibrance.GUI
         const string szKeyNameKeepActive = "keepActive";
         const string szKeyNameRefreshRate = "refreshRate";
 
-        private string fileName = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToString() + "\\vibranceGUI.ini";
+        private string fileName = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToString() + "\\vibranceGUI\\vibranceGUI.ini";
 
         public bool setVibranceSettings(string ingameLevel, string windowsLevel, string keepActive, string refreshRate)
         {

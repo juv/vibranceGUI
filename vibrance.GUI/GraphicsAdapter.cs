@@ -20,7 +20,7 @@ namespace vibrance.GUI
         private static extern IntPtr LoadLibrary(string dllToLoad);
 
         private const string nvidiaDllName = "nvapi.dll";
-        private const string amdDllName = "atiadlxx.dll";
+        private const string amdDllName = "atiadlxy.dll";
 
 
         public static GraphicsAdapter getAdapter()

@@ -5,7 +5,7 @@ namespace gui.app.gpucontroller.amd.adl
 {
     public static class ADLImport
     {
-        public const string Atiadlxy_FileName = "atiadlxx.dll";
+        public const string Atiadlxy_FileName = "atiadlxy.dll";
         public const string Kernel32_FileName = "kernel32.dll";
 
         [DllImport(Kernel32_FileName)]

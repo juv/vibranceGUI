@@ -21,7 +21,7 @@ namespace vibrance.GUI
 
         public NvidiaVibranceGUI()
         {
-            const string nvidiaAdapterName = "nvidia.adapter.dll";
+            const string nvidiaAdapterName = "vibranceDLL.dll";
             string resourceName = string.Format("{0}.NVIDIA.{1}", typeof(Program).Namespace, nvidiaAdapterName);
 
             string dllPath = CommonUtils.LoadUnmanagedLibraryFromResource(
@@ -59,7 +59,6 @@ namespace vibrance.GUI
             this.Invoke((MethodInvoker)delegate
             {
                 readVibranceSettings(out vibranceIngameLevel, out vibranceWindowsLevel, out keepActive, out refreshRate);
-                checkBoxAutostart_CheckedChanged(null, null);
             });
 
             v = new NvidiaVibranceProxy(silenced);
@@ -224,10 +223,21 @@ namespace vibrance.GUI
             RegistryController autostartController = new RegistryController();
             if (this.checkBoxAutostart.Checked)
             {
-                if (autostartController.registerProgram(appName, "\"" + Application.ExecutablePath.ToString() + "\" -minimized"))
-                    listBoxLog.Items.Add("Registered to Autostart!");
-                else
-                    listBoxLog.Items.Add("Registering to Autostart failed!");
+                string pathToExe = "\"" + Application.ExecutablePath.ToString() + "\" -minimized";
+                if (!autostartController.isProgramRegistered(appName))
+                {
+                    if (autostartController.registerProgram(appName, pathToExe))
+                        listBoxLog.Items.Add("Registered to Autostart!");
+                    else
+                        listBoxLog.Items.Add("Registering to Autostart failed!");
+                }
+                else if (!autostartController.isStartupPathUnchanged(appName, pathToExe))
+                {
+                    if(autostartController.registerProgram(appName, pathToExe))
+                        listBoxLog.Items.Add("Updated Autostart Path!");
+                    else
+                        listBoxLog.Items.Add("Updating Autostart Path failed!");
+                }
             }
             else
             {

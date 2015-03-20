@@ -18,6 +18,8 @@ namespace vibrance.GUI
         private const string twitterLink = "https://twitter.com/juvlarN";
         private const string paypalDonationLink = "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=JDQFNKNNEW356";
 
+        private bool allowVisible;
+
 
         public NvidiaVibranceGUI()
         {
@@ -29,7 +31,24 @@ namespace vibrance.GUI
                 resourceName,
                 nvidiaAdapterName);
 
+            allowVisible = true;
+
             InitializeComponent();
+        }
+
+        protected override void SetVisibleCore(bool value)
+        {
+            if (!allowVisible)
+            {
+                value = false;
+                if (!this.IsHandleCreated) CreateHandle();
+            }
+            base.SetVisibleCore(value);
+        }
+
+        public void SetAllowVisible(bool value)
+        {
+            allowVisible = value;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -166,6 +185,7 @@ namespace vibrance.GUI
 
         private void notifyIcon_MouseClick(object sender, MouseEventArgs e)
         {
+            allowVisible = true;
             this.Show();
 
 			this.WindowState = FormWindowState.Normal;

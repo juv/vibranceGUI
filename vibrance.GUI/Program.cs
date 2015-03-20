@@ -1,7 +1,7 @@
-﻿using gui.app.utils;
+﻿using System.ComponentModel;
+using System.Runtime.InteropServices;
 using System;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -9,6 +9,9 @@ namespace vibrance.GUI
 {
     static class Program
     {
+        private const string errorGraphicsAdapterUnknown = "Failed to determine your Graphic Adapter type (NVIDIA/AMD). Please contact @juvlarN at twitter. Press Yes to open twitter in your browser now. Error: ";
+        private const string messageBoxCaption = "vibranceGUI Error";
+
         [STAThread]
         static void Main(string[] args)
         {
@@ -16,7 +19,7 @@ namespace vibrance.GUI
             Mutex mutex = new Mutex(true, "vibranceGUI~Mutex", out result);
             if (!result)
             {
-                MessageBox.Show("You can run vibranceGUI only once at a time!", "vibranceGUI", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("You can run vibranceGUI only once at a time!", messageBoxCaption, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
@@ -36,9 +39,9 @@ namespace vibrance.GUI
             }
             else if (adapter == GraphicsAdapter.UNKNOWN)
             {
-                if (MessageBox.Show(
-                    "Failed to determine your Graphic Adapter type (NVIDIA/AMD). Please contact @juvlarN at twitter. Press Yes to open twitter in your browser now.", 
-                    "vibranceGUI Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
+                string errorMessage = new Win32Exception(Marshal.GetLastWin32Error()).Message;
+                if (MessageBox.Show(errorGraphicsAdapterUnknown + errorMessage,
+                    messageBoxCaption, MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
                 {
                     System.Diagnostics.Process.Start("https://twitter.com/juvlarN");
                 }
@@ -48,6 +51,14 @@ namespace vibrance.GUI
             {
                 vibranceGUI.WindowState = FormWindowState.Minimized;
                 vibranceGUI.ShowInTaskbar = false;
+                if (vibranceGUI is AmdVibranceGUI)
+                {
+                    ((AmdVibranceGUI) vibranceGUI).SetAllowVisible(false);
+                }
+                else
+                {
+                    ((NvidiaVibranceGUI) vibranceGUI).SetAllowVisible(false);
+                }
             }
             Application.Run(vibranceGUI);
 

@@ -34,6 +34,8 @@ namespace vibrance.GUI
             allowVisible = true;
 
             InitializeComponent();
+
+            backgroundWorker.RunWorkerAsync();
         }
 
         protected override void SetVisibleCore(bool value)
@@ -75,10 +77,22 @@ namespace vibrance.GUI
             int vibranceIngameLevel = NvidiaVibranceProxy.NVAPI_MAX_LEVEL, vibranceWindowsLevel = NvidiaVibranceProxy.NVAPI_DEFAULT_LEVEL, refreshRate = 5000;
             bool keepActive = false;
 
-            this.Invoke((MethodInvoker)delegate
+            while (!this.IsHandleCreated)
+            {
+                System.Threading.Thread.Sleep(500);
+            }
+
+            if (this.InvokeRequired)
+            {
+                this.Invoke((MethodInvoker) delegate
+                {
+                    readVibranceSettings(out vibranceIngameLevel, out vibranceWindowsLevel, out keepActive, out refreshRate);
+                });
+            }
+            else
             {
                 readVibranceSettings(out vibranceIngameLevel, out vibranceWindowsLevel, out keepActive, out refreshRate);
-            });
+            }
 
             v = new NvidiaVibranceProxy(silenced);
             if (v.vibranceInfo.isInitialized)
@@ -103,7 +117,10 @@ namespace vibrance.GUI
 
         private void Form1_Shown(object sender, EventArgs e)
         {
-            backgroundWorker.RunWorkerAsync();
+            if (v.vibranceInfo.isInitialized)
+            {
+                setGuiEnabledFlag(true);
+            }
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -313,14 +330,17 @@ namespace vibrance.GUI
             SettingsController settingsController = new SettingsController();
             settingsController.readVibranceSettings(GraphicsAdapter.NVIDIA, out vibranceIngameLevel, out vibranceWindowsLevel, out keepActive, out refreshRate);
 
-            //no null check needed, SettingsController will always return matching values.
-            labelWindowsLevel.Text = NvidiaSettingsWrapper.find(vibranceWindowsLevel).getPercentage;
-            labelIngameLevel.Text = NvidiaSettingsWrapper.find(vibranceIngameLevel).getPercentage;
+            if (this.IsHandleCreated)
+            {
+                //no null check needed, SettingsController will always return matching values.
+                labelWindowsLevel.Text = NvidiaSettingsWrapper.find(vibranceWindowsLevel).getPercentage;
+                labelIngameLevel.Text = NvidiaSettingsWrapper.find(vibranceIngameLevel).getPercentage;
 
-            trackBarWindowsLevel.Value = vibranceWindowsLevel;
-            trackBarIngameLevel.Value = vibranceIngameLevel;
-            checkBoxKeepActive.Checked = keepActive;
-            textBoxRefreshRate.Text = refreshRate.ToString();
+                trackBarWindowsLevel.Value = vibranceWindowsLevel;
+                trackBarIngameLevel.Value = vibranceIngameLevel;
+                checkBoxKeepActive.Checked = keepActive;
+                textBoxRefreshRate.Text = refreshRate.ToString();
+            }
         }
 
         private void saveVibranceSettings(int ingameLevel, int windowsLevel, bool keepActive, int refreshRate)

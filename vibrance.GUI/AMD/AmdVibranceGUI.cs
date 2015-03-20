@@ -27,6 +27,7 @@ namespace vibrance.GUI
             InitializeComponent();
             allowVisible = true;
             v = new AmdVibranceAdapter(silenced);
+            backgroundWorker.RunWorkerAsync();
         }
 
         protected override void SetVisibleCore(bool value)
@@ -67,11 +68,23 @@ namespace vibrance.GUI
             int vibranceIngameLevel = v.MaxLevel, vibranceWindowsLevel = v.DefaultLevel, refreshRate = 5000;
             bool keepActive = false;
 
-            this.Invoke((MethodInvoker)delegate
+            while (!this.IsHandleCreated)
+            {
+                System.Threading.Thread.Sleep(500);
+            }
+
+
+            if (this.InvokeRequired)
+            {
+                this.Invoke((MethodInvoker)delegate
+                {
+                    readVibranceSettings(out vibranceIngameLevel, out vibranceWindowsLevel, out keepActive, out refreshRate);
+                });
+            }
+            else
             {
                 readVibranceSettings(out vibranceIngameLevel, out vibranceWindowsLevel, out keepActive, out refreshRate);
-                //checkBoxAutostart_CheckedChanged(null, null);
-            });
+            }
 
             if (v.amdViewModel != null)
             {
@@ -95,7 +108,10 @@ namespace vibrance.GUI
 
         private void Form1_Shown(object sender, EventArgs e)
         {
-            backgroundWorker.RunWorkerAsync();
+            if (v.amdViewModel != null)
+            {
+                setGuiEnabledFlag(true);
+            }
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)

@@ -35,6 +35,12 @@ namespace vibrance.GUI
 
             InitializeComponent();
 
+            System.Runtime.InteropServices.Marshal.PrelinkAll(typeof(NvidiaVibranceProxy));
+            resetEvent = new AutoResetEvent(false);
+            backgroundWorker.WorkerReportsProgress = true;
+            settingsBackgroundWorker.WorkerReportsProgress = true;
+
+
             backgroundWorker.RunWorkerAsync();
         }
 
@@ -56,10 +62,6 @@ namespace vibrance.GUI
         private void Form1_Load(object sender, EventArgs e)
         {
             setGuiEnabledFlag(false);
-            System.Runtime.InteropServices.Marshal.PrelinkAll(typeof(NvidiaVibranceProxy));
-            resetEvent = new AutoResetEvent(false);
-            backgroundWorker.WorkerReportsProgress = true;
-            settingsBackgroundWorker.WorkerReportsProgress = true;
         }
 
         private void Form1_Resize(object sender, EventArgs e)

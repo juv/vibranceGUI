@@ -16,7 +16,7 @@ namespace vibrance.GUI
     public class GraphicsAdapterHelper
     {
 
-        [DllImport("kernel32.dll", SetLastError=true)]
+        [DllImport("kernel32.dll", SetLastError = true)]
         private static extern IntPtr LoadLibrary(string dllToLoad);
 
         private const string nvidiaDllName = "nvapi.dll";

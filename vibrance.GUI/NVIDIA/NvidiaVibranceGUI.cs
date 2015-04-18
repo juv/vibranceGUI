@@ -1,4 +1,5 @@
-﻿using gui.app.utils;
+﻿using System.IO;
+using gui.app.utils;
 using System;
 using System.ComponentModel;
 using System.Drawing;
@@ -39,7 +40,6 @@ namespace vibrance.GUI
             resetEvent = new AutoResetEvent(false);
             backgroundWorker.WorkerReportsProgress = true;
             settingsBackgroundWorker.WorkerReportsProgress = true;
-
 
             backgroundWorker.RunWorkerAsync();
         }
@@ -312,15 +312,39 @@ namespace vibrance.GUI
 
         private void cleanUp()
         {
-            this.statusLabel.Text = "Closing...";
-            this.statusLabel.ForeColor = Color.Red;
-            this.Update();
-            listBoxLog.Items.Add("Initiating observer thread exit... ");
-            if (v != null && v.vibranceInfo.isInitialized)
+            try
             {
-                v.setShouldRun(false);
-                resetEvent.WaitOne();
-                listBoxLog.Items.Add("Unloading NVAPI... ");
+                this.statusLabel.Text = "Closing...";
+                this.statusLabel.ForeColor = Color.Red;
+                this.Update();
+                listBoxLog.Items.Add("Initiating observer thread exit... ");
+                if (v != null && v.vibranceInfo.isInitialized)
+                {
+                    v.setShouldRun(false);
+                    resetEvent.WaitOne();
+                    listBoxLog.Items.Add("Unloading NVAPI... ");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+            }
+        }
+
+        public static void Log(Exception ex)
+        {
+            using (StreamWriter w = File.AppendText("vibranceGUI_log.txt"))
+            {
+                w.Write("\r\nLog Entry : ");
+                w.WriteLine("{0} {1}", DateTime.Now.ToLongTimeString(),
+                    DateTime.Now.ToLongDateString());
+                w.WriteLine("Exception Found:\nType: {0}", ex.GetType().FullName);
+                w.WriteLine("Message: {0}", ex.Message);
+                w.WriteLine("Source: {0}", ex.Source);
+                w.WriteLine("Stacktrace: {0}", ex.StackTrace);
+                w.WriteLine("Exception String: {0}", ex.ToString());
+
+                w.WriteLine("-------------------------------");
             }
         }
 

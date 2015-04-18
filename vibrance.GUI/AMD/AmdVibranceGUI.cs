@@ -1,4 +1,6 @@
 ﻿using gui.app.gpucontroller.amd;
+using gui.app.gpucontroller.amd32;
+using gui.app.gpucontroller.amd64;
 using gui.app.mvvm.model;
 using gui.app.mvvm.viewmodel;
 using System;
@@ -7,6 +9,7 @@ using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using vibrance.GUI.AMD.vendor;
 
 namespace vibrance.GUI
 {
@@ -53,7 +56,6 @@ namespace vibrance.GUI
             this.Invoke((MethodInvoker)delegate
             {
                 readVibranceSettings(out vibranceIngameLevel, out vibranceWindowsLevel, out keepActive, out refreshRate);
-                //checkBoxAutostart_CheckedChanged(null, null);
             });
 
             if (v.amdViewModel != null)
@@ -297,7 +299,7 @@ namespace vibrance.GUI
 
         public AmdVibranceAdapter(bool silenced)
         {
-            this.amdViewModel = new AmdViewModel(new AmdAdapter());
+            this.amdViewModel = new AmdViewModel(Environment.Is64BitOperatingSystem ? (AmdAdapter)new AmdAdapter64() : (AmdAdapter)new AmdAdapter32());
             this.silenced = silenced;
         }
 
@@ -359,7 +361,7 @@ namespace vibrance.GUI
                 {
                     task.Wait();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     this.amdViewModel.VibranceSettingsViewModel.ResetVibrance();
                 }

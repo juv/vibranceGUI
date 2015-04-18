@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace gui.app.gpucontroller.amd.adl
+namespace gui.app.gpucontroller.amd.adl32
 {
     public class Delegates
     {

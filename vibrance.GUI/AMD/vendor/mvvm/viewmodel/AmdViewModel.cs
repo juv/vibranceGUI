@@ -10,7 +10,7 @@ using GalaSoft.MvvmLight.Messaging;
 using gui.app.gpucontroller.amd;
 using gui.app.mvvm.model;
 using gui.app.utils;
-using gui.app.gpucontroller.amd.adl;
+using vibrance.GUI.AMD.vendor;
 
 namespace gui.app.mvvm.viewmodel
 {
@@ -18,8 +18,6 @@ namespace gui.app.mvvm.viewmodel
     {
         public AmdViewModel(AmdAdapter gpuAdapter)
         {
-            System.Runtime.InteropServices.Marshal.PrelinkAll(typeof(ADLImport));
-
             MinimumVibranceLevel = 100;
             MaximumVibranceLevel = 200;
 

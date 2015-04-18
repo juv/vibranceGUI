@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using gui.app.gpucontroller.amd;
 using gui.app.utils;
 using System.Diagnostics;
+using vibrance.GUI.AMD.vendor;
 
 namespace gui.app.mvvm.model
 {
@@ -22,7 +23,7 @@ namespace gui.app.mvvm.model
         private readonly AmdAdapter _gpuAdapter;
         private VibranceSettings _model;
         private readonly string _settingsFileFullName;
-        private IntPtr _handleWinEventHook;
+
         public VibranceSettingsViewModel(AmdAdapter gpuAdapter)
         {
             _gpuAdapter = gpuAdapter;

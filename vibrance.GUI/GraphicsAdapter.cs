@@ -20,11 +20,14 @@ namespace vibrance.GUI
         private static extern IntPtr LoadLibrary(string dllToLoad);
 
         private const string nvidiaDllName = "nvapi.dll";
-        private const string amdDllName = "atiadlxx.dll";
+        private static string amdDllName = Environment.Is64BitOperatingSystem 
+            ? gui.app.gpucontroller.amd.adl64.ADLImport.Atiadl_FileName 
+            : gui.app.gpucontroller.amd.adl32.ADLImport.Atiadl_FileName;
 
 
         public static GraphicsAdapter getAdapter()
         {
+            var x = Environment.Is64BitOperatingSystem;
             if (isAdapterAvailable(nvidiaDllName))
                 return GraphicsAdapter.NVIDIA;
             if (isAdapterAvailable(amdDllName))

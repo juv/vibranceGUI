@@ -20,7 +20,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace gui.app.gpucontroller.amd.adl
+namespace gui.app.gpucontroller.amd.adl32
 {
     public static class ADL
     {

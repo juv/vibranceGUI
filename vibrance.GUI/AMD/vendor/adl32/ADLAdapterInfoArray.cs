@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace gui.app.gpucontroller.amd.adl
+namespace gui.app.gpucontroller.amd.adl64
 {
     [StructLayout(LayoutKind.Sequential)]
     internal struct ADLAdapterInfoArray

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace gui.app.gpucontroller.amd.adl
+namespace gui.app.gpucontroller.amd.adl32
 {
     public class ADLCheckLibrary
     {
@@ -13,7 +13,7 @@ namespace gui.app.gpucontroller.amd.adl
             {
                 if (1 == ADLImport.ADL_Main_Control_IsFunctionValid(IntPtr.Zero, "ADL_Main_Control_Create"))
                 {
-                    ADLLibrary = ADLImport.GetModuleHandle(ADLImport.Atiadlxy_FileName);
+                    ADLLibrary = ADLImport.GetModuleHandle(ADLImport.Atiadl_FileName);
                 }
             }
             catch (DllNotFoundException) { }

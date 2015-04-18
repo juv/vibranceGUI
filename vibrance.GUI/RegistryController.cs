@@ -22,7 +22,7 @@ namespace vibrance.GUI
                 startupKey = Registry.CurrentUser.OpenSubKey(runKey);
                 var startUpValue = startupKey.GetValue(appName);
 
-                if (startUpValue == pathToExe)
+                if ((string)startUpValue == pathToExe)
                 {
                     return true;
                 }

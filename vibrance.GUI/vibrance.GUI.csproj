@@ -111,15 +111,25 @@
     <Compile Include="AMD\AmdVibranceGUI.Designer.cs">
       <DependentUpon>AmdVibranceGUI.cs</DependentUpon>
     </Compile>
-    <Compile Include="AMD\vendor\adl\ADL.cs" />
-    <Compile Include="AMD\vendor\adl\ADLAdapterInfo.cs" />
-    <Compile Include="AMD\vendor\adl\ADLAdapterInfoArray.cs" />
-    <Compile Include="AMD\vendor\adl\ADLCheckLibrary.cs" />
-    <Compile Include="AMD\vendor\adl\ADLDisplayID.cs" />
-    <Compile Include="AMD\vendor\adl\ADLDisplayInfo.cs" />
-    <Compile Include="AMD\vendor\adl\ADLImport.cs" />
-    <Compile Include="AMD\vendor\adl\Delegates.cs" />
+    <Compile Include="AMD\vendor\adl32\ADL.cs" />
+    <Compile Include="AMD\vendor\adl32\ADLAdapterInfo.cs" />
+    <Compile Include="AMD\vendor\adl32\ADLAdapterInfoArray.cs" />
+    <Compile Include="AMD\vendor\adl32\ADLCheckLibrary.cs" />
+    <Compile Include="AMD\vendor\adl32\ADLDisplayID.cs" />
+    <Compile Include="AMD\vendor\adl32\ADLDisplayInfo.cs" />
+    <Compile Include="AMD\vendor\adl32\ADLImport.cs" />
+    <Compile Include="AMD\vendor\adl32\Delegates.cs" />
+    <Compile Include="AMD\vendor\adl64\ADL.cs" />
+    <Compile Include="AMD\vendor\adl64\ADLAdapterInfo.cs" />
+    <Compile Include="AMD\vendor\adl64\ADLAdapterInfoArray.cs" />
+    <Compile Include="AMD\vendor\adl64\ADLCheckLibrary.cs" />
+    <Compile Include="AMD\vendor\adl64\ADLDisplayID.cs" />
+    <Compile Include="AMD\vendor\adl64\ADLDisplayInfo.cs" />
+    <Compile Include="AMD\vendor\adl64\ADLImport.cs" />
+    <Compile Include="AMD\vendor\adl64\Delegates.cs" />
     <Compile Include="AMD\vendor\AmdAdapter.cs" />
+    <Compile Include="AMD\vendor\AmdAdapter32,.cs" />
+    <Compile Include="AMD\vendor\AmdAdapter64.cs" />
     <Compile Include="AMD\vendor\mvvm\model\VibranceSettings.cs" />
     <Compile Include="AMD\vendor\mvvm\viewmodel\AmdViewModel.cs" />
     <Compile Include="AMD\vendor\mvvm\viewmodel\VibranceSettingsViewModel.cs" />

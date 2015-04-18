@@ -187,7 +187,7 @@
   <ItemGroup>
     <Content Include="AMD\vendor\mvvm\image\twitter.png" />
     <Content Include="FodyWeavers.xml" />
-    <EmbeddedResource Include="NVIDIA\nvidia.adapter.dll" />
+    <EmbeddedResource Include="NVIDIA\vibranceDLL.dll" />
     <Content Include="setting.ico" />
   </ItemGroup>
   <ItemGroup>

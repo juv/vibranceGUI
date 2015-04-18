@@ -1,6 +1,4 @@
 ﻿using gui.app.gpucontroller.amd;
-using gui.app.gpucontroller.amd32;
-using gui.app.gpucontroller.amd64;
 using gui.app.mvvm.model;
 using gui.app.mvvm.viewmodel;
 using System;
@@ -9,7 +7,6 @@ using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using vibrance.GUI.AMD.vendor;
 
 namespace vibrance.GUI
 {
@@ -23,19 +20,39 @@ namespace vibrance.GUI
         private const string twitterLink = "https://twitter.com/juvlarN";
         private const string paypalDonationLink = "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=JDQFNKNNEW356";
 
+        private bool allowVisible;
 
         public AmdVibranceGUI()
         {
             InitializeComponent();
+            allowVisible = true;
             v = new AmdVibranceAdapter(silenced);
+
+            resetEvent = new AutoResetEvent(false);
+            backgroundWorker.WorkerReportsProgress = true;
+            settingsBackgroundWorker.WorkerReportsProgress = true;
+
+            backgroundWorker.RunWorkerAsync();
+        }
+
+        protected override void SetVisibleCore(bool value)
+        {
+            if (!allowVisible)
+            {
+                value = false;
+                if (!this.IsHandleCreated) CreateHandle();
+            }
+            base.SetVisibleCore(value);
+        }
+
+        public void SetAllowVisible(bool value)
+        {
+            allowVisible = value;
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
             setGuiEnabledFlag(false);
-            resetEvent = new AutoResetEvent(false);
-            backgroundWorker.WorkerReportsProgress = true;
-            settingsBackgroundWorker.WorkerReportsProgress = true;
         }
 
         private void Form1_Resize(object sender, EventArgs e)
@@ -53,10 +70,23 @@ namespace vibrance.GUI
             int vibranceIngameLevel = v.MaxLevel, vibranceWindowsLevel = v.DefaultLevel, refreshRate = 5000;
             bool keepActive = false;
 
-            this.Invoke((MethodInvoker)delegate
+            while (!this.IsHandleCreated)
+            {
+                System.Threading.Thread.Sleep(500);
+            }
+
+
+            if (this.InvokeRequired)
+            {
+                this.Invoke((MethodInvoker)delegate
+                {
+                    readVibranceSettings(out vibranceIngameLevel, out vibranceWindowsLevel, out keepActive, out refreshRate);
+                });
+            }
+            else
             {
                 readVibranceSettings(out vibranceIngameLevel, out vibranceWindowsLevel, out keepActive, out refreshRate);
-            });
+            }
 
             if (v.amdViewModel != null)
             {
@@ -80,7 +110,10 @@ namespace vibrance.GUI
 
         private void Form1_Shown(object sender, EventArgs e)
         {
-            backgroundWorker.RunWorkerAsync();
+            if (v.amdViewModel != null)
+            {
+                setGuiEnabledFlag(true);
+            }
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -149,6 +182,7 @@ namespace vibrance.GUI
 
         private void notifyIcon_MouseClick(object sender, MouseEventArgs e)
         {
+            allowVisible = true;
             this.Show();
 
             this.WindowState = FormWindowState.Normal;
@@ -206,10 +240,21 @@ namespace vibrance.GUI
             RegistryController autostartController = new RegistryController();
             if (this.checkBoxAutostart.Checked)
             {
-                if (autostartController.registerProgram(appName, "\"" + Application.ExecutablePath.ToString() + "\" -minimized"))
-                    listBoxLog.Items.Add("Registered to Autostart!");
-                else
-                    listBoxLog.Items.Add("Registering to Autostart failed!");
+                string pathToExe = "\"" + Application.ExecutablePath.ToString() + "\" -minimized";
+                if (!autostartController.isProgramRegistered(appName))
+                {
+                    if (autostartController.registerProgram(appName, pathToExe))
+                        listBoxLog.Items.Add("Registered to Autostart!");
+                    else
+                        listBoxLog.Items.Add("Registering to Autostart failed!");
+                }
+                else if (!autostartController.isStartupPathUnchanged(appName, pathToExe))
+                {
+                    if (autostartController.registerProgram(appName, pathToExe))
+                        listBoxLog.Items.Add("Updated Autostart Path!");
+                    else
+                        listBoxLog.Items.Add("Updating Autostart Path failed!");
+                }
             }
             else
             {
@@ -299,7 +344,7 @@ namespace vibrance.GUI
 
         public AmdVibranceAdapter(bool silenced)
         {
-            this.amdViewModel = new AmdViewModel(Environment.Is64BitOperatingSystem ? (AmdAdapter)new AmdAdapter64() : (AmdAdapter)new AmdAdapter32());
+            this.amdViewModel = new AmdViewModel(new AmdAdapter());
             this.silenced = silenced;
         }
 
@@ -361,7 +406,7 @@ namespace vibrance.GUI
                 {
                     task.Wait();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     this.amdViewModel.VibranceSettingsViewModel.ResetVibrance();
                 }

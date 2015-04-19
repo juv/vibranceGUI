@@ -11,17 +11,18 @@ using gui.app.gpucontroller.amd;
 using gui.app.mvvm.model;
 using gui.app.utils;
 using vibrance.GUI.AMD.vendor;
+using System.Collections;
 
 namespace gui.app.mvvm.viewmodel
 {
     public class AmdViewModel
     {
-        public AmdViewModel(AmdAdapter gpuAdapter)
+        public AmdViewModel(Action<string> addLogItem, AmdAdapter gpuAdapter)
         {
             MinimumVibranceLevel = 100;
             MaximumVibranceLevel = 200;
 
-            VibranceSettingsViewModel = new VibranceSettingsViewModel(gpuAdapter);
+            VibranceSettingsViewModel = new VibranceSettingsViewModel(addLogItem, gpuAdapter);
 
             if (VibranceSettingsViewModel.SettingsExists())
             {

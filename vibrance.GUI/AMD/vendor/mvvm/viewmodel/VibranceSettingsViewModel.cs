@@ -13,6 +13,7 @@ using gui.app.gpucontroller.amd;
 using gui.app.utils;
 using System.Diagnostics;
 using vibrance.GUI.AMD.vendor;
+using System.Collections;
 
 namespace gui.app.mvvm.model
 {
@@ -21,11 +22,22 @@ namespace gui.app.mvvm.model
         private static readonly object _padlock = new object();
 
         private readonly AmdAdapter _gpuAdapter;
+
         private VibranceSettings _model;
+
         private readonly string _settingsFileFullName;
 
-        public VibranceSettingsViewModel(AmdAdapter gpuAdapter)
+        private readonly Action<string> _addLogItem;
+
+        private bool windowsAlreadySet = false;
+
+        private int lastSetIngameVibranceLevel;
+
+        private IntPtr lastSetCsgoHandle;
+
+        public VibranceSettingsViewModel(Action<string> addLogItem, AmdAdapter gpuAdapter)
         {
+            _addLogItem = addLogItem;
             _gpuAdapter = gpuAdapter;
             _model = new VibranceSettings();
             SettingsName = "amd_settings.cfg";
@@ -36,9 +48,7 @@ namespace gui.app.mvvm.model
         {
             return FindWindow(IntPtr.Zero, "Counter-Strike: Global Offensive");
         }
-
-        private bool windowsAlreadySet = false;
-
+        
         public void RefreshVibranceStatus(IntPtr foregroundHwnd)
         {
             IntPtr csgoHandle = this.GetCsGoHandle();
@@ -46,9 +56,15 @@ namespace gui.app.mvvm.model
             if (csgoHandle == foregroundHwnd || (csgoHandle != IntPtr.Zero && this.Model.KeepVibranceOnWhenCsGoIsStarted))
             {
                 windowsAlreadySet = false;
-                var displayName = GetDisplayName(csgoHandle);
 
-                _gpuAdapter.SetSaturationOnDisplay(Model.IngameVibranceLevel, displayName);
+                if (csgoHandle != lastSetCsgoHandle || Model.IngameVibranceLevel != lastSetIngameVibranceLevel) 
+                {
+                    var displayName = GetDisplayName(csgoHandle);
+                    _gpuAdapter.SetSaturationOnDisplay(Model.IngameVibranceLevel, displayName);
+                    lastSetIngameVibranceLevel = Model.IngameVibranceLevel;
+                    lastSetCsgoHandle = csgoHandle;
+                    _addLogItem(string.Format("Vibrance set to '{0}' for '{1}'", Model.IngameVibranceLevel, displayName));
+                }
             }
             else if (windowsAlreadySet == false)
             {
@@ -58,7 +74,11 @@ namespace gui.app.mvvm.model
                     foreach (var screen in Screen.AllScreens)
                     {
                         _gpuAdapter.SetSaturationOnDisplay(Model.WindowsVibranceLevel, screen.DeviceName);
+                        _addLogItem(string.Format("Vibrance set to '{0}' for '{1}'", Model.WindowsVibranceLevel, screen.DeviceName));
                     }
+
+                    lastSetIngameVibranceLevel = -1;
+                    lastSetCsgoHandle = IntPtr.Zero;
                 }
             }
         }

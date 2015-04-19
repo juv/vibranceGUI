@@ -4,7 +4,9 @@ using gui.app.gpucontroller.amd64;
 using gui.app.mvvm.model;
 using gui.app.mvvm.viewmodel;
 using System;
+using System.Collections;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,13 +31,18 @@ namespace vibrance.GUI
         {
             InitializeComponent();
             allowVisible = true;
-            v = new AmdVibranceAdapter(silenced);
+            v = new AmdVibranceAdapter(silenced, this.AddLogItem);
 
             resetEvent = new AutoResetEvent(false);
             backgroundWorker.WorkerReportsProgress = true;
             settingsBackgroundWorker.WorkerReportsProgress = true;
 
             backgroundWorker.RunWorkerAsync();
+        }
+
+        private void AddLogItem(string logItem)
+        {
+            Debug.WriteLine(logItem);
         }
 
         protected override void SetVisibleCore(bool value)
@@ -345,9 +352,9 @@ namespace vibrance.GUI
 
         private bool silenced;
 
-        public AmdVibranceAdapter(bool silenced)
+        public AmdVibranceAdapter(bool silenced, Action<string> addLogItem)
         {
-            this.amdViewModel = new AmdViewModel(Environment.Is64BitOperatingSystem ? (AmdAdapter)new AmdAdapter64() : (AmdAdapter)new AmdAdapter32());
+            this.amdViewModel = new AmdViewModel(addLogItem, Environment.Is64BitOperatingSystem ? (AmdAdapter)new AmdAdapter64() : (AmdAdapter)new AmdAdapter32());
             this.silenced = silenced;
         }
 

@@ -27,7 +27,6 @@ namespace vibrance.GUI
 
         public static GraphicsAdapter getAdapter()
         {
-            var x = Environment.Is64BitOperatingSystem;
             if (isAdapterAvailable(nvidiaDllName))
                 return GraphicsAdapter.NVIDIA;
             if (isAdapterAvailable(amdDllName))

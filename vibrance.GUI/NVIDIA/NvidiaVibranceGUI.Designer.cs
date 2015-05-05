@@ -56,6 +56,7 @@
             this.buttonPaypal = new System.Windows.Forms.Button();
             this.labelPaypal = new System.Windows.Forms.Label();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.checkBoxPrimaryMonitorOnly = new System.Windows.Forms.CheckBox();
             this.contextMenuStrip.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -122,6 +123,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.checkBoxPrimaryMonitorOnly);
             this.groupBox1.Controls.Add(this.checkBoxKeepActive);
             this.groupBox1.Controls.Add(this.groupBox4);
             this.groupBox1.Controls.Add(this.groupBox3);
@@ -129,7 +131,7 @@
             this.groupBox1.Controls.Add(this.checkBoxAutostart);
             this.groupBox1.Location = new System.Drawing.Point(13, 82);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(397, 220);
+            this.groupBox1.Size = new System.Drawing.Size(397, 249);
             this.groupBox1.TabIndex = 15;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Settings";
@@ -151,7 +153,7 @@
             // 
             this.groupBox4.Controls.Add(this.labelRefreshRate);
             this.groupBox4.Controls.Add(this.textBoxRefreshRate);
-            this.groupBox4.Location = new System.Drawing.Point(198, 61);
+            this.groupBox4.Location = new System.Drawing.Point(198, 88);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(193, 72);
             this.groupBox4.TabIndex = 13;
@@ -180,7 +182,7 @@
             // 
             this.groupBox3.Controls.Add(this.labelWindowsLevel);
             this.groupBox3.Controls.Add(this.trackBarWindowsLevel);
-            this.groupBox3.Location = new System.Drawing.Point(7, 139);
+            this.groupBox3.Location = new System.Drawing.Point(7, 166);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(182, 72);
             this.groupBox3.TabIndex = 12;
@@ -208,7 +210,7 @@
             // 
             this.groupBox2.Controls.Add(this.trackBarIngameLevel);
             this.groupBox2.Controls.Add(this.labelIngameLevel);
-            this.groupBox2.Location = new System.Drawing.Point(6, 61);
+            this.groupBox2.Location = new System.Drawing.Point(6, 88);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(183, 72);
             this.groupBox2.TabIndex = 11;
@@ -235,7 +237,7 @@
             // statusLabel
             // 
             this.statusLabel.AutoSize = true;
-            this.statusLabel.Location = new System.Drawing.Point(103, 313);
+            this.statusLabel.Location = new System.Drawing.Point(104, 341);
             this.statusLabel.Name = "statusLabel";
             this.statusLabel.Size = new System.Drawing.Size(61, 13);
             this.statusLabel.TabIndex = 14;
@@ -244,7 +246,7 @@
             // observerStatusLabel
             // 
             this.observerStatusLabel.AutoSize = true;
-            this.observerStatusLabel.Location = new System.Drawing.Point(9, 313);
+            this.observerStatusLabel.Location = new System.Drawing.Point(10, 341);
             this.observerStatusLabel.Name = "observerStatusLabel";
             this.observerStatusLabel.Size = new System.Drawing.Size(87, 13);
             this.observerStatusLabel.TabIndex = 13;
@@ -253,7 +255,7 @@
             // listBoxLog
             // 
             this.listBoxLog.FormattingEnabled = true;
-            this.listBoxLog.Location = new System.Drawing.Point(12, 329);
+            this.listBoxLog.Location = new System.Drawing.Point(13, 357);
             this.listBoxLog.Name = "listBoxLog";
             this.listBoxLog.Size = new System.Drawing.Size(397, 225);
             this.listBoxLog.TabIndex = 12;
@@ -288,7 +290,7 @@
             this.buttonPaypal.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.buttonPaypal.BackColor = System.Drawing.Color.Transparent;
             this.buttonPaypal.Image = ((System.Drawing.Image)(resources.GetObject("buttonPaypal.Image")));
-            this.buttonPaypal.Location = new System.Drawing.Point(210, 27);
+            this.buttonPaypal.Location = new System.Drawing.Point(211, 27);
             this.buttonPaypal.Name = "buttonPaypal";
             this.buttonPaypal.Size = new System.Drawing.Size(90, 55);
             this.buttonPaypal.TabIndex = 16;
@@ -312,11 +314,24 @@
             this.toolTip.IsBalloon = true;
             this.toolTip.ReshowDelay = 100;
             // 
+            // checkBoxPrimaryMonitorOnly
+            // 
+            this.checkBoxPrimaryMonitorOnly.AutoSize = true;
+            this.checkBoxPrimaryMonitorOnly.Location = new System.Drawing.Point(6, 65);
+            this.checkBoxPrimaryMonitorOnly.Name = "checkBoxPrimaryMonitorOnly";
+            this.checkBoxPrimaryMonitorOnly.Size = new System.Drawing.Size(151, 17);
+            this.checkBoxPrimaryMonitorOnly.TabIndex = 15;
+            this.checkBoxPrimaryMonitorOnly.Text = "Affect Primary Monitor only";
+            this.toolTip.SetToolTip(this.checkBoxPrimaryMonitorOnly, "When checking this, VibranceGUI will only change vibrance values on your primary " +
+        "monitor.");
+            this.checkBoxPrimaryMonitorOnly.UseVisualStyleBackColor = true;
+            this.checkBoxPrimaryMonitorOnly.CheckedChanged += new System.EventHandler(this.checkBoxPrimaryMonitorOnly_CheckedChanged);
+            // 
             // NvidiaVibranceGUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(421, 561);
+            this.ClientSize = new System.Drawing.Size(421, 589);
             this.Controls.Add(this.labelPaypal);
             this.Controls.Add(this.buttonPaypal);
             this.Controls.Add(this.groupBox1);
@@ -377,6 +392,7 @@
         private System.Windows.Forms.Button buttonPaypal;
         private System.Windows.Forms.Label labelPaypal;
         private System.Windows.Forms.ToolTip toolTip;
+        private System.Windows.Forms.CheckBox checkBoxPrimaryMonitorOnly;
 
     }
 }

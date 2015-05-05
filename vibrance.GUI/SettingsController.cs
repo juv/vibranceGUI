@@ -27,20 +27,22 @@ namespace vibrance.GUI
         const string szKeyNameActive = "activeValue";
         const string szKeyNameKeepActive = "keepActive";
         const string szKeyNameRefreshRate = "refreshRate";
+        const string szKeyNameAffectPrimaryMonitorOnly = "affectPrimaryMonitorOnly";
 
         private string fileName = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToString() + "\\vibranceGUI\\vibranceGUI.ini";
 
-        public bool setVibranceSettings(string ingameLevel, string windowsLevel, string keepActive, string refreshRate)
+        public bool setVibranceSettings(string ingameLevel, string windowsLevel, string keepActive, string refreshRate, string affectPrimaryMonitorOnly)
         {
             if (!prepareFile())
             {
                 return false;
             }
 
-            WritePrivateProfileString(szSectionName, "activeValue", ingameLevel, fileName);
-            WritePrivateProfileString(szSectionName, "inactiveValue", windowsLevel, fileName);
-            WritePrivateProfileString(szSectionName, "keepActive", keepActive, fileName);
-            WritePrivateProfileString(szSectionName, "refreshRate", refreshRate, fileName);
+            WritePrivateProfileString(szSectionName, szKeyNameActive, ingameLevel, fileName);
+            WritePrivateProfileString(szSectionName, szKeyNameInactive, windowsLevel, fileName);
+            WritePrivateProfileString(szSectionName, szKeyNameKeepActive, keepActive, fileName);
+            WritePrivateProfileString(szSectionName, szKeyNameRefreshRate, refreshRate, fileName);
+            WritePrivateProfileString(szSectionName, szKeyNameAffectPrimaryMonitorOnly, affectPrimaryMonitorOnly, fileName);
 
             return (Marshal.GetLastWin32Error() == 0);
         }
@@ -72,7 +74,7 @@ namespace vibrance.GUI
             return true;
         }
 
-        public void readVibranceSettings(GraphicsAdapter graphicsAdapter, out int vibranceIngameLevel, out int vibranceWindowsLevel, out bool keepActive, out int refreshRate)
+        public void readVibranceSettings(GraphicsAdapter graphicsAdapter, out int vibranceIngameLevel, out int vibranceWindowsLevel, out bool keepActive, out int refreshRate, out bool affectPrimaryMonitorOnly)
         {
             int defaultLevel = 0; 
             int maxLevel = 0;
@@ -93,6 +95,7 @@ namespace vibrance.GUI
                 vibranceWindowsLevel = defaultLevel;
                 refreshRate = defaultRefreshRate;
                 keepActive = false;
+                affectPrimaryMonitorOnly = false;
                 return;
             }
 
@@ -132,12 +135,21 @@ namespace vibrance.GUI
                 Convert.ToUInt32(szValueKeepActive.Capacity),
                 fileName);
 
+            StringBuilder szValueAffectPrimaryMonitorOnly = new StringBuilder(1024);
+            GetPrivateProfileString(szSectionName,
+                szKeyNameAffectPrimaryMonitorOnly,
+                szDefault,
+                szValueAffectPrimaryMonitorOnly,
+                Convert.ToUInt32(szValueAffectPrimaryMonitorOnly.Capacity),
+                fileName);
+
             try
             {
                 vibranceWindowsLevel = int.Parse(szValueInactive.ToString());
                 vibranceIngameLevel = int.Parse(szValueActive.ToString());
                 refreshRate = int.Parse(szValueRefreshRate.ToString());
                 keepActive = bool.Parse(szValueKeepActive.ToString());
+                affectPrimaryMonitorOnly = bool.Parse(szValueAffectPrimaryMonitorOnly.ToString());
             }
             catch (Exception)
             {
@@ -145,6 +157,7 @@ namespace vibrance.GUI
                 vibranceWindowsLevel = defaultLevel;
                 refreshRate = defaultRefreshRate;
                 keepActive = false;
+                affectPrimaryMonitorOnly = false;
                 return;
             }
 

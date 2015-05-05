@@ -10,5 +10,6 @@
         void handleDVC();
         bool unloadLibraryEx();
         void handleDVCExit();
+        void setAffectPrimaryMonitorOnly(bool affectPrimaryMonitorOnly);
     }
 }

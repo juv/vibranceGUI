@@ -77,7 +77,7 @@ namespace vibrance.GUI
         private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             int vibranceIngameLevel = NvidiaVibranceProxy.NVAPI_MAX_LEVEL, vibranceWindowsLevel = NvidiaVibranceProxy.NVAPI_DEFAULT_LEVEL, refreshRate = 5000;
-            bool keepActive = false;
+            bool keepActive = false, affectPrimaryMonitorOnly = false;
 
             while (!this.IsHandleCreated)
             {
@@ -88,12 +88,12 @@ namespace vibrance.GUI
             {
                 this.Invoke((MethodInvoker) delegate
                 {
-                    readVibranceSettings(out vibranceIngameLevel, out vibranceWindowsLevel, out keepActive, out refreshRate);
+                    readVibranceSettings(out vibranceIngameLevel, out vibranceWindowsLevel, out keepActive, out refreshRate, out affectPrimaryMonitorOnly);
                 });
             }
             else
             {
-                readVibranceSettings(out vibranceIngameLevel, out vibranceWindowsLevel, out keepActive, out refreshRate);
+                readVibranceSettings(out vibranceIngameLevel, out vibranceWindowsLevel, out keepActive, out refreshRate, out affectPrimaryMonitorOnly);
             }
 
             v = new NvidiaVibranceProxy(silenced);
@@ -108,6 +108,7 @@ namespace vibrance.GUI
                 v.setVibranceIngameLevel(vibranceIngameLevel);
                 v.setVibranceWindowsLevel(vibranceWindowsLevel);
                 v.setSleepInterval(refreshRate);
+                v.setAffectPrimaryMonitorOnly(affectPrimaryMonitorOnly);
                 v.handleDVC();
                 bool unload = v.unloadLibraryEx();
 
@@ -165,15 +166,16 @@ namespace vibrance.GUI
         {
             Thread.Sleep(1000);
             int ingameLevel = 0, windowsLevel = 0, refreshRate = 0;
-            bool keepActive = false;
+            bool keepActive = false, affectPrimaryMonitorOnly = false;
             this.Invoke((MethodInvoker)delegate
             {
                 ingameLevel = trackBarIngameLevel.Value;
                 windowsLevel = trackBarWindowsLevel.Value;
                 keepActive = checkBoxKeepActive.Checked;
                 refreshRate = int.Parse(textBoxRefreshRate.Text);
+                affectPrimaryMonitorOnly = checkBoxPrimaryMonitorOnly.Checked;
             });
-            saveVibranceSettings(ingameLevel, windowsLevel, keepActive, refreshRate);
+            saveVibranceSettings(ingameLevel, windowsLevel, keepActive, refreshRate, affectPrimaryMonitorOnly);
         }
 
         private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -257,6 +259,20 @@ namespace vibrance.GUI
             }
         }
 
+        private void checkBoxPrimaryMonitorOnly_CheckedChanged(object sender, EventArgs e)
+        {
+            if (v != null)
+            {
+                v.setAffectPrimaryMonitorOnly(checkBoxPrimaryMonitorOnly.Checked);
+                if (!settingsBackgroundWorker.IsBusy)
+                {
+                    settingsBackgroundWorker.RunWorkerAsync();
+                }
+                if (checkBoxPrimaryMonitorOnly.Checked)
+                    listBoxLog.Items.Add("VibranceGUI will only affect your primary monitor now.");
+            }
+        }
+
         private void checkBoxAutostart_CheckedChanged(object sender, EventArgs e)
         {
             RegistryController autostartController = new RegistryController();
@@ -306,6 +322,7 @@ namespace vibrance.GUI
                 this.trackBarIngameLevel.Enabled = flag;
                 this.textBoxRefreshRate.Enabled = flag;
                 this.checkBoxAutostart.Enabled = flag;
+                this.checkBoxPrimaryMonitorOnly.Enabled = flag;
                 //this.checkBoxMonitors.Enabled = flag;
             });
         }
@@ -348,13 +365,13 @@ namespace vibrance.GUI
             }
         }
 
-        private void readVibranceSettings(out int vibranceIngameLevel, out int vibranceWindowsLevel, out bool keepActive, out int refreshRate)
+        private void readVibranceSettings(out int vibranceIngameLevel, out int vibranceWindowsLevel, out bool keepActive, out int refreshRate, out bool affectPrimaryMonitorOnly)
         {
             registryController = new RegistryController();
             this.checkBoxAutostart.Checked = registryController.isProgramRegistered(appName);
 
             SettingsController settingsController = new SettingsController();
-            settingsController.readVibranceSettings(GraphicsAdapter.NVIDIA, out vibranceIngameLevel, out vibranceWindowsLevel, out keepActive, out refreshRate);
+            settingsController.readVibranceSettings(GraphicsAdapter.NVIDIA, out vibranceIngameLevel, out vibranceWindowsLevel, out keepActive, out refreshRate, out affectPrimaryMonitorOnly);
 
             if (this.IsHandleCreated)
             {
@@ -366,10 +383,11 @@ namespace vibrance.GUI
                 trackBarIngameLevel.Value = vibranceIngameLevel;
                 checkBoxKeepActive.Checked = keepActive;
                 textBoxRefreshRate.Text = refreshRate.ToString();
+                checkBoxPrimaryMonitorOnly.Checked = affectPrimaryMonitorOnly;
             }
         }
 
-        private void saveVibranceSettings(int ingameLevel, int windowsLevel, bool keepActive, int refreshRate)
+        private void saveVibranceSettings(int ingameLevel, int windowsLevel, bool keepActive, int refreshRate, bool affectPrimaryMonitorOnly)
         {
             SettingsController settingsController = new SettingsController();
 
@@ -377,7 +395,8 @@ namespace vibrance.GUI
                 ingameLevel.ToString(),
                 windowsLevel.ToString(),
                 keepActive.ToString(),
-                refreshRate.ToString()
+                refreshRate.ToString(),
+                affectPrimaryMonitorOnly.ToString()
             );
         }
 
@@ -385,6 +404,5 @@ namespace vibrance.GUI
         {
             System.Diagnostics.Process.Start(NvidiaVibranceGUI.paypalDonationLink);
         }
-
     }
 }

@@ -248,6 +248,11 @@ namespace vibrance.GUI
         {
             this.vibranceInfo.sleepInterval = interval;
         }
+
+        public void setAffectPrimaryMonitorOnly(bool affectPrimaryMonitorOnly)
+        {
+            this.vibranceInfo.affectPrimaryMonitorOnly = affectPrimaryMonitorOnly;
+        }
         
         public void handleDVC()
         {
@@ -289,19 +294,30 @@ namespace vibrance.GUI
                     {
                         if (isChanged && !vibranceInfo.keepActive)
                         {
-                            vibranceInfo.displayHandles.ForEach(handle => setDVCLevel(handle, vibranceInfo.userVibranceSettingDefault));
+                            if (vibranceInfo.affectPrimaryMonitorOnly)
+                            {
+                                setDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault);
+                            }
+                            else
+                            {
+                                vibranceInfo.displayHandles.ForEach(handle => setDVCLevel(handle, vibranceInfo.userVibranceSettingDefault));
+                            }
                             isChanged = false;
                         }
                     }
                 }
                 else
                 {
-                    if (isChanged || !vibranceInfo.displayHandles.TrueForAll(handle => equalsDVCLevel(handle, vibranceInfo.userVibranceSettingDefault)))
+                    if (vibranceInfo.affectPrimaryMonitorOnly && !equalsDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault))
+                    {
+                        setDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault);
+                        isChanged = false;
+                    }
+                    else if(!vibranceInfo.affectPrimaryMonitorOnly && !vibranceInfo.displayHandles.TrueForAll(handle => equalsDVCLevel(handle, vibranceInfo.userVibranceSettingDefault)))
                     {
                         vibranceInfo.displayHandles.ForEach(handle => setDVCLevel(handle, vibranceInfo.userVibranceSettingDefault));
                         isChanged = false;
                     }
-
                 }
                 System.Threading.Thread.Sleep(vibranceInfo.sleepInterval);
             }
@@ -316,7 +332,11 @@ namespace vibrance.GUI
 
         public void handleDVCExit()
         {
-            if (!vibranceInfo.displayHandles.TrueForAll(handle => equalsDVCLevel(handle, vibranceInfo.userVibranceSettingDefault)))
+            if (vibranceInfo.affectPrimaryMonitorOnly)
+            {
+                setDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault);
+            }
+            else if (!vibranceInfo.displayHandles.TrueForAll(handle => equalsDVCLevel(handle, vibranceInfo.userVibranceSettingDefault)))
                 vibranceInfo.displayHandles.ForEach(handle => setDVCLevel(handle, vibranceInfo.userVibranceSettingDefault));
         }
 

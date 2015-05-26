@@ -120,7 +120,7 @@ namespace vibrance.GUI
 
         private void Form1_Shown(object sender, EventArgs e)
         {
-            if (v.vibranceInfo.isInitialized)
+            if (v != null && v.vibranceInfo.isInitialized)
             {
                 setGuiEnabledFlag(true);
             }

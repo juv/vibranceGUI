@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
+using vibrance.GUI.common;
 
 namespace vibrance.GUI
 {

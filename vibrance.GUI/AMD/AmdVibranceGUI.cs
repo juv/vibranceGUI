@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using vibrance.GUI.AMD.vendor;
+using vibrance.GUI.common;
 
 namespace vibrance.GUI
 {

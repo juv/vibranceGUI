@@ -198,7 +198,7 @@
             // trackBarWindowsLevel
             // 
             this.trackBarWindowsLevel.Location = new System.Drawing.Point(15, 22);
-            this.trackBarWindowsLevel.Maximum = 200;
+            this.trackBarWindowsLevel.Maximum = 300;
             this.trackBarWindowsLevel.Name = "trackBarWindowsLevel";
             this.trackBarWindowsLevel.Size = new System.Drawing.Size(131, 45);
             this.trackBarWindowsLevel.TabIndex = 0;
@@ -219,7 +219,7 @@
             // trackBarIngameLevel
             // 
             this.trackBarIngameLevel.Location = new System.Drawing.Point(16, 23);
-            this.trackBarIngameLevel.Maximum = 200;
+            this.trackBarIngameLevel.Maximum = 300;
             this.trackBarIngameLevel.Name = "trackBarIngameLevel";
             this.trackBarIngameLevel.Size = new System.Drawing.Size(131, 45);
             this.trackBarIngameLevel.TabIndex = 9;

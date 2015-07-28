@@ -15,7 +15,6 @@ namespace vibrance.GUI.NVIDIA
         private BackgroundWorker settingsBackgroundWorker;
         private IVibranceProxy v;
         private ListViewItem sender;
-        private SettingsController settingsController;
 
         public VibranceSettings(IVibranceProxy v, BackgroundWorker settingsBackgroundWorker, ListViewItem sender, NvidiaApplicationSetting setting)
         {

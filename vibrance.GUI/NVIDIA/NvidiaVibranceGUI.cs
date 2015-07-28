@@ -432,7 +432,8 @@ namespace vibrance.GUI
             ListViewItem selectedItem = this.listApplications.SelectedItems[0];
             if (selectedItem != null)
             {
-                VibranceSettings settingsWindow = new VibranceSettings(v, settingsBackgroundWorker, selectedItem);
+                NvidiaApplicationSetting actualSetting = applicationSettings.FirstOrDefault(x => x.FileName == selectedItem.Tag.ToString());
+                VibranceSettings settingsWindow = new VibranceSettings(v, settingsBackgroundWorker, selectedItem, actualSetting);
                 DialogResult result = settingsWindow.ShowDialog();
                 if (result == DialogResult.OK)
                 {

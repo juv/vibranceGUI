@@ -16,7 +16,7 @@ namespace vibrance.GUI.NVIDIA
         private IVibranceProxy v;
         private ListViewItem sender;
 
-        public VibranceSettings(IVibranceProxy v, BackgroundWorker settingsBackgroundWorker, ListViewItem sender)
+        public VibranceSettings(IVibranceProxy v, BackgroundWorker settingsBackgroundWorker, ListViewItem sender, NvidiaApplicationSetting setting)
         {
             InitializeComponent();
             this.settingsBackgroundWorker = settingsBackgroundWorker;
@@ -24,6 +24,14 @@ namespace vibrance.GUI.NVIDIA
             this.v = v;
             this.labelTitle.Text += "\"" + sender.Text + "\"";
             this.pictureBox.Image = this.sender.ListView.LargeImageList.Images[this.sender.ImageIndex];
+            // If the setting is new, we don't need to set the progress bar value
+            if (setting != null)
+            {
+                // Sets the progress bar value to the Ingame Vibrance setting
+                this.trackBarIngameLevel.Value = setting.IngameLevel;
+                // Necessary to reload the label which tells the percentage
+                trackBarIngameLevel_Scroll(null, null); 
+            }
         }
 
         private void trackBarIngameLevel_Scroll(object sender, EventArgs e)

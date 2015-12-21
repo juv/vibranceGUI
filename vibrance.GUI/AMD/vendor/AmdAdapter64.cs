@@ -12,7 +12,7 @@ namespace gui.app.gpucontroller.amd64
 {
     public class AmdAdapter64 : AmdAdapter
     {
-        public bool IsAvailable()
+        public override bool IsAvailable()
         {
             if (ADL.ADL_Main_Control_Create != null)
             {

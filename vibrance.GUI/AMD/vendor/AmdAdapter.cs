@@ -10,5 +10,7 @@ namespace vibrance.GUI.AMD.vendor
         public abstract void SetSaturationOnAllDisplays(int vibranceLevel);
 
         public abstract void SetSaturationOnDisplay(int vibranceLevel, string displayName);
+
+        public abstract bool IsAvailable();
     }
 }

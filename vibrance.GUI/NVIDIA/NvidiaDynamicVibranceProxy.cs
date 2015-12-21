@@ -117,7 +117,7 @@ namespace vibrance.GUI.NVIDIA
         private static List<NvidiaApplicationSetting> applicationSettings;
         private WinEventHook hook;
 
-        public NvidiaDynamicVibranceProxy(ref List<NvidiaApplicationSetting> savedApplicationSettings) 
+        public NvidiaDynamicVibranceProxy(ref List<NvidiaApplicationSetting> savedApplicationSettings)
         {
             try
             {
@@ -187,18 +187,21 @@ namespace vibrance.GUI.NVIDIA
                 }
                 else
                 {
+                    IntPtr processHandle = e.Handle;
+                    if (!isCsgoActive(ref processHandle))
+                        return;
                     if (vibranceInfo.affectPrimaryMonitorOnly && !equalsDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault))
                     {
                         setDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault);
                     }
-                    else if(!vibranceInfo.affectPrimaryMonitorOnly && !vibranceInfo.displayHandles.TrueForAll(handle => equalsDVCLevel(handle, vibranceInfo.userVibranceSettingDefault)))
+                    else if (!vibranceInfo.affectPrimaryMonitorOnly && !vibranceInfo.displayHandles.TrueForAll(handle => equalsDVCLevel(handle, vibranceInfo.userVibranceSettingDefault)))
                     {
                         vibranceInfo.displayHandles.ForEach(handle => setDVCLevel(handle, vibranceInfo.userVibranceSettingDefault));
                     }
                 }
             }
         }
-    
+
         private void enumerateDisplayHandles()
         {
             for (int i = 0, displayHandle = 0; displayHandle != -1; i++)

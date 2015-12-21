@@ -101,7 +101,7 @@ namespace vibrance.GUI
 
             if (this.InvokeRequired)
             {
-                this.Invoke((MethodInvoker) delegate
+                this.Invoke((MethodInvoker)delegate
                 {
                     readVibranceSettings(out vibranceWindowsLevel, out keepActive, out affectPrimaryMonitorOnly);
                 });
@@ -192,11 +192,11 @@ namespace vibrance.GUI
             allowVisible = true;
             this.Show();
 
-			this.WindowState = FormWindowState.Normal;
-			this.Visible = true;
+            this.WindowState = FormWindowState.Normal;
+            this.Visible = true;
 
-			this.Refresh();
-			this.ShowInTaskbar = true;
+            this.Refresh();
+            this.ShowInTaskbar = true;
         }
 
         private void checkBoxKeepActive_CheckedChanged(object sender, EventArgs e)
@@ -253,7 +253,7 @@ namespace vibrance.GUI
                 }
                 else if (!autostartController.isStartupPathUnchanged(appName, pathToExe))
                 {
-                    if(autostartController.registerProgram(appName, pathToExe))
+                    if (autostartController.registerProgram(appName, pathToExe))
                         notifyIcon.BalloonTipText = "Updated Autostart Path!";
                     else
                         notifyIcon.BalloonTipText = "Updating Autostart Path failed!";
@@ -263,12 +263,12 @@ namespace vibrance.GUI
             else
             {
                 if (autostartController.unregisterProgram(appName))
-                    notifyIcon.BalloonTipText ="Unregistered from Autostart!";
+                    notifyIcon.BalloonTipText = "Unregistered from Autostart!";
                 else
                     notifyIcon.BalloonTipText = "Unregistering from Autostart failed!";
                 notifyIcon.ShowBalloonTip(250);
             }
-            
+
         }
 
         private void twitterToolStripTextBox_Click(object sender, EventArgs e)
@@ -329,6 +329,18 @@ namespace vibrance.GUI
             }
         }
 
+        public static void Log(String msg)
+        {
+            using (StreamWriter w = File.AppendText("vibranceGUI_log.txt"))
+            {
+                w.Write("\r\nLog Entry : ");
+                w.WriteLine("{0} {1}", DateTime.Now.ToLongTimeString(),
+                    DateTime.Now.ToLongDateString());
+                w.WriteLine(msg);
+                w.WriteLine("-------------------------------");
+            }
+        }
+
         private void readVibranceSettings(out int vibranceWindowsLevel, out bool keepActive, out bool affectPrimaryMonitorOnly)
         {
             registryController = new RegistryController();
@@ -347,6 +359,8 @@ namespace vibrance.GUI
                 checkBoxPrimaryMonitorOnly.Checked = affectPrimaryMonitorOnly;
                 foreach (NvidiaApplicationSetting application in applicationSettings)
                 {
+                    if (!File.Exists(application.FileName))
+                        continue;
                     if (this.listApplications.LargeImageList == null)
                     {
                         ImageList imageList = new ImageList();
@@ -364,7 +378,7 @@ namespace vibrance.GUI
                         lvi.ImageIndex = this.listApplications.Items.Count;
                         lvi.Tag = application.FileName;
                         this.listApplications.Items.Add(lvi);
-                    }                   
+                    }
                 }
             }
         }
@@ -468,6 +482,6 @@ namespace vibrance.GUI
             {
                 settingsBackgroundWorker.RunWorkerAsync();
             }
-        } 
+        }
     }
 }

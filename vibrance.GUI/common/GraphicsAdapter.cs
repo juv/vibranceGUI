@@ -1,5 +1,9 @@
-﻿using System;
+﻿using gui.app.gpucontroller.amd32;
+using gui.app.gpucontroller.amd64;
+using System;
 using System.Runtime.InteropServices;
+using vibrance.GUI.AMD.vendor;
+using vibrance.GUI.NVIDIA;
 
 namespace vibrance.GUI.common
 {
@@ -24,10 +28,18 @@ namespace vibrance.GUI.common
 
         public static GraphicsAdapter getAdapter()
         {
-            if (isAdapterAvailable(nvidiaDllName))
-                return GraphicsAdapter.NVIDIA;
             if (isAdapterAvailable(amdDllName))
-                return GraphicsAdapter.AMD;
+            {
+                AmdAdapter amdAdapter = Environment.Is64BitOperatingSystem ? (AmdAdapter)new AmdAdapter64() : (AmdAdapter)new AmdAdapter32();
+                if (amdAdapter.IsAvailable())
+                {
+                    return GraphicsAdapter.AMD;
+                }
+            }
+            if (isAdapterAvailable(nvidiaDllName))
+            {
+                return GraphicsAdapter.NVIDIA;
+            }
             return GraphicsAdapter.UNKNOWN;
         }
 

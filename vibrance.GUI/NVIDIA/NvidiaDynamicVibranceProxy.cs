@@ -224,7 +224,7 @@ namespace vibrance.GUI.NVIDIA
         private static bool isResolutionChangeNeeded(Screen screen, ResolutionModeWrapper resolutionSettings)
         {
             DEVMODE mode;            
-            if (resolutionSettings != null && ResolutionHelper.GetCurrentResolutionSettings(out mode, null) && !resolutionSettings.Equals(mode))
+            if (resolutionSettings != null && ResolutionHelper.GetCurrentResolutionSettings(out mode, screen.DeviceName) && !resolutionSettings.Equals(mode))
             {
                 return true;
             }

@@ -11,15 +11,9 @@ namespace vibrance.GUI.common
     {
         private const int ENUM_CURRENT_SETTINGS = -1;
 
-        [DllImport("User32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern Boolean EnumDisplaySettings(
-            [param: MarshalAs(UnmanagedType.LPTStr)]
-            string lpszDeviceName,
-            [param: MarshalAs(UnmanagedType.U4)]
-            int iModeNum,
-            [In, Out]
-            ref DEVMODE lpDevMode);
+        [DllImport("user32.dll")]
+        public static extern bool EnumDisplaySettings(string deviceName, int modeNum, ref DEVMODE devMode);
+
 
         [DllImport("User32.dll")]
         [return: MarshalAs(UnmanagedType.I4)]
@@ -50,9 +44,9 @@ namespace vibrance.GUI.common
         {
             mode = new DEVMODE();
             mode.dmSize = (ushort)Marshal.SizeOf(mode);
+            mode.dmDriverExtra = 0;
 
-            //first parameter should be lpszDeviceName but this fails as there's a bug in the API
-            if (EnumDisplaySettings(null, ENUM_CURRENT_SETTINGS, ref mode) == true)
+            if (EnumDisplaySettings(lpszDeviceName, ENUM_CURRENT_SETTINGS, ref mode) == true)
             {
                 return true;
             }

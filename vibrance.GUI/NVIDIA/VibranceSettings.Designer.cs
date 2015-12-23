@@ -35,9 +35,14 @@
             this.buttonSave = new System.Windows.Forms.Button();
             this.labelTitle = new System.Windows.Forms.Label();
             this.pictureBox = new System.Windows.Forms.PictureBox();
+            this.cBoxResolution = new System.Windows.Forms.ComboBox();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.checkBoxResolution = new System.Windows.Forms.CheckBox();
+            this.labelResolution = new System.Windows.Forms.Label();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarIngameLevel)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox2
@@ -46,7 +51,7 @@
             this.groupBox2.Controls.Add(this.labelIngameLevel);
             this.groupBox2.Location = new System.Drawing.Point(12, 63);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(183, 72);
+            this.groupBox2.Size = new System.Drawing.Size(246, 72);
             this.groupBox2.TabIndex = 13;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Ingame Vibrance Level";
@@ -71,7 +76,7 @@
             // 
             // buttonSave
             // 
-            this.buttonSave.Location = new System.Drawing.Point(65, 154);
+            this.buttonSave.Location = new System.Drawing.Point(100, 231);
             this.buttonSave.Name = "buttonSave";
             this.buttonSave.Size = new System.Drawing.Size(75, 23);
             this.buttonSave.TabIndex = 14;
@@ -97,11 +102,51 @@
             this.pictureBox.TabIndex = 16;
             this.pictureBox.TabStop = false;
             // 
+            // cBoxResolution
+            // 
+            this.cBoxResolution.FormattingEnabled = true;
+            this.cBoxResolution.Location = new System.Drawing.Point(6, 57);
+            this.cBoxResolution.Name = "cBoxResolution";
+            this.cBoxResolution.Size = new System.Drawing.Size(234, 21);
+            this.cBoxResolution.TabIndex = 17;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.labelResolution);
+            this.groupBox1.Controls.Add(this.checkBoxResolution);
+            this.groupBox1.Controls.Add(this.cBoxResolution);
+            this.groupBox1.Location = new System.Drawing.Point(12, 141);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(246, 84);
+            this.groupBox1.TabIndex = 19;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Ingame Resolution";
+            // 
+            // checkBoxResolution
+            // 
+            this.checkBoxResolution.AutoSize = true;
+            this.checkBoxResolution.Location = new System.Drawing.Point(7, 34);
+            this.checkBoxResolution.Name = "checkBoxResolution";
+            this.checkBoxResolution.Size = new System.Drawing.Size(183, 17);
+            this.checkBoxResolution.TabIndex = 18;
+            this.checkBoxResolution.Text = "Change Resolution when Ingame";
+            this.checkBoxResolution.UseVisualStyleBackColor = true;
+            // 
+            // labelResolution
+            // 
+            this.labelResolution.AutoSize = true;
+            this.labelResolution.Location = new System.Drawing.Point(4, 18);
+            this.labelResolution.Name = "labelResolution";
+            this.labelResolution.Size = new System.Drawing.Size(225, 13);
+            this.labelResolution.TabIndex = 19;
+            this.labelResolution.Text = "For (Borderless) Windowed Mode players only!";
+            // 
             // VibranceSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(206, 189);
+            this.ClientSize = new System.Drawing.Size(270, 266);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.pictureBox);
             this.Controls.Add(this.labelTitle);
             this.Controls.Add(this.buttonSave);
@@ -115,6 +160,8 @@
             this.groupBox2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarIngameLevel)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).EndInit();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -128,5 +175,9 @@
         private System.Windows.Forms.Button buttonSave;
         private System.Windows.Forms.Label labelTitle;
         private System.Windows.Forms.PictureBox pictureBox;
+        private System.Windows.Forms.ComboBox cBoxResolution;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.CheckBox checkBoxResolution;
+        private System.Windows.Forms.Label labelResolution;
     }
 }

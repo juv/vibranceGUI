@@ -135,6 +135,8 @@
     <Compile Include="AMD\vendor\mvvm\viewmodel\VibranceSettingsViewModel.cs" />
     <Compile Include="AMD\vendor\utils\CommonUtils.cs" />
     <Compile Include="AMD\vendor\utils\NativeMethods.cs" />
+    <Compile Include="common\ResolutionHelper.cs" />
+    <Compile Include="common\ResolutionModeWrapper.cs" />
     <Compile Include="common\WinEventHook.cs" />
     <Compile Include="common\WinEventHookEventArgs.cs" />
     <Compile Include="common\Definitions.cs" />

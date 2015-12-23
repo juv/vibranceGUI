@@ -31,7 +31,8 @@ namespace vibrance.GUI
         private bool allowVisible;
 
         List<NvidiaApplicationSetting> applicationSettings;
-
+        List<ResolutionModeWrapper> supportedResolutionList;
+        ResolutionModeWrapper WindowsResolutionSettings;
 
         public NvidiaVibranceGUI()
         {
@@ -45,11 +46,25 @@ namespace vibrance.GUI
 
             allowVisible = true;
             InitializeComponent();
-
             System.Runtime.InteropServices.Marshal.PrelinkAll(typeof(NvidiaVibranceProxy));
 
+            //enumerate the supported resolution list (used in the checkbox for all VibranceSettings-Forms)
+            supportedResolutionList = ResolutionHelper.EnumerateSupportedResolutionModes();
+
+            //read out current resolution
+            DEVMODE currentResolutionMode;
+            if (ResolutionHelper.GetCurrentResolutionSettings(out currentResolutionMode, null))
+            {
+                WindowsResolutionSettings = new ResolutionModeWrapper(currentResolutionMode);
+            }
+            else
+            {
+                MessageBox.Show("Current resolution mode could not be determined. Switching back to your Windows resolution will not work.");
+            }
+
+            //instantiate the nvidia vibrance proxy
             applicationSettings = new List<NvidiaApplicationSetting>();
-            v = new NvidiaDynamicVibranceProxy(ref applicationSettings);
+            v = new NvidiaDynamicVibranceProxy(ref applicationSettings, WindowsResolutionSettings);
 
             resetEvent = new AutoResetEvent(false);
             backgroundWorker.WorkerReportsProgress = true;
@@ -447,7 +462,7 @@ namespace vibrance.GUI
             if (selectedItem != null)
             {
                 NvidiaApplicationSetting actualSetting = applicationSettings.FirstOrDefault(x => x.FileName == selectedItem.Tag.ToString());
-                VibranceSettings settingsWindow = new VibranceSettings(v, settingsBackgroundWorker, selectedItem, actualSetting);
+                VibranceSettings settingsWindow = new VibranceSettings(v, selectedItem, actualSetting, supportedResolutionList);
                 DialogResult result = settingsWindow.ShowDialog();
                 if (result == DialogResult.OK)
                 {

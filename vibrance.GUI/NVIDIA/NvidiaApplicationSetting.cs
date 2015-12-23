@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
+using vibrance.GUI.common;
 
 namespace vibrance.GUI.NVIDIA
 {
@@ -16,13 +17,17 @@ namespace vibrance.GUI.NVIDIA
         public string FileName { get; set; }
         public int IngameLevel { get; set; }
 
+        [XmlElement(IsNullable = true)]
+        public ResolutionModeWrapper ResolutionSettings { get; set; }
+
         public NvidiaApplicationSetting(){ }
 
-        public NvidiaApplicationSetting(string name, string fileName, int ingameLevel)
+        public NvidiaApplicationSetting(string name, string fileName, int ingameLevel, ResolutionModeWrapper resolutionSettings)
         {
             this.Name = name;
             this.FileName = fileName;
             this.IngameLevel = ingameLevel;
+            this.ResolutionSettings = resolutionSettings;
         }
     }
 }

@@ -115,13 +115,15 @@ namespace vibrance.GUI.NVIDIA
 
         private static VIBRANCE_INFO vibranceInfo;
         private static List<NvidiaApplicationSetting> applicationSettings;
+        private static ResolutionModeWrapper windowsResolutionSettings;
         private WinEventHook hook;
 
-        public NvidiaDynamicVibranceProxy(ref List<NvidiaApplicationSetting> savedApplicationSettings)
+        public NvidiaDynamicVibranceProxy(ref List<NvidiaApplicationSetting> savedApplicationSettings, ResolutionModeWrapper currentWindowsResolutionSettings)
         {
             try
             {
                 applicationSettings = savedApplicationSettings;
+                windowsResolutionSettings = currentWindowsResolutionSettings;
                 vibranceInfo = new VIBRANCE_INFO();
                 if (initializeLibrary())
                 {
@@ -175,6 +177,14 @@ namespace vibrance.GUI.NVIDIA
                 NvidiaApplicationSetting applicationSetting = applicationSettings.FirstOrDefault(x => x.Name.Equals(e.ProcessName));
                 if (applicationSetting != null)
                 {
+                    //test if a resolution change is needed
+                    Screen screen = Screen.FromHandle(e.Handle);
+                    if (isResolutionChangeNeeded(screen, applicationSetting.ResolutionSettings))
+                    {
+                        performResolutionChange(screen, applicationSetting.ResolutionSettings);
+                    }
+
+                    //test if changing the vibrance value is needed
                     if (!equalsDVCLevel(vibranceInfo.defaultHandle, applicationSetting.IngameLevel))
                     {
                         int displayHandle = getApplicationDisplayHandle(e.Handle);
@@ -190,6 +200,15 @@ namespace vibrance.GUI.NVIDIA
                     IntPtr processHandle = e.Handle;
                     if (!isCsgoActive(ref processHandle))
                         return;
+
+                    //test if a resolution change is needed
+                    Screen screen = Screen.FromHandle(processHandle);
+                    if (isResolutionChangeNeeded(screen, windowsResolutionSettings))
+                    {
+                        performResolutionChange(screen, windowsResolutionSettings);
+                    }
+
+                    //test if changing the vibrance value is needed
                     if (vibranceInfo.affectPrimaryMonitorOnly && !equalsDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault))
                     {
                         setDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault);
@@ -200,6 +219,21 @@ namespace vibrance.GUI.NVIDIA
                     }
                 }
             }
+        }
+
+        private static bool isResolutionChangeNeeded(Screen screen, ResolutionModeWrapper resolutionSettings)
+        {
+            if (resolutionSettings != null && (screen.Bounds.Height != resolutionSettings.dmPelsHeight
+                || screen.Bounds.Width != resolutionSettings.dmPelsWidth))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private static void performResolutionChange(Screen screen, ResolutionModeWrapper resolutionSettings)
+        {
+            ResolutionHelper.ChangeResolutionEx(resolutionSettings, screen.DeviceName);
         }
 
         private void enumerateDisplayHandles()

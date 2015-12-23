@@ -37,8 +37,8 @@
             this.pictureBox = new System.Windows.Forms.PictureBox();
             this.cBoxResolution = new System.Windows.Forms.ComboBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.checkBoxResolution = new System.Windows.Forms.CheckBox();
             this.labelResolution = new System.Windows.Forms.Label();
+            this.checkBoxResolution = new System.Windows.Forms.CheckBox();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarIngameLevel)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
@@ -104,6 +104,7 @@
             // 
             // cBoxResolution
             // 
+            this.cBoxResolution.Enabled = false;
             this.cBoxResolution.FormattingEnabled = true;
             this.cBoxResolution.Location = new System.Drawing.Point(6, 57);
             this.cBoxResolution.Name = "cBoxResolution";
@@ -122,24 +123,26 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Ingame Resolution";
             // 
-            // checkBoxResolution
-            // 
-            this.checkBoxResolution.AutoSize = true;
-            this.checkBoxResolution.Location = new System.Drawing.Point(7, 34);
-            this.checkBoxResolution.Name = "checkBoxResolution";
-            this.checkBoxResolution.Size = new System.Drawing.Size(183, 17);
-            this.checkBoxResolution.TabIndex = 18;
-            this.checkBoxResolution.Text = "Change Resolution when Ingame";
-            this.checkBoxResolution.UseVisualStyleBackColor = true;
-            // 
             // labelResolution
             // 
             this.labelResolution.AutoSize = true;
+            this.labelResolution.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelResolution.Location = new System.Drawing.Point(4, 18);
             this.labelResolution.Name = "labelResolution";
             this.labelResolution.Size = new System.Drawing.Size(225, 13);
             this.labelResolution.TabIndex = 19;
             this.labelResolution.Text = "For (Borderless) Windowed Mode players only!";
+            // 
+            // checkBoxResolution
+            // 
+            this.checkBoxResolution.AutoSize = true;
+            this.checkBoxResolution.Location = new System.Drawing.Point(6, 34);
+            this.checkBoxResolution.Name = "checkBoxResolution";
+            this.checkBoxResolution.Size = new System.Drawing.Size(183, 17);
+            this.checkBoxResolution.TabIndex = 18;
+            this.checkBoxResolution.Text = "Change Resolution when Ingame";
+            this.checkBoxResolution.UseVisualStyleBackColor = true;
+            this.checkBoxResolution.CheckedChanged += new System.EventHandler(this.checkBoxResolution_CheckedChanged);
             // 
             // VibranceSettings
             // 

@@ -51,7 +51,13 @@ namespace vibrance.GUI.NVIDIA
 
         public NvidiaApplicationSetting getApplicationSetting()
         {
-            return new NvidiaApplicationSetting(sender.Text, sender.Tag.ToString(), this.trackBarIngameLevel.Value, (ResolutionModeWrapper)this.cBoxResolution.SelectedItem);
+            return new NvidiaApplicationSetting(sender.Text, sender.Tag.ToString(), this.trackBarIngameLevel.Value, 
+                (ResolutionModeWrapper)this.cBoxResolution.SelectedItem, this.checkBoxResolution.Checked);
+        }
+
+        private void checkBoxResolution_CheckedChanged(object sender, EventArgs e)
+        {
+            this.cBoxResolution.Enabled = this.checkBoxResolution.Checked;
         }
     }
 }

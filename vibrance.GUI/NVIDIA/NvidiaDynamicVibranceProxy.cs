@@ -179,7 +179,7 @@ namespace vibrance.GUI.NVIDIA
                 {
                     //test if a resolution change is needed
                     Screen screen = Screen.FromHandle(e.Handle);
-                    if (isResolutionChangeNeeded(screen, applicationSetting.ResolutionSettings))
+                    if (applicationSetting.IsResolutionChangeNeeded && isResolutionChangeNeeded(screen, applicationSetting.ResolutionSettings))
                     {
                         performResolutionChange(screen, applicationSetting.ResolutionSettings);
                     }
@@ -223,8 +223,8 @@ namespace vibrance.GUI.NVIDIA
 
         private static bool isResolutionChangeNeeded(Screen screen, ResolutionModeWrapper resolutionSettings)
         {
-            if (resolutionSettings != null && (screen.Bounds.Height != resolutionSettings.dmPelsHeight
-                || screen.Bounds.Width != resolutionSettings.dmPelsWidth))
+            DEVMODE mode;            
+            if (resolutionSettings != null && ResolutionHelper.GetCurrentResolutionSettings(out mode, null) && !resolutionSettings.Equals(mode))
             {
                 return true;
             }

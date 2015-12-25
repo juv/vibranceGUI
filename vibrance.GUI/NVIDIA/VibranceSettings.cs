@@ -29,6 +29,7 @@ namespace vibrance.GUI.NVIDIA
                 // Sets the progress bar value to the Ingame Vibrance setting
                 this.trackBarIngameLevel.Value = setting.IngameLevel;
                 this.cBoxResolution.SelectedItem = setting.ResolutionSettings;
+                this.checkBoxResolution.Checked = setting.IsResolutionChangeNeeded;
                 // Necessary to reload the label which tells the percentage
                 trackBarIngameLevel_Scroll(null, null); 
             }

@@ -355,7 +355,7 @@ namespace vibrance.GUI
 
         public AmdVibranceAdapter(bool silenced, Action<string> addLogItem)
         {
-            this.amdViewModel = new AmdViewModel(addLogItem, Environment.Is64BitOperatingSystem ? (AmdAdapter)new AmdAdapter64() : (AmdAdapter)new AmdAdapter32());
+            this.amdViewModel = new AmdViewModel(addLogItem, Environment.Is64BitOperatingSystem ? (IAmdAdapter)new AmdAdapter64() : new AmdAdapter32());
             this.silenced = silenced;
         }
 

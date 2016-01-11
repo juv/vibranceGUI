@@ -17,7 +17,7 @@ namespace gui.app.mvvm.viewmodel
 {
     public class AmdViewModel
     {
-        public AmdViewModel(Action<string> addLogItem, AmdAdapter gpuAdapter)
+        public AmdViewModel(Action<string> addLogItem, IAmdAdapter gpuAdapter)
         {
             MinimumVibranceLevel = 100;
             MaximumVibranceLevel = 300;

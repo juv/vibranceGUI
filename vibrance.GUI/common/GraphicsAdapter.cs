@@ -30,7 +30,7 @@ namespace vibrance.GUI.common
         {
             if (isAdapterAvailable(amdDllName))
             {
-                AmdAdapter amdAdapter = Environment.Is64BitOperatingSystem ? (AmdAdapter)new AmdAdapter64() : (AmdAdapter)new AmdAdapter32();
+                IAmdAdapter amdAdapter = Environment.Is64BitOperatingSystem ? (IAmdAdapter)new AmdAdapter64() :new AmdAdapter32();
                 if (amdAdapter.IsAvailable())
                 {
                     return GraphicsAdapter.AMD;

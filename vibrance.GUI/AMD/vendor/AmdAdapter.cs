@@ -5,12 +5,12 @@ using System.Text;
 
 namespace vibrance.GUI.AMD.vendor
 {
-    public abstract class AmdAdapter
+    public interface IAmdAdapter
     {
-        public abstract void SetSaturationOnAllDisplays(int vibranceLevel);
+        void SetSaturationOnAllDisplays(int vibranceLevel);
 
-        public abstract void SetSaturationOnDisplay(int vibranceLevel, string displayName);
+        void SetSaturationOnDisplay(int vibranceLevel, string displayName);
 
-        public abstract bool IsAvailable();
+        bool IsAvailable();
     }
 }

@@ -47,10 +47,7 @@ namespace vibrance.GUI.common
         {
             try
             {
-                IntPtr pDll = LoadLibrary(dllName);
-                if(pDll != IntPtr.Zero)
-                    return true;
-                return false;
+                return LoadLibrary(dllName) != IntPtr.Zero;
             }
             catch (Exception)
             {

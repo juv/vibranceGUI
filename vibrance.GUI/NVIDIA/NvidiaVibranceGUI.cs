@@ -65,7 +65,10 @@ namespace vibrance.GUI
             if (!allowVisible)
             {
                 value = false;
-                if (!this.IsHandleCreated) CreateHandle();
+                if (!this.IsHandleCreated)
+                {
+                    CreateHandle();
+                }
             }
             base.SetVisibleCore(value);
         }
@@ -98,7 +101,7 @@ namespace vibrance.GUI
 
             while (!this.IsHandleCreated)
             {
-                System.Threading.Thread.Sleep(500);
+                Thread.Sleep(500);
             }
 
             if (this.InvokeRequired)
@@ -220,18 +223,20 @@ namespace vibrance.GUI
 
         private void checkBoxPrimaryMonitorOnly_CheckedChanged(object sender, EventArgs e)
         {
-            if (v != null)
+            if (this.v == null)
             {
-                v.setAffectPrimaryMonitorOnly(checkBoxPrimaryMonitorOnly.Checked);
-                if (!settingsBackgroundWorker.IsBusy)
-                {
-                    settingsBackgroundWorker.RunWorkerAsync();
-                }
-                if (checkBoxPrimaryMonitorOnly.Checked)
-                {
-                    notifyIcon.BalloonTipText = "vibranceGUI will only affect your primary monitor now.";
-                    notifyIcon.ShowBalloonTip(250);
-                }
+                return;
+            }
+
+            this.v.setAffectPrimaryMonitorOnly(this.checkBoxPrimaryMonitorOnly.Checked);
+            if (!this.settingsBackgroundWorker.IsBusy)
+            {
+                this.settingsBackgroundWorker.RunWorkerAsync();
+            }
+            if (this.checkBoxPrimaryMonitorOnly.Checked)
+            {
+                this.notifyIcon.BalloonTipText = "vibranceGUI will only affect your primary monitor now.";
+                this.notifyIcon.ShowBalloonTip(250);
             }
         }
 
@@ -240,37 +245,32 @@ namespace vibrance.GUI
             RegistryController autostartController = new RegistryController();
             if (this.checkBoxAutostart.Checked)
             {
-                string pathToExe = "\"" + Application.ExecutablePath.ToString() + "\" -minimized";
+                string pathToExe = "\"" + Application.ExecutablePath + "\" -minimized";
                 if (!autostartController.isProgramRegistered(appName))
                 {
-                    if (autostartController.registerProgram(appName, pathToExe))
-                    {
-                        notifyIcon.BalloonTipText = "Registered to Autostart!";
-                    }
-                    else
-                    {
-                        notifyIcon.BalloonTipText = "Registering to Autostart failed!";
-                    }
-                    notifyIcon.ShowBalloonTip(250);
+                    this.notifyIcon.BalloonTipText = autostartController.registerProgram(appName, pathToExe) 
+                        ? "Registered to Autostart!" 
+                        : "Registering to Autostart failed!";
                 }
                 else if (!autostartController.isStartupPathUnchanged(appName, pathToExe))
                 {
-                    if (autostartController.registerProgram(appName, pathToExe))
-                        notifyIcon.BalloonTipText = "Updated Autostart Path!";
-                    else
-                        notifyIcon.BalloonTipText = "Updating Autostart Path failed!";
-                    notifyIcon.ShowBalloonTip(250);
+                    this.notifyIcon.BalloonTipText = autostartController.registerProgram(appName, pathToExe)
+                        ? "Updated Autostart Path!"
+                        : "Updating Autostart Path failed!";
+                }
+                else
+                {
+                    return;
                 }
             }
             else
             {
-                if (autostartController.unregisterProgram(appName))
-                    notifyIcon.BalloonTipText = "Unregistered from Autostart!";
-                else
-                    notifyIcon.BalloonTipText = "Unregistering from Autostart failed!";
-                notifyIcon.ShowBalloonTip(250);
+                this.notifyIcon.BalloonTipText = autostartController.unregisterProgram(appName) 
+                    ? "Unregistered from Autostart!" 
+                    : "Unregistering from Autostart failed!";
             }
 
+            notifyIcon.ShowBalloonTip(250);
         }
 
         private void twitterToolStripTextBox_Click(object sender, EventArgs e)
@@ -304,7 +304,7 @@ namespace vibrance.GUI
                 if (v != null && v.getVibranceInfo().isInitialized)
                 {
                     v.setShouldRun(false);
-                    bool unload = v.unloadLibraryEx();
+                    v.unloadLibraryEx();
                 }
             }
             catch (Exception ex)
@@ -330,7 +330,7 @@ namespace vibrance.GUI
             }
         }
 
-        public static void Log(String msg)
+        public static void Log(string msg)
         {
             using (StreamWriter w = File.AppendText("vibranceGUI_log.txt"))
             {

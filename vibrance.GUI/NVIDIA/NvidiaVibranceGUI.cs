@@ -22,7 +22,6 @@ namespace vibrance.GUI
     {
         private IVibranceProxy v;
         private IRegistryController registryController;
-        private AutoResetEvent resetEvent;
         public bool silenced = false;
         private const string appName = "vibranceGUI";
         private const string twitterLink = "https://twitter.com/juvlarN";
@@ -36,22 +35,12 @@ namespace vibrance.GUI
 
         public NvidiaVibranceGUI()
         {
-            const string nvidiaAdapterName = "vibranceDLL.dll";
-            string resourceName = string.Format("{0}.NVIDIA.{1}", typeof(Program).Namespace, nvidiaAdapterName);
-
-            string dllPath = CommonUtils.LoadUnmanagedLibraryFromResource(
-                Assembly.GetExecutingAssembly(),
-                resourceName,
-                nvidiaAdapterName);
-
             allowVisible = true;
             InitializeComponent();
-            System.Runtime.InteropServices.Marshal.PrelinkAll(typeof(NvidiaVibranceProxy));
+            Marshal.PrelinkAll(typeof(NvidiaVibranceProxy));
 
-            //enumerate the supported resolution list (used in the checkbox for all VibranceSettings-Forms)
             supportedResolutionList = ResolutionHelper.EnumerateSupportedResolutionModes();
 
-            //read out current resolution
             DEVMODE currentResolutionMode;
             if (ResolutionHelper.GetCurrentResolutionSettings(out currentResolutionMode, null))
             {
@@ -62,11 +51,9 @@ namespace vibrance.GUI
                 MessageBox.Show("Current resolution mode could not be determined. Switching back to your Windows resolution will not work.");
             }
 
-            //instantiate the nvidia vibrance proxy
             applicationSettings = new List<NvidiaApplicationSetting>();
             v = new NvidiaDynamicVibranceProxy(ref applicationSettings, WindowsResolutionSettings);
 
-            resetEvent = new AutoResetEvent(false);
             backgroundWorker.WorkerReportsProgress = true;
             settingsBackgroundWorker.WorkerReportsProgress = true;
 
@@ -304,7 +291,6 @@ namespace vibrance.GUI
                 this.trackBarWindowsLevel.Enabled = flag;
                 this.checkBoxAutostart.Enabled = flag;
                 this.checkBoxPrimaryMonitorOnly.Enabled = flag;
-                //this.checkBoxMonitors.Enabled = flag;
             });
         }
 

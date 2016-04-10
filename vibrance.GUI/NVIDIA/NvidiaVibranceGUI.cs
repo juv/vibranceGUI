@@ -36,9 +36,17 @@ namespace vibrance.GUI
 
         public NvidiaVibranceGUI()
         {
+            const string nvidiaAdapterName = "vibranceDLL.dll";
+            string resourceName = string.Format("{0}.NVIDIA.{1}", typeof(Program).Namespace, nvidiaAdapterName);
+            
+            string dllPath = CommonUtils.LoadUnmanagedLibraryFromResource(
+                Assembly.GetExecutingAssembly(),
+                resourceName,
+                nvidiaAdapterName);
+
             allowVisible = true;
             InitializeComponent();
-            Marshal.PrelinkAll(typeof(NvidiaVibranceProxy));
+            Marshal.PrelinkAll(typeof(NvidiaDynamicVibranceProxy));
 
             supportedResolutionList = ResolutionHelper.EnumerateSupportedResolutionModes();
 

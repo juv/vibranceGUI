@@ -149,8 +149,9 @@ namespace vibrance.GUI.NVIDIA
                 }
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                MessageBox.Show(ex.ToString());
                 MessageBox.Show(NvidiaDynamicVibranceProxy.NVAPI_ERROR_INIT_FAILED, "vibranceGUI Error", 
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
             }

@@ -92,6 +92,13 @@ namespace vibrance.GUI.NVIDIA
             CharSet = CharSet.Auto)]
         static extern bool equalsDVCLevel([In] int defaultHandle, [In] int level);
 
+        [DllImport(
+            "vibranceDLL.dll",
+            EntryPoint = "?getGpuSystemType@vibrance@vibranceDLL@@QAEHPAH@Z",
+            CallingConvention = CallingConvention.StdCall,
+            CharSet = CharSet.Auto)]
+        static extern NV_SYSTEM_TYPE getGpuSystemType(int gpuHandle);
+
         [DllImport("user32.dll", CharSet = CharSet.Ansi)]
         static extern int GetWindowTextLength([In] IntPtr hWnd);
 
@@ -112,11 +119,16 @@ namespace vibrance.GUI.NVIDIA
         public const int NVAPI_DEFAULT_LEVEL = 0;
 
         public const string NVAPI_ERROR_INIT_FAILED = "VibranceProxy failed to initialize! Read readme.txt for fix!";
+        public const string NVAPI_ERROR_SYSTYPE_UNSUPPORTED = "VibranceProxy detected that you are running a Laptop with integrated NVIDIA card. " +
+            "NVIDIA Laptops are not supported because their NVIDIA drivers do not contain Digital Vibrance! " +
+            "You are missing the Digital Vibrance option in your NVIDIA Control Panel. VibranceGUI can not run on your system.";
+        public const string NVAPI_ERROR_SYSTYPE_UNKNOWN = "VibranceProxy failed to initialize! Graphics card system type (Desktop / Laptop) is unknown!";
 
         private static VIBRANCE_INFO vibranceInfo;
         private static List<NvidiaApplicationSetting> applicationSettings;
         private static ResolutionModeWrapper windowsResolutionSettings;
         private WinEventHook hook;
+        private static Screen gameScreen;
 
         public NvidiaDynamicVibranceProxy(ref List<NvidiaApplicationSetting> savedApplicationSettings, ResolutionModeWrapper currentWindowsResolutionSettings)
         {
@@ -139,7 +151,8 @@ namespace vibrance.GUI.NVIDIA
             }
             catch (Exception)
             {
-                MessageBox.Show(NvidiaVibranceProxy.NVAPI_ERROR_INIT_FAILED);
+                MessageBox.Show(NvidiaDynamicVibranceProxy.NVAPI_ERROR_INIT_FAILED, "vibranceGUI Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -148,6 +161,28 @@ namespace vibrance.GUI.NVIDIA
             int[] gpuHandles = new int[NVAPI_MAX_PHYSICAL_GPUS];
             int[] outputIds = new int[NVAPI_MAX_PHYSICAL_GPUS];
             enumeratePhsyicalGPUs(gpuHandles);
+
+            foreach (int gpuHandle in gpuHandles)
+            {
+                if(gpuHandle != 0)
+                {
+                    NV_SYSTEM_TYPE systemType = getGpuSystemType(gpuHandle);
+                    if (systemType == NV_SYSTEM_TYPE.NV_SYSTEM_TYPE_UNKNOWN)
+                    {
+                        MessageBox.Show(NvidiaDynamicVibranceProxy.NVAPI_ERROR_SYSTYPE_UNKNOWN, "vibranceGUI Error", 
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        vibranceInfo.isInitialized = false; 
+                        return;
+                    }
+                    else if (systemType == NV_SYSTEM_TYPE.NV_SYSTEM_TYPE_LAPTOP)
+                    {
+                        MessageBox.Show(NvidiaDynamicVibranceProxy.NVAPI_ERROR_SYSTYPE_UNSUPPORTED, "vibranceGUI Error",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        vibranceInfo.isInitialized = false;
+                        return;
+                    }
+                }
+            }
 
             enumerateDisplayHandles();
 
@@ -181,6 +216,7 @@ namespace vibrance.GUI.NVIDIA
                     Screen screen = Screen.FromHandle(e.Handle);
                     if (applicationSetting.IsResolutionChangeNeeded && isResolutionChangeNeeded(screen, applicationSetting.ResolutionSettings))
                     {
+                        gameScreen = screen;
                         performResolutionChange(screen, applicationSetting.ResolutionSettings);
                     }
 
@@ -203,7 +239,7 @@ namespace vibrance.GUI.NVIDIA
 
                     //test if a resolution change is needed
                     Screen screen = Screen.FromHandle(processHandle);
-                    if (isResolutionChangeNeeded(screen, windowsResolutionSettings))
+                    if (gameScreen != null && gameScreen.Equals(screen) && isResolutionChangeNeeded(screen, windowsResolutionSettings))
                     {
                         performResolutionChange(screen, windowsResolutionSettings);
                     }
@@ -285,11 +321,6 @@ namespace vibrance.GUI.NVIDIA
         public void setVibranceIngameLevel(int vibranceIngameLevel)
         {
             vibranceInfo.userVibranceSettingActive = vibranceIngameLevel;
-        }
-
-        public void setKeepActive(bool keepActive)
-        {
-            vibranceInfo.keepActive = keepActive;
         }
 
         public void setSleepInterval(int interval)

@@ -56,6 +56,7 @@
             this.buttonPaypal = new System.Windows.Forms.Button();
             this.labelPaypal = new System.Windows.Forms.Label();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.buttonSteam = new System.Windows.Forms.Button();
             this.contextMenuStrip.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -314,11 +315,26 @@
             this.toolTip.IsBalloon = true;
             this.toolTip.ReshowDelay = 100;
             // 
+            // buttonSteam
+            // 
+            this.buttonSteam.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.buttonSteam.BackColor = System.Drawing.Color.Transparent;
+            this.buttonSteam.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.buttonSteam.Image = ((System.Drawing.Image)(resources.GetObject("buttonSteam.Image")));
+            this.buttonSteam.Location = new System.Drawing.Point(306, 27);
+            this.buttonSteam.Name = "buttonSteam";
+            this.buttonSteam.Size = new System.Drawing.Size(90, 55);
+            this.buttonSteam.TabIndex = 20;
+            this.toolTip.SetToolTip(this.buttonSteam, "Click here to donate to vibranceGUI through Steam");
+            this.buttonSteam.UseVisualStyleBackColor = false;
+            this.buttonSteam.Click += new System.EventHandler(this.buttonSteam_Click);
+            // 
             // AmdVibranceGUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(421, 561);
+            this.Controls.Add(this.buttonSteam);
             this.Controls.Add(this.labelPaypal);
             this.Controls.Add(this.buttonPaypal);
             this.Controls.Add(this.groupBox1);
@@ -379,7 +395,7 @@
         private System.Windows.Forms.Button buttonPaypal;
         private System.Windows.Forms.Label labelPaypal;
         private System.Windows.Forms.ToolTip toolTip;
-
+        private System.Windows.Forms.Button buttonSteam;
     }
 }
 

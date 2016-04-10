@@ -25,6 +25,7 @@ namespace vibrance.GUI
         private const string appName = "vibranceGUI";
         private const string twitterLink = "https://twitter.com/juvlarN";
         private const string paypalDonationLink = "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=JDQFNKNNEW356";
+        private const string steamDonationLink = "https://steamcommunity.com/tradeoffer/new/?partner=92410529&token=Oas6jXrc";
 
         private bool allowVisible;
 
@@ -345,6 +346,10 @@ namespace vibrance.GUI
             System.Diagnostics.Process.Start(AmdVibranceGUI.paypalDonationLink);
         }
 
+        private void buttonSteam_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start(AmdVibranceGUI.steamDonationLink);
+        }
     }
 
     public class AmdVibranceAdapter

@@ -73,10 +73,10 @@ namespace vibrance.GUI.NVIDIA
 
         [DllImport(
             "vibranceDLL.dll",
-            EntryPoint = "?isCsgoActive@vibrance@vibranceDLL@@QAE_NPAPAUHWND__@@@Z",
+            EntryPoint = "?isWindowActive@vibrance@vibranceDLL@@QAE_NPAPAUHWND__@@@Z",
             CallingConvention = CallingConvention.StdCall,
             CharSet = CharSet.Auto)]
-        static extern bool isCsgoActive(ref IntPtr hwnd);
+        static extern bool isWindowActive(ref IntPtr hwnd);
 
         [DllImport(
             "vibranceDLL.dll",
@@ -235,7 +235,7 @@ namespace vibrance.GUI.NVIDIA
                 else
                 {
                     IntPtr processHandle = e.Handle;
-                    if (!isCsgoActive(ref processHandle))
+                    if (!isWindowActive(ref processHandle))
                         return;
 
                     //test if a resolution change is needed

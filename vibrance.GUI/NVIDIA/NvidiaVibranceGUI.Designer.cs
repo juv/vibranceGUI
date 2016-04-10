@@ -38,7 +38,6 @@
             this.checkBoxAutostart = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.checkBoxPrimaryMonitorOnly = new System.Windows.Forms.CheckBox();
-            this.checkBoxKeepActive = new System.Windows.Forms.CheckBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.labelWindowsLevel = new System.Windows.Forms.Label();
             this.trackBarWindowsLevel = new System.Windows.Forms.TrackBar();
@@ -50,6 +49,7 @@
             this.buttonPaypal = new System.Windows.Forms.Button();
             this.labelPaypal = new System.Windows.Forms.Label();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.buttonSteam = new System.Windows.Forms.Button();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.buttonRemoveProgram = new System.Windows.Forms.Button();
             this.listApplications = new System.Windows.Forms.ListView();
@@ -119,12 +119,11 @@
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.checkBoxPrimaryMonitorOnly);
-            this.groupBox1.Controls.Add(this.checkBoxKeepActive);
             this.groupBox1.Controls.Add(this.groupBox3);
             this.groupBox1.Controls.Add(this.checkBoxAutostart);
             this.groupBox1.Location = new System.Drawing.Point(13, 82);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(397, 167);
+            this.groupBox1.Size = new System.Drawing.Size(397, 143);
             this.groupBox1.TabIndex = 15;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Settings";
@@ -132,7 +131,7 @@
             // checkBoxPrimaryMonitorOnly
             // 
             this.checkBoxPrimaryMonitorOnly.AutoSize = true;
-            this.checkBoxPrimaryMonitorOnly.Location = new System.Drawing.Point(6, 65);
+            this.checkBoxPrimaryMonitorOnly.Location = new System.Drawing.Point(6, 42);
             this.checkBoxPrimaryMonitorOnly.Name = "checkBoxPrimaryMonitorOnly";
             this.checkBoxPrimaryMonitorOnly.Size = new System.Drawing.Size(151, 17);
             this.checkBoxPrimaryMonitorOnly.TabIndex = 15;
@@ -142,24 +141,11 @@
             this.checkBoxPrimaryMonitorOnly.UseVisualStyleBackColor = true;
             this.checkBoxPrimaryMonitorOnly.CheckedChanged += new System.EventHandler(this.checkBoxPrimaryMonitorOnly_CheckedChanged);
             // 
-            // checkBoxKeepActive
-            // 
-            this.checkBoxKeepActive.AutoSize = true;
-            this.checkBoxKeepActive.Location = new System.Drawing.Point(6, 42);
-            this.checkBoxKeepActive.Name = "checkBoxKeepActive";
-            this.checkBoxKeepActive.Size = new System.Drawing.Size(221, 17);
-            this.checkBoxKeepActive.TabIndex = 14;
-            this.checkBoxKeepActive.Text = "Keep Vibrance on when CSGO is running";
-            this.toolTip.SetToolTip(this.checkBoxKeepActive, "While CSGO is running, the vibrance level will be fixed on your ingame vibrance l" +
-        "evel. Tabbing out to your Desktop will not set to windows level. ");
-            this.checkBoxKeepActive.UseVisualStyleBackColor = true;
-            this.checkBoxKeepActive.CheckedChanged += new System.EventHandler(this.checkBoxKeepActive_CheckedChanged);
-            // 
             // groupBox3
             // 
             this.groupBox3.Controls.Add(this.labelWindowsLevel);
             this.groupBox3.Controls.Add(this.trackBarWindowsLevel);
-            this.groupBox3.Location = new System.Drawing.Point(7, 88);
+            this.groupBox3.Location = new System.Drawing.Point(7, 65);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(182, 72);
             this.groupBox3.TabIndex = 12;
@@ -255,12 +241,26 @@
             this.toolTip.IsBalloon = true;
             this.toolTip.ReshowDelay = 100;
             // 
+            // buttonSteam
+            // 
+            this.buttonSteam.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.buttonSteam.BackColor = System.Drawing.Color.Transparent;
+            this.buttonSteam.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.buttonSteam.Image = ((System.Drawing.Image)(resources.GetObject("buttonSteam.Image")));
+            this.buttonSteam.Location = new System.Drawing.Point(307, 27);
+            this.buttonSteam.Name = "buttonSteam";
+            this.buttonSteam.Size = new System.Drawing.Size(90, 55);
+            this.buttonSteam.TabIndex = 19;
+            this.toolTip.SetToolTip(this.buttonSteam, "Click here to donate to vibranceGUI through Steam");
+            this.buttonSteam.UseVisualStyleBackColor = false;
+            this.buttonSteam.Click += new System.EventHandler(this.buttonSteam_Click);
+            // 
             // groupBox5
             // 
             this.groupBox5.Controls.Add(this.buttonRemoveProgram);
             this.groupBox5.Controls.Add(this.listApplications);
             this.groupBox5.Controls.Add(this.buttonAddProgram);
-            this.groupBox5.Location = new System.Drawing.Point(13, 259);
+            this.groupBox5.Location = new System.Drawing.Point(13, 231);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Size = new System.Drawing.Size(397, 227);
             this.groupBox5.TabIndex = 18;
@@ -301,6 +301,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(419, 524);
+            this.Controls.Add(this.buttonSteam);
             this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.labelPaypal);
             this.Controls.Add(this.buttonPaypal);
@@ -346,7 +347,6 @@
         private System.Windows.Forms.Label labelTwitter;
         private System.Windows.Forms.LinkLabel linkLabelTwitter;
         private System.ComponentModel.BackgroundWorker settingsBackgroundWorker;
-        private System.Windows.Forms.CheckBox checkBoxKeepActive;
         private System.Windows.Forms.Button buttonPaypal;
         private System.Windows.Forms.Label labelPaypal;
         private System.Windows.Forms.ToolTip toolTip;
@@ -355,7 +355,7 @@
         private System.Windows.Forms.Button buttonRemoveProgram;
         private System.Windows.Forms.ListView listApplications;
         private System.Windows.Forms.Button buttonAddProgram;
-
+        private System.Windows.Forms.Button buttonSteam;
     }
 }
 

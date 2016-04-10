@@ -195,11 +195,6 @@ namespace vibrance.GUI
             this.vibranceInfo.userVibranceSettingActive = vibranceIngameLevel;
         }
 
-        public void setKeepActive(bool keepActive)
-        {
-            this.vibranceInfo.keepActive = keepActive;
-        }
-
         public void setSleepInterval(int interval)
         {
             this.vibranceInfo.sleepInterval = interval;
@@ -248,7 +243,7 @@ namespace vibrance.GUI
                     }
                     else
                     {
-                        if (isChanged && !vibranceInfo.keepActive)
+                        if (isChanged /*&& !vibranceInfo.keepActive*/)
                         {
                             if (vibranceInfo.affectPrimaryMonitorOnly)
                             {

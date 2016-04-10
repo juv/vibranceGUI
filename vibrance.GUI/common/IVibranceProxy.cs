@@ -9,7 +9,6 @@ namespace vibrance.GUI.common
         void setShouldRun(bool shouldRun);
         void setVibranceWindowsLevel(int vibranceWindowsLevel);
         void setVibranceIngameLevel(int vibranceIngameLevel);
-        void setKeepActive(bool keepActive);
         void setSleepInterval(int interval);
         void handleDVC();
         bool unloadLibraryEx();

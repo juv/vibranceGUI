@@ -14,7 +14,6 @@ namespace vibrance.GUI.common
         public int userVibranceSettingActive;
         public String szGpuName;
         public bool shouldRun;
-        public bool keepActive;
         public int sleepInterval;
         public List<int> displayHandles;
         public bool affectPrimaryMonitorOnly;

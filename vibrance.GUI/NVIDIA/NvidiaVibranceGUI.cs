@@ -26,6 +26,7 @@ namespace vibrance.GUI
         private const string appName = "vibranceGUI";
         private const string twitterLink = "https://twitter.com/juvlarN";
         private const string paypalDonationLink = "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=JDQFNKNNEW356";
+        private const string steamDonationLink = "https://steamcommunity.com/tradeoffer/new/?partner=92410529&token=Oas6jXrc";
 
         private bool allowVisible;
 
@@ -97,7 +98,7 @@ namespace vibrance.GUI
         private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             int vibranceWindowsLevel = NvidiaVibranceProxy.NVAPI_DEFAULT_LEVEL;
-            bool keepActive = false, affectPrimaryMonitorOnly = false;
+            bool affectPrimaryMonitorOnly = false;
 
             while (!this.IsHandleCreated)
             {
@@ -108,12 +109,12 @@ namespace vibrance.GUI
             {
                 this.Invoke((MethodInvoker)delegate
                 {
-                    readVibranceSettings(out vibranceWindowsLevel, out keepActive, out affectPrimaryMonitorOnly);
+                    readVibranceSettings(out vibranceWindowsLevel, out affectPrimaryMonitorOnly);
                 });
             }
             else
             {
-                readVibranceSettings(out vibranceWindowsLevel, out keepActive, out affectPrimaryMonitorOnly);
+                readVibranceSettings(out vibranceWindowsLevel, out affectPrimaryMonitorOnly);
             }
 
             if (v.getVibranceInfo().isInitialized)
@@ -124,7 +125,6 @@ namespace vibrance.GUI
 
                 v.setApplicationSettings(ref applicationSettings);
                 v.setShouldRun(true);
-                v.setKeepActive(keepActive);
                 v.setVibranceWindowsLevel(vibranceWindowsLevel);
                 v.setAffectPrimaryMonitorOnly(affectPrimaryMonitorOnly);
             }
@@ -165,14 +165,13 @@ namespace vibrance.GUI
         {
             Thread.Sleep(5000);
             int windowsLevel = 0;
-            bool keepActive = false, affectPrimaryMonitorOnly = false;
+            bool affectPrimaryMonitorOnly = false;
             this.Invoke((MethodInvoker)delegate
             {
                 windowsLevel = trackBarWindowsLevel.Value;
-                keepActive = checkBoxKeepActive.Checked;
                 affectPrimaryMonitorOnly = checkBoxPrimaryMonitorOnly.Checked;
             });
-            saveVibranceSettings(windowsLevel, keepActive, affectPrimaryMonitorOnly);
+            saveVibranceSettings(windowsLevel, affectPrimaryMonitorOnly);
         }
 
         private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -202,23 +201,6 @@ namespace vibrance.GUI
 
             this.Refresh();
             this.ShowInTaskbar = true;
-        }
-
-        private void checkBoxKeepActive_CheckedChanged(object sender, EventArgs e)
-        {
-            if (v != null)
-            {
-                v.setKeepActive(checkBoxKeepActive.Checked);
-                if (!settingsBackgroundWorker.IsBusy)
-                {
-                    settingsBackgroundWorker.RunWorkerAsync();
-                }
-                if (checkBoxKeepActive.Checked)
-                {
-                    notifyIcon.BalloonTipText = "Vibrance stays at ingame level when tabbed out.";
-                    notifyIcon.ShowBalloonTip(250);
-                }
-            }
         }
 
         private void checkBoxPrimaryMonitorOnly_CheckedChanged(object sender, EventArgs e)
@@ -287,7 +269,6 @@ namespace vibrance.GUI
         {
             this.Invoke((MethodInvoker)delegate
             {
-                this.checkBoxKeepActive.Enabled = flag;
                 this.trackBarWindowsLevel.Enabled = flag;
                 this.checkBoxAutostart.Enabled = flag;
                 this.checkBoxPrimaryMonitorOnly.Enabled = flag;
@@ -342,13 +323,13 @@ namespace vibrance.GUI
             }
         }
 
-        private void readVibranceSettings(out int vibranceWindowsLevel, out bool keepActive, out bool affectPrimaryMonitorOnly)
+        private void readVibranceSettings(out int vibranceWindowsLevel, out bool affectPrimaryMonitorOnly)
         {
             registryController = new RegistryController();
             this.checkBoxAutostart.Checked = registryController.isProgramRegistered(appName);
 
             SettingsController settingsController = new SettingsController();
-            settingsController.readVibranceSettings(GraphicsAdapter.NVIDIA, out vibranceWindowsLevel, out keepActive, out affectPrimaryMonitorOnly, out applicationSettings);
+            settingsController.readVibranceSettings(GraphicsAdapter.NVIDIA, out vibranceWindowsLevel, out affectPrimaryMonitorOnly, out applicationSettings);
 
             if (this.IsHandleCreated)
             {
@@ -356,7 +337,6 @@ namespace vibrance.GUI
                 labelWindowsLevel.Text = NvidiaVibranceValueWrapper.find(vibranceWindowsLevel).getPercentage;
 
                 trackBarWindowsLevel.Value = vibranceWindowsLevel;
-                checkBoxKeepActive.Checked = keepActive;
                 checkBoxPrimaryMonitorOnly.Checked = affectPrimaryMonitorOnly;
                 foreach (NvidiaApplicationSetting application in applicationSettings)
                 {
@@ -384,13 +364,12 @@ namespace vibrance.GUI
             }
         }
 
-        private void saveVibranceSettings(int windowsLevel, bool keepActive, bool affectPrimaryMonitorOnly)
+        private void saveVibranceSettings(int windowsLevel, bool affectPrimaryMonitorOnly)
         {
             SettingsController settingsController = new SettingsController();
 
             settingsController.setVibranceSettings(
                 windowsLevel.ToString(),
-                keepActive.ToString(),
                 affectPrimaryMonitorOnly.ToString(),
                 applicationSettings
             );
@@ -399,6 +378,11 @@ namespace vibrance.GUI
         private void buttonPaypal_Click(object sender, EventArgs e)
         {
             System.Diagnostics.Process.Start(NvidiaVibranceGUI.paypalDonationLink);
+        }
+
+        private void buttonSteam_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start(NvidiaVibranceGUI.steamDonationLink);
         }
 
         private void buttonAddProgram_Click(object sender, EventArgs e)

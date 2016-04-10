@@ -29,7 +29,6 @@ namespace vibrance.GUI.common
 
         const string szSectionName = "Settings";
         const string szKeyNameInactive = "inactiveValue";
-        const string szKeyNameKeepActive = "keepActive";
         const string szKeyNameRefreshRate = "refreshRate";
         const string szKeyNameAffectPrimaryMonitorOnly = "affectPrimaryMonitorOnly";
 
@@ -37,7 +36,7 @@ namespace vibrance.GUI.common
         private string fileNameApplicationSettings = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToString() + "\\vibranceGUI\\applicationData.xml";
 
 
-        public bool setVibranceSettings(string windowsLevel, string keepActive, string affectPrimaryMonitorOnly, List<NvidiaApplicationSetting> applicationSettings)
+        public bool setVibranceSettings(string windowsLevel, string affectPrimaryMonitorOnly, List<NvidiaApplicationSetting> applicationSettings)
         {
             if (!prepareFile())
             {
@@ -45,7 +44,6 @@ namespace vibrance.GUI.common
             }
 
             WritePrivateProfileString(szSectionName, szKeyNameInactive, windowsLevel, fileName);
-            WritePrivateProfileString(szSectionName, szKeyNameKeepActive, keepActive, fileName);
             WritePrivateProfileString(szSectionName, szKeyNameAffectPrimaryMonitorOnly, affectPrimaryMonitorOnly, fileName);
 
             try
@@ -93,7 +91,7 @@ namespace vibrance.GUI.common
             return true;
         }
 
-        public void readVibranceSettings(GraphicsAdapter graphicsAdapter, out int vibranceWindowsLevel, out bool keepActive, out bool affectPrimaryMonitorOnly, out List<NvidiaApplicationSetting> applicationSettings)
+        public void readVibranceSettings(GraphicsAdapter graphicsAdapter, out int vibranceWindowsLevel, out bool affectPrimaryMonitorOnly, out List<NvidiaApplicationSetting> applicationSettings)
         {
             int defaultLevel = 0; 
             int maxLevel = 0;
@@ -107,7 +105,6 @@ namespace vibrance.GUI.common
             if (!isFileExisting(fileName) || !isFileExisting(fileNameApplicationSettings))
             {
                 vibranceWindowsLevel = defaultLevel;
-                keepActive = false;
                 affectPrimaryMonitorOnly = false;
                 applicationSettings = new List<NvidiaApplicationSetting>();
                 return;
@@ -131,15 +128,6 @@ namespace vibrance.GUI.common
                 Convert.ToUInt32(szValueRefreshRate.Capacity),
                 fileName);
 
-
-            StringBuilder szValueKeepActive = new StringBuilder(1024);
-            GetPrivateProfileString(szSectionName,
-                szKeyNameKeepActive,
-                szDefault,
-                szValueKeepActive,
-                Convert.ToUInt32(szValueKeepActive.Capacity),
-                fileName);
-
             StringBuilder szValueAffectPrimaryMonitorOnly = new StringBuilder(1024);
             GetPrivateProfileString(szSectionName,
                 szKeyNameAffectPrimaryMonitorOnly,
@@ -151,13 +139,11 @@ namespace vibrance.GUI.common
             try
             {
                 vibranceWindowsLevel = int.Parse(szValueInactive.ToString());
-                keepActive = bool.Parse(szValueKeepActive.ToString());
                 affectPrimaryMonitorOnly = bool.Parse(szValueAffectPrimaryMonitorOnly.ToString());
             }
             catch (Exception)
             {
                 vibranceWindowsLevel = defaultLevel;
-                keepActive = false;
                 affectPrimaryMonitorOnly = false;
                 applicationSettings = new List<NvidiaApplicationSetting>();
                 return;

@@ -3,7 +3,7 @@ VibranceGUI is a Windows Utility written in C# that automates NVIDIAs Digitial V
 
 As of 18th April 2015, vibranceGUI also fully supports AMD graphic cards. Prior to that, vibranceGUI was developed to support NVIDIA graphic cards only. 
 
-More information and binary download available at: http://vibrance.pushre.de/
+More information and binary download available at: http://vibrancegui.com
 
 ## Compiling
 When compiling, make sure to compile for x86 target platform.  

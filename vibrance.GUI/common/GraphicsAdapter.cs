@@ -1,8 +1,7 @@
-﻿using gui.app.gpucontroller.amd32;
-using gui.app.gpucontroller.amd64;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using vibrance.GUI.AMD.vendor;
+using vibrance.GUI.AMD.vendor.adl32;
 using vibrance.GUI.NVIDIA;
 
 namespace vibrance.GUI.common
@@ -22,8 +21,8 @@ namespace vibrance.GUI.common
 
         private const string nvidiaDllName = "nvapi.dll";
         private static string amdDllName = Environment.Is64BitOperatingSystem 
-            ? gui.app.gpucontroller.amd.adl64.ADLImport.Atiadl_FileName 
-            : gui.app.gpucontroller.amd.adl32.ADLImport.Atiadl_FileName;
+            ? ADLImport.Atiadl_FileName 
+            : AMD.vendor.adl64.ADLImport.Atiadl_FileName;
 
 
         public static GraphicsAdapter getAdapter()

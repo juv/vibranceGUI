@@ -1,4 +1,4 @@
-﻿namespace vibrance.GUI
+﻿namespace vibrance.GUI.AMD
 {
     partial class AmdVibranceGUI
     {

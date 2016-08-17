@@ -1,14 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Windows;
-using gui.app.gpucontroller.amd.adl64;
-using gui.app.mvvm.model;
-using System.Diagnostics;
-using System.Threading;
-using vibrance.GUI.AMD.vendor;
+using vibrance.GUI.AMD.vendor.adl32;
 
-namespace gui.app.gpucontroller.amd64
+namespace vibrance.GUI.AMD.vendor
 {
     public class AmdAdapter64 : IAmdAdapter
     {

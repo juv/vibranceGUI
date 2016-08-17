@@ -1,10 +1,4 @@
-﻿using gui.app.gpucontroller.amd;
-using gui.app.gpucontroller.amd32;
-using gui.app.gpucontroller.amd64;
-using gui.app.mvvm.model;
-using gui.app.mvvm.viewmodel;
-using System;
-using System.Collections;
+﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
@@ -12,9 +6,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using vibrance.GUI.AMD.vendor;
+using vibrance.GUI.AMD.vendor.mvvm.viewmodel;
 using vibrance.GUI.common;
 
-namespace vibrance.GUI
+namespace vibrance.GUI.AMD
 {
     public partial class AmdVibranceGUI : Form
     {

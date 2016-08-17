@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace gui.app.gpucontroller.amd.adl64
+namespace vibrance.GUI.AMD.vendor.adl32
 {
     public static class ADLImport
     {

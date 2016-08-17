@@ -4,6 +4,7 @@ using System.Media;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
+using vibrance.GUI.NVIDIA;
 
 namespace vibrance.GUI.common
 {

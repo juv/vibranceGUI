@@ -1,8 +1,6 @@
-﻿using System;
-using System.ComponentModel;
-using GalaSoft.MvvmLight;
+﻿using GalaSoft.MvvmLight;
 
-namespace gui.app.mvvm.model
+namespace vibrance.GUI.AMD.vendor.mvvm.model
 {
     public class VibranceSettings : ObservableObject
     {

@@ -1,22 +1,19 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Windows;
-using System.Windows.Forms.VisualStyles;
-using gui.app.utils;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
+using vibrance.GUI.AMD.vendor.utils;
 using vibrance.GUI.common;
-using vibrance.GUI.NVIDIA;
 using Application = System.Windows.Forms.Application;
 using MessageBox = System.Windows.Forms.MessageBox;
 
-namespace vibrance.GUI
+namespace vibrance.GUI.NVIDIA
 {
     public partial class NvidiaVibranceGUI : Form
     {

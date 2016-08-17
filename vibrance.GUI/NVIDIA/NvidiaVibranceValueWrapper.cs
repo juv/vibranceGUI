@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace vibrance.GUI
+namespace vibrance.GUI.NVIDIA
 {
     class NvidiaVibranceValueWrapper
     {

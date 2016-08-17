@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace gui.app.utils
+namespace vibrance.GUI.AMD.vendor.utils
 {
     public static class NativeMethods
     {

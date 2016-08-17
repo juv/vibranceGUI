@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace gui.app.gpucontroller.amd.adl64
+namespace vibrance.GUI.AMD.vendor.adl32
 {
     [StructLayout(LayoutKind.Sequential)]
     internal struct ADLDisplayInfo

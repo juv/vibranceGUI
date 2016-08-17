@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace gui.app.gpucontroller.amd.adl64
+namespace vibrance.GUI.AMD.vendor.adl32
 {
     public class ADLCheckLibrary
     {

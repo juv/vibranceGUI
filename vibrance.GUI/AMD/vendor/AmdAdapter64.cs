@@ -10,7 +10,7 @@ using vibrance.GUI.AMD.vendor;
 
 namespace gui.app.gpucontroller.amd64
 {
-    public class AmdAdapter64 : AmdAdapter
+    public class AmdAdapter64 : IAmdAdapter
     {
         public bool IsAvailable()
         {
@@ -30,12 +30,12 @@ namespace gui.app.gpucontroller.amd64
             return false;
         }
 
-        public override void SetSaturationOnAllDisplays(int vibranceLevel)
+        public void SetSaturationOnAllDisplays(int vibranceLevel)
         {
             this.SetSaturationOnDisplay(vibranceLevel, null);
         }
 
-        public override void SetSaturationOnDisplay(int vibranceLevel, string displayName)
+        public void SetSaturationOnDisplay(int vibranceLevel, string displayName)
         {
             SetSaturation((adlDisplayInfo, adlAdapterInfo, adapterIndex) =>
             {

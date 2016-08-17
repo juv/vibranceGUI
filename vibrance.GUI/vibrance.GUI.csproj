@@ -127,7 +127,7 @@
     <Compile Include="AMD\vendor\adl64\ADLDisplayInfo.cs" />
     <Compile Include="AMD\vendor\adl64\ADLImport.cs" />
     <Compile Include="AMD\vendor\adl64\Delegates.cs" />
-    <Compile Include="AMD\vendor\AmdAdapter.cs" />
+    <Compile Include="AMD\vendor\IAmdAdapter.cs" />
     <Compile Include="AMD\vendor\AmdAdapter32,.cs" />
     <Compile Include="AMD\vendor\AmdAdapter64.cs" />
     <Compile Include="AMD\vendor\mvvm\model\VibranceSettings.cs" />

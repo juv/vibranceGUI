@@ -21,7 +21,7 @@ namespace gui.app.mvvm.model
     {
         private static readonly object _padlock = new object();
 
-        private readonly AmdAdapter _gpuAdapter;
+        private readonly IAmdAdapter _gpuAdapter;
 
         private VibranceSettings _model;
 
@@ -35,7 +35,7 @@ namespace gui.app.mvvm.model
 
         private IntPtr lastSetCsgoHandle;
 
-        public VibranceSettingsViewModel(Action<string> addLogItem, AmdAdapter gpuAdapter)
+        public VibranceSettingsViewModel(Action<string> addLogItem, IAmdAdapter gpuAdapter)
         {
             _addLogItem = addLogItem;
             _gpuAdapter = gpuAdapter;

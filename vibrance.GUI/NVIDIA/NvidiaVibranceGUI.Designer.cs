@@ -1,4 +1,4 @@
-﻿namespace vibrance.GUI
+﻿namespace vibrance.GUI.NVIDIA
 {
     partial class NvidiaVibranceGUI
     {

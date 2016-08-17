@@ -2,7 +2,7 @@
 using System.IO;
 using System.Reflection;
 
-namespace gui.app.utils
+namespace vibrance.GUI.AMD.vendor.utils
 {
     public static class CommonUtils
     {

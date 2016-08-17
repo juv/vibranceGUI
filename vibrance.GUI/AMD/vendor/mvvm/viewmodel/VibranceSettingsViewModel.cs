@@ -3,19 +3,13 @@ using System.ComponentModel;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Messaging;
 using Newtonsoft.Json;
-using gui.app.gpucontroller.amd;
-using gui.app.utils;
-using System.Diagnostics;
-using vibrance.GUI.AMD.vendor;
-using System.Collections;
+using vibrance.GUI.AMD.vendor.mvvm.model;
+using vibrance.GUI.AMD.vendor.utils;
 
-namespace gui.app.mvvm.model
+namespace vibrance.GUI.AMD.vendor.mvvm.viewmodel
 {
     public class VibranceSettingsViewModel : ViewModelBase
     {

@@ -20,7 +20,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace gui.app.gpucontroller.amd.adl32
+namespace vibrance.GUI.AMD.vendor.adl64
 {
     public static class ADL
     {

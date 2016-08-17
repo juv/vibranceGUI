@@ -1,19 +1,8 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading;
-using System.Windows;
-using System.Windows.Forms;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Messaging;
-using gui.app.gpucontroller.amd;
-using gui.app.mvvm.model;
-using gui.app.utils;
-using vibrance.GUI.AMD.vendor;
-using System.Collections;
+using vibrance.GUI.AMD.vendor.utils;
 
-namespace gui.app.mvvm.viewmodel
+namespace vibrance.GUI.AMD.vendor.mvvm.viewmodel
 {
     public class AmdViewModel
     {

@@ -4,6 +4,8 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
+using vibrance.GUI.AMD;
+using vibrance.GUI.NVIDIA;
 
 namespace vibrance.GUI
 {

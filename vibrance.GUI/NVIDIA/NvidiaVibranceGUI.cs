@@ -1,13 +1,13 @@
-﻿using System.IO;
-using gui.app.utils;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
+using vibrance.GUI.AMD.vendor.utils;
 
-namespace vibrance.GUI
+namespace vibrance.GUI.NVIDIA
 {
     public partial class NvidiaVibranceGUI : Form
     {

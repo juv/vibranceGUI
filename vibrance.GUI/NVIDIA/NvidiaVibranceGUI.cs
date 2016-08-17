@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace vibrance.GUI.NVIDIA
 {
     public partial class NvidiaVibranceGUI : Form
     {
-        private IVibranceProxy v;
+        private readonly IVibranceProxy v;
         private IRegistryController registryController;
         public bool silenced = false;
         private const string appName = "vibranceGUI";
@@ -26,15 +27,14 @@ namespace vibrance.GUI.NVIDIA
         private const string steamDonationLink = "https://steamcommunity.com/tradeoffer/new/?partner=92410529&token=Oas6jXrc";
 
         private bool allowVisible;
-
-        List<NvidiaApplicationSetting> applicationSettings;
-        List<ResolutionModeWrapper> supportedResolutionList;
-        ResolutionModeWrapper WindowsResolutionSettings;
+        private List<NvidiaApplicationSetting> applicationSettings;
+        private readonly List<ResolutionModeWrapper> supportedResolutionList;
+        private readonly ResolutionModeWrapper WindowsResolutionSettings;
 
         public NvidiaVibranceGUI()
         {
             const string nvidiaAdapterName = "vibranceDLL.dll";
-            string resourceName = string.Format("{0}.NVIDIA.{1}", typeof(Program).Namespace, nvidiaAdapterName);
+            string resourceName = $"{typeof(Program).Namespace}.NVIDIA.{nvidiaAdapterName}";
             
             string dllPath = CommonUtils.LoadUnmanagedLibraryFromResource(
                 Assembly.GetExecutingAssembly(),
@@ -188,7 +188,7 @@ namespace vibrance.GUI.NVIDIA
             }
             else if (e.ProgressPercentage == 2)
             {
-                this.statusLabel.Text = "NVAPI Unloaded: " + e.UserState;
+                this.statusLabel.Text = $"NVAPI Unloaded: {e.UserState}";
             }
         }
 
@@ -262,12 +262,12 @@ namespace vibrance.GUI.NVIDIA
 
         private void twitterToolStripTextBox_Click(object sender, EventArgs e)
         {
-            System.Diagnostics.Process.Start(NvidiaVibranceGUI.twitterLink);
+            Process.Start(twitterLink);
         }
 
         private void linkLabelTwitter_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            System.Diagnostics.Process.Start(NvidiaVibranceGUI.twitterLink);
+            Process.Start(twitterLink);
         }
 
         private void setGuiEnabledFlag(bool flag)
@@ -382,12 +382,12 @@ namespace vibrance.GUI.NVIDIA
 
         private void buttonPaypal_Click(object sender, EventArgs e)
         {
-            System.Diagnostics.Process.Start(NvidiaVibranceGUI.paypalDonationLink);
+            Process.Start(paypalDonationLink);
         }
 
         private void buttonSteam_Click(object sender, EventArgs e)
         {
-            System.Diagnostics.Process.Start(NvidiaVibranceGUI.steamDonationLink);
+            Process.Start(steamDonationLink);
         }
 
         private void buttonAddProgram_Click(object sender, EventArgs e)

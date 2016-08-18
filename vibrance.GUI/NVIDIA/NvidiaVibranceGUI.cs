@@ -27,7 +27,7 @@ namespace vibrance.GUI.NVIDIA
         private const string steamDonationLink = "https://steamcommunity.com/tradeoffer/new/?partner=92410529&token=Oas6jXrc";
 
         private bool allowVisible;
-        private List<NvidiaApplicationSetting> applicationSettings;
+        private List<ApplicationSetting> applicationSettings;
         private readonly List<ResolutionModeWrapper> supportedResolutionList;
         private readonly ResolutionModeWrapper WindowsResolutionSettings;
 
@@ -57,7 +57,7 @@ namespace vibrance.GUI.NVIDIA
                 MessageBox.Show("Current resolution mode could not be determined. Switching back to your Windows resolution will not work.");
             }
 
-            applicationSettings = new List<NvidiaApplicationSetting>();
+            applicationSettings = new List<ApplicationSetting>();
             v = new NvidiaDynamicVibranceProxy(ref applicationSettings, WindowsResolutionSettings);
 
             backgroundWorker.WorkerReportsProgress = true;
@@ -343,7 +343,7 @@ namespace vibrance.GUI.NVIDIA
 
                 trackBarWindowsLevel.Value = vibranceWindowsLevel;
                 checkBoxPrimaryMonitorOnly.Checked = affectPrimaryMonitorOnly;
-                foreach (NvidiaApplicationSetting application in applicationSettings)
+                foreach (ApplicationSetting application in applicationSettings)
                 {
                     if (!File.Exists(application.FileName))
                         continue;
@@ -436,12 +436,12 @@ namespace vibrance.GUI.NVIDIA
             ListViewItem selectedItem = this.listApplications.SelectedItems[0];
             if (selectedItem != null)
             {
-                NvidiaApplicationSetting actualSetting = applicationSettings.FirstOrDefault(x => x.FileName == selectedItem.Tag.ToString());
+                ApplicationSetting actualSetting = applicationSettings.FirstOrDefault(x => x.FileName == selectedItem.Tag.ToString());
                 VibranceSettings settingsWindow = new VibranceSettings(v, selectedItem, actualSetting, supportedResolutionList);
                 DialogResult result = settingsWindow.ShowDialog();
                 if (result == DialogResult.OK)
                 {
-                    NvidiaApplicationSetting newSetting = settingsWindow.getApplicationSetting();
+                    ApplicationSetting newSetting = settingsWindow.getApplicationSetting();
                     if (applicationSettings.FirstOrDefault(x => x.FileName == newSetting.FileName) != null)
                         applicationSettings.Remove(applicationSettings.First(x => x.FileName == newSetting.FileName));
                     applicationSettings.Add(newSetting);

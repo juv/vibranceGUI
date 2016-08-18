@@ -36,7 +36,7 @@ namespace vibrance.GUI.common
         private string fileNameApplicationSettings = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToString() + "\\vibranceGUI\\applicationData.xml";
 
 
-        public bool setVibranceSettings(string windowsLevel, string affectPrimaryMonitorOnly, List<NvidiaApplicationSetting> applicationSettings)
+        public bool setVibranceSettings(string windowsLevel, string affectPrimaryMonitorOnly, List<ApplicationSetting> applicationSettings)
         {
             if (!prepareFile())
             {
@@ -51,7 +51,7 @@ namespace vibrance.GUI.common
                 var writer = System.Xml.XmlWriter.Create(fileNameApplicationSettings);
                 if (writer.WriteState != WriteState.Start)
                     return false;
-                XmlSerializer serializer = new XmlSerializer(typeof(List<NvidiaApplicationSetting>));
+                XmlSerializer serializer = new XmlSerializer(typeof(List<ApplicationSetting>));
                 serializer.Serialize(writer, applicationSettings);
                 writer.Flush();
                 writer.Close();
@@ -91,7 +91,7 @@ namespace vibrance.GUI.common
             return true;
         }
 
-        public void readVibranceSettings(GraphicsAdapter graphicsAdapter, out int vibranceWindowsLevel, out bool affectPrimaryMonitorOnly, out List<NvidiaApplicationSetting> applicationSettings)
+        public void readVibranceSettings(GraphicsAdapter graphicsAdapter, out int vibranceWindowsLevel, out bool affectPrimaryMonitorOnly, out List<ApplicationSetting> applicationSettings)
         {
             int defaultLevel = 0; 
             int maxLevel = 0;
@@ -106,7 +106,7 @@ namespace vibrance.GUI.common
             {
                 vibranceWindowsLevel = defaultLevel;
                 affectPrimaryMonitorOnly = false;
-                applicationSettings = new List<NvidiaApplicationSetting>();
+                applicationSettings = new List<ApplicationSetting>();
                 return;
             }
 
@@ -145,7 +145,7 @@ namespace vibrance.GUI.common
             {
                 vibranceWindowsLevel = defaultLevel;
                 affectPrimaryMonitorOnly = false;
-                applicationSettings = new List<NvidiaApplicationSetting>();
+                applicationSettings = new List<ApplicationSetting>();
                 return;
             }
 
@@ -155,13 +155,13 @@ namespace vibrance.GUI.common
             try
             {
                 var reader = System.Xml.XmlReader.Create(fileNameApplicationSettings);
-                XmlSerializer serializer = new XmlSerializer(typeof(List<NvidiaApplicationSetting>));
-                applicationSettings = (List<NvidiaApplicationSetting>)serializer.Deserialize(reader);
+                XmlSerializer serializer = new XmlSerializer(typeof(List<ApplicationSetting>));
+                applicationSettings = (List<ApplicationSetting>)serializer.Deserialize(reader);
                 reader.Close();
             }
             catch (Exception)
             {
-                applicationSettings = new List<NvidiaApplicationSetting>();
+                applicationSettings = new List<ApplicationSetting>();
             }
         }
 

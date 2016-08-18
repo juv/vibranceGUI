@@ -145,7 +145,7 @@
     <Compile Include="common\IRegistryController.cs" />
     <Compile Include="common\ISettingsController.cs" />
     <Compile Include="common\IVibranceProxy.cs" />
-    <Compile Include="NVIDIA\NvidiaApplicationSetting.cs" />
+    <Compile Include="common\ApplicationSetting.cs" />
     <Compile Include="NVIDIA\NvidiaDynamicVibranceProxy.cs" />
     <Compile Include="NVIDIA\NvidiaTypes.cs" />
     <Compile Include="NVIDIA\VibranceSettings.cs">

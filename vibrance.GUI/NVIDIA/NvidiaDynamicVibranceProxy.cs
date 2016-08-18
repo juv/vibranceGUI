@@ -125,12 +125,12 @@ namespace vibrance.GUI.NVIDIA
         public const string NVAPI_ERROR_SYSTYPE_UNKNOWN = "VibranceProxy failed to initialize! Graphics card system type (Desktop / Laptop) is unknown!";
 
         private static VIBRANCE_INFO vibranceInfo;
-        private static List<NvidiaApplicationSetting> applicationSettings;
+        private static List<ApplicationSetting> applicationSettings;
         private static ResolutionModeWrapper windowsResolutionSettings;
         private WinEventHook hook;
         private static Screen gameScreen;
 
-        public NvidiaDynamicVibranceProxy(ref List<NvidiaApplicationSetting> savedApplicationSettings, ResolutionModeWrapper currentWindowsResolutionSettings)
+        public NvidiaDynamicVibranceProxy(ref List<ApplicationSetting> savedApplicationSettings, ResolutionModeWrapper currentWindowsResolutionSettings)
         {
             try
             {
@@ -210,7 +210,7 @@ namespace vibrance.GUI.NVIDIA
         {
             if (applicationSettings.Count > 0)
             {
-                NvidiaApplicationSetting applicationSetting = applicationSettings.FirstOrDefault(x => x.Name.Equals(e.ProcessName));
+                ApplicationSetting applicationSetting = applicationSettings.FirstOrDefault(x => x.Name.Equals(e.ProcessName));
                 if (applicationSetting != null)
                 {
                     //test if a resolution change is needed
@@ -304,7 +304,7 @@ namespace vibrance.GUI.NVIDIA
             return -1;
         }
 
-        public void setApplicationSettings(ref List<NvidiaApplicationSetting> refApplicationSettings)
+        public void setApplicationSettings(ref List<ApplicationSetting> refApplicationSettings)
         {
             applicationSettings = refApplicationSettings;
         }

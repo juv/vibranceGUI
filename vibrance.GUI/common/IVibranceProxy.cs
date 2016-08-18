@@ -5,7 +5,7 @@ namespace vibrance.GUI.common
 {
     public interface IVibranceProxy
     {
-        void setApplicationSettings(ref List<NvidiaApplicationSetting> refApplicationSettings);
+        void setApplicationSettings(ref List<ApplicationSetting> refApplicationSettings);
         void setShouldRun(bool shouldRun);
         void setVibranceWindowsLevel(int vibranceWindowsLevel);
         void setVibranceIngameLevel(int vibranceIngameLevel);

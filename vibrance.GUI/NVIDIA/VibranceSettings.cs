@@ -15,7 +15,7 @@ namespace vibrance.GUI.NVIDIA
         private IVibranceProxy v;
         private ListViewItem sender;
 
-        public VibranceSettings(IVibranceProxy v, ListViewItem sender, NvidiaApplicationSetting setting, List<ResolutionModeWrapper> supportedResolutionList)
+        public VibranceSettings(IVibranceProxy v, ListViewItem sender, ApplicationSetting setting, List<ResolutionModeWrapper> supportedResolutionList)
         {
             InitializeComponent();
             this.sender = sender;
@@ -50,9 +50,9 @@ namespace vibrance.GUI.NVIDIA
             this.Close();
         }
 
-        public NvidiaApplicationSetting getApplicationSetting()
+        public ApplicationSetting getApplicationSetting()
         {
-            return new NvidiaApplicationSetting(sender.Text, sender.Tag.ToString(), this.trackBarIngameLevel.Value, 
+            return new ApplicationSetting(sender.Text, sender.Tag.ToString(), this.trackBarIngameLevel.Value, 
                 (ResolutionModeWrapper)this.cBoxResolution.SelectedItem, this.checkBoxResolution.Checked);
         }
 

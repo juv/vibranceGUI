@@ -173,7 +173,7 @@ namespace vibrance.GUI.NVIDIA
             return -1;
         }
 
-        public void setApplicationSettings(ref List<NvidiaApplicationSetting> refApplicationSettings)
+        public void setApplicationSettings(ref List<ApplicationSetting> refApplicationSettings)
         {
             throw new NotImplementedException();
         }

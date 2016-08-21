@@ -5,15 +5,13 @@ namespace vibrance.GUI.common
 {
     public interface IVibranceProxy
     {
-        void setApplicationSettings(ref List<ApplicationSetting> refApplicationSettings);
-        void setShouldRun(bool shouldRun);
-        void setVibranceWindowsLevel(int vibranceWindowsLevel);
-        void setVibranceIngameLevel(int vibranceIngameLevel);
-        void setSleepInterval(int interval);
-        void handleDVC();
-        bool unloadLibraryEx();
-        void handleDVCExit();
-        void setAffectPrimaryMonitorOnly(bool affectPrimaryMonitorOnly);
-        VIBRANCE_INFO getVibranceInfo();
+        void SetApplicationSettings(List<ApplicationSetting> refApplicationSettings);
+        void SetShouldRun(bool shouldRun);
+        void SetVibranceWindowsLevel(int vibranceWindowsLevel);
+        void SetVibranceIngameLevel(int vibranceIngameLevel);
+        bool UnloadLibraryEx();
+        void HandleDvcExit();
+        void SetAffectPrimaryMonitorOnly(bool affectPrimaryMonitorOnly);
+        VibranceInfo GetVibranceInfo();
     }
 }

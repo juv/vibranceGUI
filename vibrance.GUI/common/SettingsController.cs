@@ -27,28 +27,28 @@ namespace vibrance.GUI.common
         private static extern bool WritePrivateProfileString(string lpAppName,
           string lpKeyName, string lpString, string lpFileName);
 
-        const string szSectionName = "Settings";
-        const string szKeyNameInactive = "inactiveValue";
-        const string szKeyNameRefreshRate = "refreshRate";
-        const string szKeyNameAffectPrimaryMonitorOnly = "affectPrimaryMonitorOnly";
+        const string SzSectionName = "Settings";
+        const string SzKeyNameInactive = "inactiveValue";
+        const string SzKeyNameRefreshRate = "refreshRate";
+        const string SzKeyNameAffectPrimaryMonitorOnly = "affectPrimaryMonitorOnly";
 
-        private string fileName = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToString() + "\\vibranceGUI\\vibranceGUI.ini";
-        private string fileNameApplicationSettings = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToString() + "\\vibranceGUI\\applicationData.xml";
+        private string _fileName = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToString() + "\\vibranceGUI\\vibranceGUI.ini";
+        private string _fileNameApplicationSettings = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToString() + "\\vibranceGUI\\applicationData.xml";
 
 
-        public bool setVibranceSettings(string windowsLevel, string affectPrimaryMonitorOnly, List<ApplicationSetting> applicationSettings)
+        public bool SetVibranceSettings(string windowsLevel, string affectPrimaryMonitorOnly, List<ApplicationSetting> applicationSettings)
         {
-            if (!prepareFile())
+            if (!PrepareFile())
             {
                 return false;
             }
 
-            WritePrivateProfileString(szSectionName, szKeyNameInactive, windowsLevel, fileName);
-            WritePrivateProfileString(szSectionName, szKeyNameAffectPrimaryMonitorOnly, affectPrimaryMonitorOnly, fileName);
+            WritePrivateProfileString(SzSectionName, SzKeyNameInactive, windowsLevel, _fileName);
+            WritePrivateProfileString(SzSectionName, SzKeyNameAffectPrimaryMonitorOnly, affectPrimaryMonitorOnly, _fileName);
 
             try
             {
-                var writer = System.Xml.XmlWriter.Create(fileNameApplicationSettings);
+                var writer = System.Xml.XmlWriter.Create(_fileNameApplicationSettings);
                 if (writer.WriteState != WriteState.Start)
                     return false;
                 XmlSerializer serializer = new XmlSerializer(typeof(List<ApplicationSetting>));
@@ -64,25 +64,25 @@ namespace vibrance.GUI.common
             return (Marshal.GetLastWin32Error() == 0);
         }
 
-        public bool setVibranceSetting(string szKeyName, string value)
+        public bool SetVibranceSetting(string szKeyName, string value)
         {
-            if (!prepareFile())
+            if (!PrepareFile())
             {
                 return false;
             }
 
-            WritePrivateProfileString(szSectionName, szKeyName, value.ToString(), fileName);
+            WritePrivateProfileString(SzSectionName, szKeyName, value.ToString(), _fileName);
 
             return (Marshal.GetLastWin32Error() == 0);
         }
 
-        private bool prepareFile()
+        private bool PrepareFile()
         {
-            if (!isFileExisting(fileName))
+            if (!IsFileExisting(_fileName))
             {
-                StreamWriter sw = new StreamWriter(fileName);
+                StreamWriter sw = new StreamWriter(_fileName);
                 sw.Close();
-                if (!isFileExisting(fileName))
+                if (!IsFileExisting(_fileName))
                 {
                     return false;
                 }
@@ -91,18 +91,23 @@ namespace vibrance.GUI.common
             return true;
         }
 
-        public void readVibranceSettings(GraphicsAdapter graphicsAdapter, out int vibranceWindowsLevel, out bool affectPrimaryMonitorOnly, out List<ApplicationSetting> applicationSettings)
+        public void ReadVibranceSettings(GraphicsAdapter graphicsAdapter, out int vibranceWindowsLevel, out bool affectPrimaryMonitorOnly, out List<ApplicationSetting> applicationSettings)
         {
             int defaultLevel = 0; 
             int maxLevel = 0;
-            if (graphicsAdapter == GraphicsAdapter.NVIDIA)
+            if (graphicsAdapter == GraphicsAdapter.Nvidia)
             {
-                defaultLevel = NvidiaVibranceProxy.NVAPI_DEFAULT_LEVEL;
-                maxLevel = NvidiaVibranceProxy.NVAPI_MAX_LEVEL;
+                defaultLevel = NvidiaVibranceProxy.NvapiDefaultLevel;
+                maxLevel = NvidiaVibranceProxy.NvapiMaxLevel;
+            }
+            if (graphicsAdapter == GraphicsAdapter.Amd)
+            {
+                // todo
+                defaultLevel = 100;
+                maxLevel = 300;
             }
 
-
-            if (!isFileExisting(fileName) || !isFileExisting(fileNameApplicationSettings))
+            if (!IsFileExisting(_fileName) || !IsFileExisting(_fileNameApplicationSettings))
             {
                 vibranceWindowsLevel = defaultLevel;
                 affectPrimaryMonitorOnly = false;
@@ -113,28 +118,28 @@ namespace vibrance.GUI.common
             string szDefault = "";
 
             StringBuilder szValueInactive = new StringBuilder(1024);
-            GetPrivateProfileString(szSectionName,
-                szKeyNameInactive,
+            GetPrivateProfileString(SzSectionName,
+                SzKeyNameInactive,
                 szDefault,
                 szValueInactive,
                 Convert.ToUInt32(szValueInactive.Capacity),
-                fileName);
+                _fileName);
 
             StringBuilder szValueRefreshRate = new StringBuilder(1024);
-            GetPrivateProfileString(szSectionName,
-                szKeyNameRefreshRate,
+            GetPrivateProfileString(SzSectionName,
+                SzKeyNameRefreshRate,
                 szDefault,
                 szValueRefreshRate,
                 Convert.ToUInt32(szValueRefreshRate.Capacity),
-                fileName);
+                _fileName);
 
             StringBuilder szValueAffectPrimaryMonitorOnly = new StringBuilder(1024);
-            GetPrivateProfileString(szSectionName,
-                szKeyNameAffectPrimaryMonitorOnly,
+            GetPrivateProfileString(SzSectionName,
+                SzKeyNameAffectPrimaryMonitorOnly,
                 szDefault,
                 szValueAffectPrimaryMonitorOnly,
                 Convert.ToUInt32(szValueAffectPrimaryMonitorOnly.Capacity),
-                fileName);
+                _fileName);
 
             try
             {
@@ -154,7 +159,7 @@ namespace vibrance.GUI.common
 
             try
             {
-                var reader = System.Xml.XmlReader.Create(fileNameApplicationSettings);
+                var reader = System.Xml.XmlReader.Create(_fileNameApplicationSettings);
                 XmlSerializer serializer = new XmlSerializer(typeof(List<ApplicationSetting>));
                 applicationSettings = (List<ApplicationSetting>)serializer.Deserialize(reader);
                 reader.Close();
@@ -165,7 +170,7 @@ namespace vibrance.GUI.common
             }
         }
 
-        private bool isFileExisting(string szFilename)
+        private bool IsFileExisting(string szFilename)
         {
             return File.Exists(szFilename);
         }

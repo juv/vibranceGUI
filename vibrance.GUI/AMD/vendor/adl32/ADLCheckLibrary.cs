@@ -2,18 +2,18 @@
 
 namespace vibrance.GUI.AMD.vendor.adl32
 {
-    public class ADLCheckLibrary
+    public class AdlCheckLibrary
     {
-        private IntPtr ADLLibrary = System.IntPtr.Zero;
-        private static ADLCheckLibrary ADLCheckLibrary_ = new ADLCheckLibrary();
+        private IntPtr _adlLibrary = System.IntPtr.Zero;
+        private static AdlCheckLibrary _adlCheckLibrary = new AdlCheckLibrary();
 
-        private ADLCheckLibrary()
+        private AdlCheckLibrary()
         {
             try
             {
-                if (1 == ADLImport.ADL_Main_Control_IsFunctionValid(IntPtr.Zero, "ADL_Main_Control_Create"))
+                if (1 == AdlImport.ADL_Main_Control_IsFunctionValid(IntPtr.Zero, "ADL_Main_Control_Create"))
                 {
-                    ADLLibrary = ADLImport.GetModuleHandle(ADLImport.Atiadl_FileName);
+                    _adlLibrary = AdlImport.GetModuleHandle(AdlImport.AtiadlFileName);
                 }
             }
             catch (DllNotFoundException) { }
@@ -21,20 +21,20 @@ namespace vibrance.GUI.AMD.vendor.adl32
             catch (Exception) { }
         }
 
-        ~ADLCheckLibrary()
+        ~AdlCheckLibrary()
         {
-            if (System.IntPtr.Zero != ADLCheckLibrary_.ADLLibrary)
+            if (System.IntPtr.Zero != _adlCheckLibrary._adlLibrary)
             {
-                ADLImport.ADL_Main_Control_Destroy();
+                AdlImport.ADL_Main_Control_Destroy();
             }
         }
 
         public static bool IsFunctionValid(string functionName)
         {
             bool result = false;
-            if (System.IntPtr.Zero != ADLCheckLibrary_.ADLLibrary)
+            if (System.IntPtr.Zero != _adlCheckLibrary._adlLibrary)
             {
-                if (1 == ADLImport.ADL_Main_Control_IsFunctionValid(ADLCheckLibrary_.ADLLibrary, functionName))
+                if (1 == AdlImport.ADL_Main_Control_IsFunctionValid(_adlCheckLibrary._adlLibrary, functionName))
                 {
                     result = true;
                 }
@@ -45,9 +45,9 @@ namespace vibrance.GUI.AMD.vendor.adl32
         public static IntPtr GetProcAddress(string functionName)
         {
             IntPtr result = System.IntPtr.Zero;
-            if (System.IntPtr.Zero != ADLCheckLibrary_.ADLLibrary)
+            if (System.IntPtr.Zero != _adlCheckLibrary._adlLibrary)
             {
-                result = ADLImport.ADL_Main_Control_GetProcAddress(ADLCheckLibrary_.ADLLibrary, functionName);
+                result = AdlImport.ADL_Main_Control_GetProcAddress(_adlCheckLibrary._adlLibrary, functionName);
             }
             return result;
         }

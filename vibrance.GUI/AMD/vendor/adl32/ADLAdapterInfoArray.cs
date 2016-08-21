@@ -3,9 +3,9 @@ using System.Runtime.InteropServices;
 namespace vibrance.GUI.AMD.vendor.adl32
 {
     [StructLayout(LayoutKind.Sequential)]
-    internal struct ADLAdapterInfoArray
+    internal struct AdlAdapterInfoArray
     {
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = (int)ADL.ADL_MAX_ADAPTERS)]
-        internal ADLAdapterInfo[] ADLAdapterInfo;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = (int)Adl.AdlMaxAdapters)]
+        internal AdlAdapterInfo[] ADLAdapterInfo;
     }
 }

@@ -3,7 +3,7 @@
 namespace vibrance.GUI.AMD.vendor.adl64
 {
     [StructLayout(LayoutKind.Sequential)]
-    internal struct ADLDisplayID
+    internal struct AdlDisplayId
     {
         internal int DisplayLogicalIndex;
         internal int DisplayPhysicalIndex;

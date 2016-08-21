@@ -3,13 +3,13 @@
 namespace vibrance.GUI.AMD.vendor.adl64
 {
     [StructLayout(LayoutKind.Sequential)]
-    internal struct ADLDisplayInfo
+    internal struct AdlDisplayInfo
     {
-        internal ADLDisplayID DisplayID;
+        internal AdlDisplayId DisplayID;
         internal int DisplayControllerIndex;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = (int)ADL.ADL_MAX_PATH)]
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = (int)Adl.AdlMaxPath)]
         internal string DisplayName;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = (int)ADL.ADL_MAX_PATH)]
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = (int)Adl.AdlMaxPath)]
         internal string DisplayManufacturerName;
         internal int DisplayType;
         internal int DisplayOutputType;

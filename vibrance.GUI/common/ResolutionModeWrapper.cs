@@ -7,27 +7,27 @@ namespace vibrance.GUI.common
 {
     public class ResolutionModeWrapper
     {
-        public uint dmPelsWidth { get; set; }
-        public uint dmPelsHeight { get; set; }
-        public uint dmBitsPerPel { get; set; }
-        public uint dmDisplayFrequency { get; set; }
-        public uint dmDisplayFixedOutput { get; set; }
+        public uint DmPelsWidth { get; set; }
+        public uint DmPelsHeight { get; set; }
+        public uint DmBitsPerPel { get; set; }
+        public uint DmDisplayFrequency { get; set; }
+        public uint DmDisplayFixedOutput { get; set; }
 
         public ResolutionModeWrapper() { }
 
-        public ResolutionModeWrapper(DEVMODE mode)
+        public ResolutionModeWrapper(Devmode mode)
         {
-            this.dmPelsWidth = mode.dmPelsWidth;
-            this.dmPelsHeight = mode.dmPelsHeight;
-            this.dmBitsPerPel = mode.dmBitsPerPel;
-            this.dmDisplayFrequency = mode.dmDisplayFrequency;
-            this.dmDisplayFixedOutput = mode.dmDisplayFixedOutput;
+            this.DmPelsWidth = mode.dmPelsWidth;
+            this.DmPelsHeight = mode.dmPelsHeight;
+            this.DmBitsPerPel = mode.dmBitsPerPel;
+            this.DmDisplayFrequency = mode.dmDisplayFrequency;
+            this.DmDisplayFixedOutput = mode.dmDisplayFixedOutput;
         }
 
         public override string ToString()
         {
-            return String.Format("{0} x {1} @ {3} hz ({2} bit, {4})", this.dmPelsWidth, this.dmPelsHeight, 
-                this.dmBitsPerPel, this.dmDisplayFrequency, Enum.GetName(typeof(DMDFO), this.dmDisplayFixedOutput));
+            return String.Format("{0} x {1} @ {3} hz ({2} bit, {4})", this.DmPelsWidth, this.DmPelsHeight, 
+                this.DmBitsPerPel, this.DmDisplayFrequency, Enum.GetName(typeof(Dmdfo), this.DmDisplayFixedOutput));
         }
 
         public override bool Equals(object obj)
@@ -36,18 +36,18 @@ namespace vibrance.GUI.common
 
             //if the object is of type DEVMODE, it corresponding ResolutionModeWrapper 
             //will be determined and the second check will always pass
-            if (obj is DEVMODE)
+            if (obj is Devmode)
             {
-                that = new ResolutionModeWrapper((DEVMODE)obj);
+                that = new ResolutionModeWrapper((Devmode)obj);
             }
             if (obj is ResolutionModeWrapper)
             {
                 that = that == null ? obj as ResolutionModeWrapper : that;
-                if (this.dmPelsWidth == that.dmPelsWidth &&
-                    this.dmPelsHeight == that.dmPelsHeight &&
-                    this.dmBitsPerPel == that.dmBitsPerPel &&
-                    this.dmDisplayFrequency == that.dmDisplayFrequency &&
-                    this.dmDisplayFixedOutput == that.dmDisplayFixedOutput)
+                if (this.DmPelsWidth == that.DmPelsWidth &&
+                    this.DmPelsHeight == that.DmPelsHeight &&
+                    this.DmBitsPerPel == that.DmBitsPerPel &&
+                    this.DmDisplayFrequency == that.DmDisplayFrequency &&
+                    this.DmDisplayFixedOutput == that.DmDisplayFixedOutput)
                 {
                     return true;
                 }

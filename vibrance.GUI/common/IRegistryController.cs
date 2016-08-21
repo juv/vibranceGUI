@@ -2,8 +2,8 @@
 {
     internal interface IRegistryController
     {
-        bool registerProgram(string appName, string pathToExe);
-        bool unregisterProgram(string appName);
-        bool isProgramRegistered(string appName);
+        bool RegisterProgram(string appName, string pathToExe);
+        bool UnregisterProgram(string appName);
+        bool IsProgramRegistered(string appName);
     }
 }

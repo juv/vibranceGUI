@@ -4,6 +4,7 @@ using System.Media;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
+using vibrance.GUI.AMD;
 using vibrance.GUI.NVIDIA;
 
 namespace vibrance.GUI.common
@@ -33,159 +34,159 @@ namespace vibrance.GUI.common
         private struct WinEvent
         {
 
-            public const uint WINEVENT_OUTOFCONTEXT = 0x0000; // Events are ASYNC
+            public const uint WineventOutofcontext = 0x0000; // Events are ASYNC
 
-            public const uint WINEVENT_SKIPOWNTHREAD = 0x0001; // Don't call back for events on installer's thread
+            public const uint WineventSkipownthread = 0x0001; // Don't call back for events on installer's thread
 
-            public const uint WINEVENT_SKIPOWNPROCESS = 0x0002; // Don't call back for events on installer's process
+            public const uint WineventSkipownprocess = 0x0002; // Don't call back for events on installer's process
 
-            public const uint WINEVENT_INCONTEXT = 0x0004; // Events are SYNC; this causes your dll to be injected into every process
+            public const uint WineventIncontext = 0x0004; // Events are SYNC; this causes your dll to be injected into every process
 
-            public const uint EVENT_MIN = 0x00000001;
+            public const uint EventMin = 0x00000001;
 
-            public const uint EVENT_MAX = 0x7FFFFFFF;
+            public const uint EventMax = 0x7FFFFFFF;
 
-            public const uint EVENT_SYSTEM_SOUND = 0x0001;
+            public const uint EventSystemSound = 0x0001;
 
-            public const uint EVENT_SYSTEM_ALERT = 0x0002;
+            public const uint EventSystemAlert = 0x0002;
 
-            public const uint EVENT_SYSTEM_FOREGROUND = 0x0003;
+            public const uint EventSystemForeground = 0x0003;
 
-            public const uint EVENT_SYSTEM_MENUSTART = 0x0004;
+            public const uint EventSystemMenustart = 0x0004;
 
-            public const uint EVENT_SYSTEM_MENUEND = 0x0005;
+            public const uint EventSystemMenuend = 0x0005;
 
-            public const uint EVENT_SYSTEM_MENUPOPUPSTART = 0x0006;
+            public const uint EventSystemMenupopupstart = 0x0006;
 
-            public const uint EVENT_SYSTEM_MENUPOPUPEND = 0x0007;
+            public const uint EventSystemMenupopupend = 0x0007;
 
-            public const uint EVENT_SYSTEM_CAPTURESTART = 0x0008;
+            public const uint EventSystemCapturestart = 0x0008;
 
-            public const uint EVENT_SYSTEM_CAPTUREEND = 0x0009;
+            public const uint EventSystemCaptureend = 0x0009;
 
-            public const uint EVENT_SYSTEM_MOVESIZESTART = 0x000A;
+            public const uint EventSystemMovesizestart = 0x000A;
 
-            public const uint EVENT_SYSTEM_MOVESIZEEND = 0x000B;
+            public const uint EventSystemMovesizeend = 0x000B;
 
-            public const uint EVENT_SYSTEM_CONTEXTHELPSTART = 0x000C;
+            public const uint EventSystemContexthelpstart = 0x000C;
 
-            public const uint EVENT_SYSTEM_CONTEXTHELPEND = 0x000D;
+            public const uint EventSystemContexthelpend = 0x000D;
 
-            public const uint EVENT_SYSTEM_DRAGDROPSTART = 0x000E;
+            public const uint EventSystemDragdropstart = 0x000E;
 
-            public const uint EVENT_SYSTEM_DRAGDROPEND = 0x000F;
+            public const uint EventSystemDragdropend = 0x000F;
 
-            public const uint EVENT_SYSTEM_DIALOGSTART = 0x0010;
+            public const uint EventSystemDialogstart = 0x0010;
 
-            public const uint EVENT_SYSTEM_DIALOGEND = 0x0011;
+            public const uint EventSystemDialogend = 0x0011;
 
-            public const uint EVENT_SYSTEM_SCROLLINGSTART = 0x0012;
+            public const uint EventSystemScrollingstart = 0x0012;
 
-            public const uint EVENT_SYSTEM_SCROLLINGEND = 0x0013;
+            public const uint EventSystemScrollingend = 0x0013;
 
-            public const uint EVENT_SYSTEM_SWITCHSTART = 0x0014;
+            public const uint EventSystemSwitchstart = 0x0014;
 
-            public const uint EVENT_SYSTEM_SWITCHEND = 0x0015;
+            public const uint EventSystemSwitchend = 0x0015;
 
-            public const uint EVENT_SYSTEM_MINIMIZESTART = 0x0016;
+            public const uint EventSystemMinimizestart = 0x0016;
 
-            public const uint EVENT_SYSTEM_MINIMIZEEND = 0x0017;
+            public const uint EventSystemMinimizeend = 0x0017;
 
-            public const uint EVENT_SYSTEM_DESKTOPSWITCH = 0x0020;
+            public const uint EventSystemDesktopswitch = 0x0020;
 
-            public const uint EVENT_SYSTEM_END = 0x00FF;
+            public const uint EventSystemEnd = 0x00FF;
 
-            public const uint EVENT_OEM_DEFINED_START = 0x0101;
+            public const uint EventOemDefinedStart = 0x0101;
 
-            public const uint EVENT_OEM_DEFINED_END = 0x01FF;
+            public const uint EventOemDefinedEnd = 0x01FF;
 
-            public const uint EVENT_UIA_EVENTID_START = 0x4E00;
+            public const uint EventUiaEventidStart = 0x4E00;
 
-            public const uint EVENT_UIA_EVENTID_END = 0x4EFF;
+            public const uint EventUiaEventidEnd = 0x4EFF;
 
-            public const uint EVENT_UIA_PROPID_START = 0x7500;
+            public const uint EventUiaPropidStart = 0x7500;
 
-            public const uint EVENT_UIA_PROPID_END = 0x75FF;
+            public const uint EventUiaPropidEnd = 0x75FF;
 
-            public const uint EVENT_CONSOLE_CARET = 0x4001;
+            public const uint EventConsoleCaret = 0x4001;
 
-            public const uint EVENT_CONSOLE_UPDATE_REGION = 0x4002;
+            public const uint EventConsoleUpdateRegion = 0x4002;
 
-            public const uint EVENT_CONSOLE_UPDATE_SIMPLE = 0x4003;
+            public const uint EventConsoleUpdateSimple = 0x4003;
 
-            public const uint EVENT_CONSOLE_UPDATE_SCROLL = 0x4004;
+            public const uint EventConsoleUpdateScroll = 0x4004;
 
-            public const uint EVENT_CONSOLE_LAYOUT = 0x4005;
+            public const uint EventConsoleLayout = 0x4005;
 
-            public const uint EVENT_CONSOLE_START_APPLICATION = 0x4006;
+            public const uint EventConsoleStartApplication = 0x4006;
 
-            public const uint EVENT_CONSOLE_END_APPLICATION = 0x4007;
+            public const uint EventConsoleEndApplication = 0x4007;
 
-            public const uint EVENT_CONSOLE_END = 0x40FF;
+            public const uint EventConsoleEnd = 0x40FF;
 
-            public const uint EVENT_OBJECT_CREATE = 0x8000; // hwnd ID idChild is created item
+            public const uint EventObjectCreate = 0x8000; // hwnd ID idChild is created item
 
-            public const uint EVENT_OBJECT_DESTROY = 0x8001; // hwnd ID idChild is destroyed item
+            public const uint EventObjectDestroy = 0x8001; // hwnd ID idChild is destroyed item
 
-            public const uint EVENT_OBJECT_SHOW = 0x8002; // hwnd ID idChild is shown item
+            public const uint EventObjectShow = 0x8002; // hwnd ID idChild is shown item
 
-            public const uint EVENT_OBJECT_HIDE = 0x8003; // hwnd ID idChild is hidden item
+            public const uint EventObjectHide = 0x8003; // hwnd ID idChild is hidden item
 
-            public const uint EVENT_OBJECT_REORDER = 0x8004; // hwnd ID idChild is parent of zordering children
+            public const uint EventObjectReorder = 0x8004; // hwnd ID idChild is parent of zordering children
 
-            public const uint EVENT_OBJECT_FOCUS = 0x8005; // hwnd ID idChild is focused item
+            public const uint EventObjectFocus = 0x8005; // hwnd ID idChild is focused item
 
-            public const uint EVENT_OBJECT_SELECTION = 0x8006; // hwnd ID idChild is selected item (if only one); or idChild is OBJID_WINDOW if complex
+            public const uint EventObjectSelection = 0x8006; // hwnd ID idChild is selected item (if only one); or idChild is OBJID_WINDOW if complex
 
-            public const uint EVENT_OBJECT_SELECTIONADD = 0x8007; // hwnd ID idChild is item added
+            public const uint EventObjectSelectionadd = 0x8007; // hwnd ID idChild is item added
 
-            public const uint EVENT_OBJECT_SELECTIONREMOVE = 0x8008; // hwnd ID idChild is item removed
+            public const uint EventObjectSelectionremove = 0x8008; // hwnd ID idChild is item removed
 
-            public const uint EVENT_OBJECT_SELECTIONWITHIN = 0x8009; // hwnd ID idChild is parent of changed selected items
+            public const uint EventObjectSelectionwithin = 0x8009; // hwnd ID idChild is parent of changed selected items
 
-            public const uint EVENT_OBJECT_STATECHANGE = 0x800A; // hwnd ID idChild is item w/ state change
+            public const uint EventObjectStatechange = 0x800A; // hwnd ID idChild is item w/ state change
 
-            public const uint EVENT_OBJECT_LOCATIONCHANGE = 0x800B; // hwnd ID idChild is moved/sized item
+            public const uint EventObjectLocationchange = 0x800B; // hwnd ID idChild is moved/sized item
 
-            public const uint EVENT_OBJECT_NAMECHANGE = 0x800C; // hwnd ID idChild is item w/ name change
+            public const uint EventObjectNamechange = 0x800C; // hwnd ID idChild is item w/ name change
 
-            public const uint EVENT_OBJECT_DESCRIPTIONCHANGE = 0x800D; // hwnd ID idChild is item w/ desc change
+            public const uint EventObjectDescriptionchange = 0x800D; // hwnd ID idChild is item w/ desc change
 
-            public const uint EVENT_OBJECT_VALUECHANGE = 0x800E; // hwnd ID idChild is item w/ value change
+            public const uint EventObjectValuechange = 0x800E; // hwnd ID idChild is item w/ value change
 
-            public const uint EVENT_OBJECT_PARENTCHANGE = 0x800F; // hwnd ID idChild is item w/ new parent
+            public const uint EventObjectParentchange = 0x800F; // hwnd ID idChild is item w/ new parent
 
-            public const uint EVENT_OBJECT_HELPCHANGE = 0x8010; // hwnd ID idChild is item w/ help change
+            public const uint EventObjectHelpchange = 0x8010; // hwnd ID idChild is item w/ help change
 
-            public const uint EVENT_OBJECT_DEFACTIONCHANGE = 0x8011; // hwnd ID idChild is item w/ def action change
+            public const uint EventObjectDefactionchange = 0x8011; // hwnd ID idChild is item w/ def action change
 
-            public const uint EVENT_OBJECT_ACCELERATORCHANGE = 0x8012; // hwnd ID idChild is item w/ keybd accel change
+            public const uint EventObjectAcceleratorchange = 0x8012; // hwnd ID idChild is item w/ keybd accel change
 
-            public const uint EVENT_OBJECT_INVOKED = 0x8013; // hwnd ID idChild is item invoked
+            public const uint EventObjectInvoked = 0x8013; // hwnd ID idChild is item invoked
 
-            public const uint EVENT_OBJECT_TEXTSELECTIONCHANGED = 0x8014; // hwnd ID idChild is item w? test selection change
+            public const uint EventObjectTextselectionchanged = 0x8014; // hwnd ID idChild is item w? test selection change
 
-            public const uint EVENT_OBJECT_CONTENTSCROLLED = 0x8015;
+            public const uint EventObjectContentscrolled = 0x8015;
 
-            public const uint EVENT_SYSTEM_ARRANGMENTPREVIEW = 0x8016;
+            public const uint EventSystemArrangmentpreview = 0x8016;
 
-            public const uint EVENT_OBJECT_END = 0x80FF;
+            public const uint EventObjectEnd = 0x80FF;
 
-            public const uint EVENT_AIA_START = 0xA000;
+            public const uint EventAiaStart = 0xA000;
 
-            public const uint EVENT_AIA_END = 0xAFFF;
+            public const uint EventAiaEnd = 0xAFFF;
         }
 
 
-        private static WinEventHook instance;
+        private static WinEventHook _instance;
         public event EventHandler<WinEventHookEventArgs> WinEventHookHandler;
-        WinEventDelegate procDelegate = new WinEventDelegate(WinEventProc);
+        WinEventDelegate _procDelegate = new WinEventDelegate(WinEventProc);
 
-        private readonly IntPtr winEventHookHandle;
+        private readonly IntPtr _winEventHookHandle;
 
         private WinEventHook()
         {
-            winEventHookHandle = SetWinEventHook(WinEvent.EVENT_SYSTEM_FOREGROUND, WinEvent.EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, procDelegate, 0, 0, WinEvent.WINEVENT_OUTOFCONTEXT);
+            _winEventHookHandle = SetWinEventHook(WinEvent.EventSystemForeground, WinEvent.EventSystemForeground, IntPtr.Zero, _procDelegate, 0, 0, WinEvent.WineventOutofcontext);
         }
 
         ~WinEventHook()
@@ -195,12 +196,12 @@ namespace vibrance.GUI.common
             //    bool result = UnhookWinEvent(winEventHookHandle);
             //    if (!result)
             //    {
-            //        NvidiaVibranceGUI.Log(new Exception("UnhookWinEvent(winEventHookHandle) failed. winEventHookHandle = " + winEventHookHandle));
+            //        AmdVibranceGUI.Log(new Exception("UnhookWinEvent(winEventHookHandle) failed. winEventHookHandle = " + winEventHookHandle));
             //    }
             //}
             //catch (Exception ex)
             //{
-            //    NvidiaVibranceGUI.Log(new Exception("UnhookWinEvent(winEventHookHandle) failed."));
+            //    AmdVibranceGUI.Log(new Exception("UnhookWinEvent(winEventHookHandle) failed."));
             //}
             //finally
             //{
@@ -208,19 +209,19 @@ namespace vibrance.GUI.common
             //}
         }
 
-        public void removeWinEventHook()
+        public void RemoveWinEventHook()
         {
             try
             {
-                bool result = UnhookWinEvent(winEventHookHandle);
+                bool result = UnhookWinEvent(_winEventHookHandle);
                 if (!result)
                 {
-                    NvidiaVibranceGUI.Log(new Exception("UnhookWinEvent(winEventHookHandle) failed. winEventHookHandle = " + winEventHookHandle));
+                    AmdVibranceGui.Log(new Exception("UnhookWinEvent(winEventHookHandle) failed. winEventHookHandle = " + _winEventHookHandle));
                 }
             }
             catch (Exception ex)
             {
-                NvidiaVibranceGUI.Log(new Exception("UnhookWinEvent(winEventHookHandle) failed."));
+                AmdVibranceGui.Log(new Exception("UnhookWinEvent(winEventHookHandle) failed."));
             }
             finally
             {
@@ -230,9 +231,9 @@ namespace vibrance.GUI.common
 
         public static WinEventHook GetInstance()
         {
-            if (instance == null)
-                instance = new WinEventHook();
-            return instance;
+            if (_instance == null)
+                _instance = new WinEventHook();
+            return _instance;
         }
 
         static void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)

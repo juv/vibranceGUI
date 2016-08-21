@@ -93,13 +93,8 @@ namespace vibrance.GUI.AMD
         [DllImport("user32.dll")]
         public static extern IntPtr GetForegroundWindow();
 
-        [DllImport("user32.dll", EntryPoint = "FindWindow", SetLastError = true)]
-        private static extern IntPtr FindWindow(IntPtr zeroOnly, string lpWindowName);
-
         private void OnWinEventHook(object sender, WinEventHookEventArgs e)
         {
-            var hwnd = FindWindow(IntPtr.Zero, e.WindowText);
-            var dn = Screen.FromHandle(e.Handle).DeviceName;
             if (_applicationSettings.Count > 0)
             {
                 ApplicationSetting applicationSetting = _applicationSettings.FirstOrDefault(x => x.Name.Equals(e.ProcessName));

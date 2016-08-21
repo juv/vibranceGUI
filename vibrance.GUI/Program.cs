@@ -63,7 +63,7 @@ namespace vibrance.GUI
                 }
                 else
                 {
-                    ((AmdVibranceGui) vibranceGui).SetAllowVisible(false);
+                    ((NvidiaVibranceGUI) vibranceGui).SetAllowVisible(false);
                 }
             }
             Application.Run(vibranceGui);

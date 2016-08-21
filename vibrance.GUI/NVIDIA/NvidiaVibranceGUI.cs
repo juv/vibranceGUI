@@ -93,9 +93,9 @@ namespace vibrance.GUI.NVIDIA
         {
             if (this.WindowState == FormWindowState.Minimized)
             {
-                this.notifyIcon.Visible = true;
-                this.notifyIcon.BalloonTipText = "Running minimized... Like the program? Consider donating!";
-                this.notifyIcon.ShowBalloonTip(250);
+                //this.notifyIcon.Visible = true;
+                //this.notifyIcon.BalloonTipText = "Running minimized... Like the program? Consider donating!";
+                //this.notifyIcon.ShowBalloonTip(250);
                 this.Hide();
             }
         }
@@ -472,6 +472,12 @@ namespace vibrance.GUI.NVIDIA
             {
                 settingsBackgroundWorker.RunWorkerAsync();
             }
+        }
+
+        private void buttonProcessExplorer_Click(object sender, EventArgs e)
+        {
+            ProcessExplorer ex = new ProcessExplorer();
+            ex.Show();
         }
     }
 }

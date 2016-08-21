@@ -85,9 +85,9 @@ namespace vibrance.GUI.AMD
         {
             if (this.WindowState == FormWindowState.Minimized)
             {
-                this.notifyIcon.Visible = true;
-                this.notifyIcon.BalloonTipText = "Running minimized... Like the program? Consider donating!";
-                this.notifyIcon.ShowBalloonTip(250);
+                //this.notifyIcon.Visible = true;
+                //this.notifyIcon.BalloonTipText = "Running minimized... Like the program? Consider donating!";
+                //this.notifyIcon.ShowBalloonTip(250);
                 this.Hide();
             }
         }

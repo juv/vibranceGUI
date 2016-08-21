@@ -54,6 +54,7 @@
             this.buttonRemoveProgram = new System.Windows.Forms.Button();
             this.listApplications = new System.Windows.Forms.ListView();
             this.buttonAddProgram = new System.Windows.Forms.Button();
+            this.buttonProcessExplorer = new System.Windows.Forms.Button();
             this.contextMenuStrip.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -257,6 +258,7 @@
             // 
             // groupBox5
             // 
+            this.groupBox5.Controls.Add(this.buttonProcessExplorer);
             this.groupBox5.Controls.Add(this.buttonRemoveProgram);
             this.groupBox5.Controls.Add(this.listApplications);
             this.groupBox5.Controls.Add(this.buttonAddProgram);
@@ -296,6 +298,16 @@
             this.buttonAddProgram.UseVisualStyleBackColor = true;
             this.buttonAddProgram.Click += new System.EventHandler(this.buttonAddProgram_Click);
             // 
+            // buttonProcessExplorer
+            // 
+            this.buttonProcessExplorer.Location = new System.Drawing.Point(183, 19);
+            this.buttonProcessExplorer.Name = "buttonProcessExplorer";
+            this.buttonProcessExplorer.Size = new System.Drawing.Size(133, 23);
+            this.buttonProcessExplorer.TabIndex = 3;
+            this.buttonProcessExplorer.Text = "Show Process Explorer";
+            this.buttonProcessExplorer.UseVisualStyleBackColor = true;
+            this.buttonProcessExplorer.Click += new System.EventHandler(this.buttonProcessExplorer_Click);
+            // 
             // NvidiaVibranceGUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -312,7 +324,7 @@
             this.Controls.Add(this.linkLabelTwitter);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Name = "NvidiaVibranceGui";
+            this.Name = "NvidiaVibranceGUI";
             this.Text = "vibranceGUI";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
@@ -356,6 +368,7 @@
         private System.Windows.Forms.ListView listApplications;
         private System.Windows.Forms.Button buttonAddProgram;
         private System.Windows.Forms.Button buttonSteam;
+        private System.Windows.Forms.Button buttonProcessExplorer;
     }
 }
 

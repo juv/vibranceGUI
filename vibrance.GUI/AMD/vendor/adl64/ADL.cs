@@ -20,45 +20,45 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace gui.app.gpucontroller.amd.adl32
+namespace vibrance.GUI.AMD.vendor.adl64
 {
-    public static class ADL
+    public static class Adl
     {
-        private static Delegates.ADL_Main_Control_Create ADL_Main_Control_Create_;
-        private static Delegates.ADL_Main_Control_Destroy ADL_Main_Control_Destroy_;
-        private static Delegates.ADL_Adapter_NumberOfAdapters_Get ADL_Adapter_NumberOfAdapters_Get_;
-        private static Delegates.ADL_Adapter_AdapterInfo_Get ADL_Adapter_AdapterInfo_Get_;
-        private static Delegates.ADL_Adapter_Active_Get ADL_Adapter_Active_Get_;
-        private static Delegates.ADL_Display_DisplayInfo_Get ADL_Display_DisplayInfo_Get_;
-        private static Delegates.ADL_Display_Color_Set ADL_Display_Color_Set_;
-        private static Delegates.ADL_Display_Color_Get ADL_Display_Color_Get_;
-        private static bool ADL_Display_Color_Set_Check;
-        private static bool ADL_Display_DisplayInfo_Get_Check;
-        private static bool ADL_Adapter_Active_Get_Check;
-        private static bool ADL_Adapter_AdapterInfo_Get_Check;
-        private static bool ADL_Adapter_NumberOfAdapters_Get_Check;
-        private static bool ADL_Main_Control_Destroy_Check;
-        private static bool ADL_Main_Control_Create_Check;
-        private static bool ADL_Display_Color_Get_Check;
+        private static Delegates.AdlMainControlCreate _adlMainControlCreate;
+        private static Delegates.AdlMainControlDestroy _adlMainControlDestroy;
+        private static Delegates.AdlAdapterNumberOfAdaptersGet _adlAdapterNumberOfAdaptersGet;
+        private static Delegates.AdlAdapterAdapterInfoGet _adlAdapterAdapterInfoGet;
+        private static Delegates.AdlAdapterActiveGet _adlAdapterActiveGet;
+        private static Delegates.AdlDisplayDisplayInfoGet _adlDisplayDisplayInfoGet;
+        private static Delegates.AdlDisplayColorSet _adlDisplayColorSet;
+        private static Delegates.AdlDisplayColorGet _adlDisplayColorGet;
+        private static bool _adlDisplayColorSetCheck;
+        private static bool _adlDisplayDisplayInfoGetCheck;
+        private static bool _adlAdapterActiveGetCheck;
+        private static bool _adlAdapterAdapterInfoGetCheck;
+        private static bool _adlAdapterNumberOfAdaptersGetCheck;
+        private static bool _adlMainControlDestroyCheck;
+        private static bool _adlMainControlCreateCheck;
+        private static bool _adlDisplayColorGetCheck;
 
-        public const int ADL_DISPLAY_COLOR_BRIGHTNESS = (1 << 0);
-        public const int ADL_DISPLAY_COLOR_CONTRAST = (1 << 1);
-        public const int ADL_DISPLAY_COLOR_SATURATION = (1 << 2);
-        public const int ADL_DISPLAY_COLOR_HUE = (1 << 3);
-        public const int ADL_DISPLAY_COLOR_TEMPERATURE = (1 << 4);
+        public const int AdlDisplayColorBrightness = (1 << 0);
+        public const int AdlDisplayColorContrast = (1 << 1);
+        public const int AdlDisplayColorSaturation = (1 << 2);
+        public const int AdlDisplayColorHue = (1 << 3);
+        public const int AdlDisplayColorTemperature = (1 << 4);
 
-        public const int ADL_MAX_PATH = 256;
-        public const int ADL_MAX_ADAPTERS = 40;
-        public const int ADL_MAX_DISPLAYS = 40;
-        public const int ADL_MAX_DEVICENAME = 32;
-        public const int ADL_SUCCESS = 0;
-        public const int ADL_FAIL = -1;
-        public const int ADL_DRIVER_OK = 0;
-        public const int ADL_MAX_GLSYNC_PORTS = 8;
-        public const int ADL_MAX_GLSYNC_PORT_LEDS = 8;
-        public const int ADL_MAX_NUM_DISPLAYMODES = 1024;
+        public const int AdlMaxPath = 256;
+        public const int AdlMaxAdapters = 40;
+        public const int AdlMaxDisplays = 40;
+        public const int AdlMaxDevicename = 32;
+        public const int AdlSuccess = 0;
+        public const int AdlFail = -1;
+        public const int AdlDriverOk = 0;
+        public const int AdlMaxGlsyncPorts = 8;
+        public const int AdlMaxGlsyncPortLeds = 8;
+        public const int AdlMaxNumDisplaymodes = 1024;
 
-        public static Delegates.ADL_Main_Memory_Alloc ADL_Main_Memory_Alloc = ADL_Main_Memory_Alloc_;
+        public static Delegates.AdlMainMemoryAlloc AdlMainMemoryAlloc = ADL_Main_Memory_Alloc_;
         
         private static IntPtr ADL_Main_Memory_Alloc_(int size)
         {
@@ -74,131 +74,131 @@ namespace gui.app.gpucontroller.amd.adl32
             }
         }
         
-        public static Delegates.ADL_Main_Control_Create ADL_Main_Control_Create
+        public static Delegates.AdlMainControlCreate AdlMainControlCreate
         {
             get
             {
-                if (!ADL_Main_Control_Create_Check && null == ADL_Main_Control_Create_)
+                if (!_adlMainControlCreateCheck && null == _adlMainControlCreate)
                 {
-                    ADL_Main_Control_Create_Check = true;
-                    if (ADLCheckLibrary.IsFunctionValid("ADL_Main_Control_Create"))
+                    _adlMainControlCreateCheck = true;
+                    if (AdlCheckLibrary.IsFunctionValid("ADL_Main_Control_Create"))
                     {
-                        ADL_Main_Control_Create_ = ADLImport.ADL_Main_Control_Create;
+                        _adlMainControlCreate = AdlImport.ADL_Main_Control_Create;
                     }
                 }
-                return ADL_Main_Control_Create_;
+                return _adlMainControlCreate;
             }
         }
         
-        public static Delegates.ADL_Main_Control_Destroy ADL_Main_Control_Destroy
+        public static Delegates.AdlMainControlDestroy AdlMainControlDestroy
         {
             get
             {
-                if (!ADL_Main_Control_Destroy_Check && null == ADL_Main_Control_Destroy_)
+                if (!_adlMainControlDestroyCheck && null == _adlMainControlDestroy)
                 {
-                    ADL_Main_Control_Destroy_Check = true;
-                    if (ADLCheckLibrary.IsFunctionValid("ADL_Main_Control_Destroy"))
+                    _adlMainControlDestroyCheck = true;
+                    if (AdlCheckLibrary.IsFunctionValid("ADL_Main_Control_Destroy"))
                     {
-                        ADL_Main_Control_Destroy_ = ADLImport.ADL_Main_Control_Destroy;
+                        _adlMainControlDestroy = AdlImport.ADL_Main_Control_Destroy;
                     }
                 }
-                return ADL_Main_Control_Destroy_;
+                return _adlMainControlDestroy;
             }
         }
 
-        public static Delegates.ADL_Adapter_NumberOfAdapters_Get ADL_Adapter_NumberOfAdapters_Get
+        public static Delegates.AdlAdapterNumberOfAdaptersGet AdlAdapterNumberOfAdaptersGet
         {
             get
             {
-                if (!ADL_Adapter_NumberOfAdapters_Get_Check && null == ADL_Adapter_NumberOfAdapters_Get_)
+                if (!_adlAdapterNumberOfAdaptersGetCheck && null == _adlAdapterNumberOfAdaptersGet)
                 {
-                    ADL_Adapter_NumberOfAdapters_Get_Check = true;
-                    if (ADLCheckLibrary.IsFunctionValid("ADL_Adapter_NumberOfAdapters_Get"))
+                    _adlAdapterNumberOfAdaptersGetCheck = true;
+                    if (AdlCheckLibrary.IsFunctionValid("ADL_Adapter_NumberOfAdapters_Get"))
                     {
-                        ADL_Adapter_NumberOfAdapters_Get_ = ADLImport.ADL_Adapter_NumberOfAdapters_Get;
+                        _adlAdapterNumberOfAdaptersGet = AdlImport.ADL_Adapter_NumberOfAdapters_Get;
                     }
                 }
-                return ADL_Adapter_NumberOfAdapters_Get_;
+                return _adlAdapterNumberOfAdaptersGet;
             }
         }
         
-        public static Delegates.ADL_Adapter_AdapterInfo_Get ADL_Adapter_AdapterInfo_Get
+        public static Delegates.AdlAdapterAdapterInfoGet AdlAdapterAdapterInfoGet
         {
             get
             {
-                if (!ADL_Adapter_AdapterInfo_Get_Check && null == ADL_Adapter_AdapterInfo_Get_)
+                if (!_adlAdapterAdapterInfoGetCheck && null == _adlAdapterAdapterInfoGet)
                 {
-                    ADL_Adapter_AdapterInfo_Get_Check = true;
-                    if (ADLCheckLibrary.IsFunctionValid("ADL_Adapter_AdapterInfo_Get"))
+                    _adlAdapterAdapterInfoGetCheck = true;
+                    if (AdlCheckLibrary.IsFunctionValid("ADL_Adapter_AdapterInfo_Get"))
                     {
-                        ADL_Adapter_AdapterInfo_Get_ = ADLImport.ADL_Adapter_AdapterInfo_Get;
+                        _adlAdapterAdapterInfoGet = AdlImport.ADL_Adapter_AdapterInfo_Get;
                     }
                 }
-                return ADL_Adapter_AdapterInfo_Get_;
+                return _adlAdapterAdapterInfoGet;
             }
         }
         
-        public static Delegates.ADL_Adapter_Active_Get ADL_Adapter_Active_Get
+        public static Delegates.AdlAdapterActiveGet AdlAdapterActiveGet
         {
             get
             {
-                if (!ADL_Adapter_Active_Get_Check && null == ADL_Adapter_Active_Get_)
+                if (!_adlAdapterActiveGetCheck && null == _adlAdapterActiveGet)
                 {
-                    ADL_Adapter_Active_Get_Check = true;
-                    if (ADLCheckLibrary.IsFunctionValid("ADL_Adapter_Active_Get"))
+                    _adlAdapterActiveGetCheck = true;
+                    if (AdlCheckLibrary.IsFunctionValid("ADL_Adapter_Active_Get"))
                     {
-                        ADL_Adapter_Active_Get_ = ADLImport.ADL_Adapter_Active_Get;
+                        _adlAdapterActiveGet = AdlImport.ADL_Adapter_Active_Get;
                     }
                 }
-                return ADL_Adapter_Active_Get_;
+                return _adlAdapterActiveGet;
             }
         }
 
-        public static Delegates.ADL_Display_DisplayInfo_Get ADL_Display_DisplayInfo_Get
+        public static Delegates.AdlDisplayDisplayInfoGet AdlDisplayDisplayInfoGet
         {
             get
             {
-                if (!ADL_Display_DisplayInfo_Get_Check && null == ADL_Display_DisplayInfo_Get_)
+                if (!_adlDisplayDisplayInfoGetCheck && null == _adlDisplayDisplayInfoGet)
                 {
-                    ADL_Display_DisplayInfo_Get_Check = true;
-                    if (ADLCheckLibrary.IsFunctionValid("ADL_Display_DisplayInfo_Get"))
+                    _adlDisplayDisplayInfoGetCheck = true;
+                    if (AdlCheckLibrary.IsFunctionValid("ADL_Display_DisplayInfo_Get"))
                     {
-                        ADL_Display_DisplayInfo_Get_ = ADLImport.ADL_Display_DisplayInfo_Get;
+                        _adlDisplayDisplayInfoGet = AdlImport.ADL_Display_DisplayInfo_Get;
                     }
                 }
-                return ADL_Display_DisplayInfo_Get_;
+                return _adlDisplayDisplayInfoGet;
             }
         }
         
-        public static Delegates.ADL_Display_Color_Set ADL_Display_Color_Set
+        public static Delegates.AdlDisplayColorSet AdlDisplayColorSet
         {
             get
             {
-                if (!ADL_Display_Color_Set_Check && null == ADL_Display_Color_Set_)
+                if (!_adlDisplayColorSetCheck && null == _adlDisplayColorSet)
                 {
-                    ADL_Display_Color_Set_Check = true;
-                    if (ADLCheckLibrary.IsFunctionValid("ADL_Display_Color_Set"))
+                    _adlDisplayColorSetCheck = true;
+                    if (AdlCheckLibrary.IsFunctionValid("ADL_Display_Color_Set"))
                     {
-                        ADL_Display_Color_Set_ = ADLImport.ADL_Display_Color_Set;
+                        _adlDisplayColorSet = AdlImport.ADL_Display_Color_Set;
                     }
                 }
-                return ADL_Display_Color_Set_;
+                return _adlDisplayColorSet;
             }
         }
 
-        public static Delegates.ADL_Display_Color_Get ADL_Display_Color_Get
+        public static Delegates.AdlDisplayColorGet AdlDisplayColorGet
         {
             get
             {
-                if (!ADL_Display_Color_Get_Check && null == ADL_Display_Color_Get_)
+                if (!_adlDisplayColorGetCheck && null == _adlDisplayColorGet)
                 {
-                    ADL_Display_Color_Get_Check = true;
-                    if (ADLCheckLibrary.IsFunctionValid("ADL_Display_Color_Get"))
+                    _adlDisplayColorGetCheck = true;
+                    if (AdlCheckLibrary.IsFunctionValid("ADL_Display_Color_Get"))
                     {
-                        ADL_Display_Color_Get_ = ADLImport.ADL_Display_Color_Get;
+                        _adlDisplayColorGet = AdlImport.ADL_Display_Color_Get;
                     }
                 }
-                return ADL_Display_Color_Get_;
+                return _adlDisplayColorGet;
             }
         }
     }

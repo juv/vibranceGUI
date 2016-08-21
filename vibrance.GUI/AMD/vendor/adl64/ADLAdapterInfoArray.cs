@@ -1,11 +1,11 @@
 using System.Runtime.InteropServices;
 
-namespace gui.app.gpucontroller.amd.adl32
+namespace vibrance.GUI.AMD.vendor.adl64
 {
     [StructLayout(LayoutKind.Sequential)]
-    internal struct ADLAdapterInfoArray
+    internal struct AdlAdapterInfoArray
     {
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = (int)ADL.ADL_MAX_ADAPTERS)]
-        internal ADLAdapterInfo[] ADLAdapterInfo;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = (int)Adl.AdlMaxAdapters)]
+        internal AdlAdapterInfo[] ADLAdapterInfo;
     }
 }

@@ -9,30 +9,30 @@ namespace vibrance.GUI.common
 {
     class ResolutionHelper
     {
-        private const int ENUM_CURRENT_SETTINGS = -1;
+        private const int EnumCurrentSettings = -1;
 
         [DllImport("user32.dll")]
-        public static extern bool EnumDisplaySettings(string deviceName, int modeNum, ref DEVMODE devMode);
+        public static extern bool EnumDisplaySettings(string deviceName, int modeNum, ref Devmode devMode);
 
 
         [DllImport("User32.dll")]
         [return: MarshalAs(UnmanagedType.I4)]
         private static extern int ChangeDisplaySettings(
             [In, Out]
-            ref DEVMODE lpDevMode,
+            ref Devmode lpDevMode,
             [param: MarshalAs(UnmanagedType.U4)]
             uint dwflags);
 
         [DllImport("user32.dll")]
-        private static extern DISP_CHANGE ChangeDisplaySettingsEx(
+        private static extern DispChange ChangeDisplaySettingsEx(
             string lpszDeviceName,
-            ref DEVMODE lpDevMode,
+            ref Devmode lpDevMode,
             IntPtr hwnd,
             ChangeDisplaySettingsFlags dwflags,
             IntPtr lParam);
 
         [DllImport("user32.dll")]
-        public static extern DISP_CHANGE ChangeDisplaySettingsEx(
+        public static extern DispChange ChangeDisplaySettingsEx(
             string lpszDeviceName, 
             IntPtr lpDevMode, 
             IntPtr hwnd, 
@@ -40,13 +40,13 @@ namespace vibrance.GUI.common
             IntPtr lParam);
 
 
-        public static bool GetCurrentResolutionSettings(out DEVMODE mode, string lpszDeviceName)
+        public static bool GetCurrentResolutionSettings(out Devmode mode, string lpszDeviceName)
         {
-            mode = new DEVMODE();
+            mode = new Devmode();
             mode.dmSize = (ushort)Marshal.SizeOf(mode);
             mode.dmDriverExtra = 0;
 
-            if (EnumDisplaySettings(lpszDeviceName, ENUM_CURRENT_SETTINGS, ref mode) == true)
+            if (EnumDisplaySettings(lpszDeviceName, EnumCurrentSettings, ref mode) == true)
             {
                 return true;
             }
@@ -57,7 +57,7 @@ namespace vibrance.GUI.common
         public static List<ResolutionModeWrapper> EnumerateSupportedResolutionModes()
         {
             List<ResolutionModeWrapper> resolutionList = new List<ResolutionModeWrapper>();
-            DEVMODE mode = new DEVMODE();
+            Devmode mode = new Devmode();
             mode.dmSize = (ushort)Marshal.SizeOf(mode);
 
             int index = 0;
@@ -71,23 +71,23 @@ namespace vibrance.GUI.common
 
         public static bool ChangeResolution(ResolutionModeWrapper resolutionMode)
         {
-            DEVMODE mode = new DEVMODE();
+            Devmode mode = new Devmode();
             if (GetCurrentResolutionSettings(out mode, null))
             {
-                mode.dmPelsWidth = resolutionMode.dmPelsWidth;
-                mode.dmPelsHeight = resolutionMode.dmPelsHeight;
-                mode.dmBitsPerPel = resolutionMode.dmBitsPerPel;
-                mode.dmDisplayFrequency = resolutionMode.dmDisplayFrequency;
-                mode.dmDisplayFixedOutput = resolutionMode.dmDisplayFixedOutput;
+                mode.dmPelsWidth = resolutionMode.DmPelsWidth;
+                mode.dmPelsHeight = resolutionMode.DmPelsHeight;
+                mode.dmBitsPerPel = resolutionMode.DmBitsPerPel;
+                mode.dmDisplayFrequency = resolutionMode.DmDisplayFrequency;
+                mode.dmDisplayFixedOutput = resolutionMode.DmDisplayFixedOutput;
 
-                DISP_CHANGE returnValue = (DISP_CHANGE)ChangeDisplaySettings(ref mode, 0);
-                if (DISP_CHANGE.DISP_CHANGE_SUCCESSFUL == returnValue)
+                DispChange returnValue = (DispChange)ChangeDisplaySettings(ref mode, 0);
+                if (DispChange.DispChangeSuccessful == returnValue)
                 {
                     return true;
                 }
                 else
                 {
-                    MessageBox.Show("Changing the resolution failed: " + Enum.GetName(typeof(DISP_CHANGE), returnValue));
+                    MessageBox.Show("Changing the resolution failed: " + Enum.GetName(typeof(DispChange), returnValue));
                 }
             }
             return false;
@@ -95,52 +95,52 @@ namespace vibrance.GUI.common
 
         public static bool ChangeResolutionEx(ResolutionModeWrapper resolutionMode, string lpszDeviceName)
         {
-            DEVMODE mode = new DEVMODE();
+            Devmode mode = new Devmode();
             if (GetCurrentResolutionSettings(out mode, lpszDeviceName))
             {
-                mode.dmPelsWidth = resolutionMode.dmPelsWidth;
-                mode.dmPelsHeight = resolutionMode.dmPelsHeight;
-                mode.dmBitsPerPel = resolutionMode.dmBitsPerPel;
-                mode.dmDisplayFrequency = resolutionMode.dmDisplayFrequency;
-                mode.dmDisplayFixedOutput = resolutionMode.dmDisplayFixedOutput;
+                mode.dmPelsWidth = resolutionMode.DmPelsWidth;
+                mode.dmPelsHeight = resolutionMode.DmPelsHeight;
+                mode.dmBitsPerPel = resolutionMode.DmBitsPerPel;
+                mode.dmDisplayFrequency = resolutionMode.DmDisplayFrequency;
+                mode.dmDisplayFixedOutput = resolutionMode.DmDisplayFixedOutput;
 
 
-                DISP_CHANGE returnValue = (DISP_CHANGE)ChangeDisplaySettingsEx(lpszDeviceName, ref mode, IntPtr.Zero, (ChangeDisplaySettingsFlags.CDS_UPDATEREGISTRY | ChangeDisplaySettingsFlags.CDS_NORESET), IntPtr.Zero);
-                ChangeDisplaySettingsEx(null, IntPtr.Zero, (IntPtr)null, ChangeDisplaySettingsFlags.CDS_NONE, (IntPtr)null);
+                DispChange returnValue = (DispChange)ChangeDisplaySettingsEx(lpszDeviceName, ref mode, IntPtr.Zero, (ChangeDisplaySettingsFlags.CdsUpdateregistry | ChangeDisplaySettingsFlags.CdsNoreset), IntPtr.Zero);
+                ChangeDisplaySettingsEx(null, IntPtr.Zero, (IntPtr)null, ChangeDisplaySettingsFlags.CdsNone, (IntPtr)null);
 
-                if (DISP_CHANGE.DISP_CHANGE_SUCCESSFUL == returnValue)
+                if (DispChange.DispChangeSuccessful == returnValue)
                 {
                     return true;
                 }
                 else
                 {
-                    MessageBox.Show("Changing the resolution failed: " + Enum.GetName(typeof(DISP_CHANGE), returnValue));
+                    MessageBox.Show("Changing the resolution failed: " + Enum.GetName(typeof(DispChange), returnValue));
                 }
             }
             return false;
         }
     }
 
-    public enum DISP_CHANGE : int
+    public enum DispChange : int
     {
-        DISP_CHANGE_SUCCESSFUL = 0,
-        DISP_CHANGE_RESTART = 1,
-        DISP_CHANGE_FAILED = -1,
-        DISP_CHANGE_BADMODE = -2,
-        DISP_CHANGE_NOTUPDATED = -3,
-        DISP_CHANGE_BADFLAGS = -4,
-        DISP_CHANGE_BADPARAM = -5
+        DispChangeSuccessful = 0,
+        DispChangeRestart = 1,
+        DispChangeFailed = -1,
+        DispChangeBadmode = -2,
+        DispChangeNotupdated = -3,
+        DispChangeBadflags = -4,
+        DispChangeBadparam = -5
     };
 
-    public enum DMDFO : int
+    public enum Dmdfo : int
     {
-        DEFAULT = 0,
-        STRETCH = 1,
-        CENTER = 2
+        Default = 0,
+        Stretch = 1,
+        Center = 2
     }
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-    public struct DEVMODE
+    public struct Devmode
     {
         // You can define the following constant
         // but OUTSIDE the structure because you know
@@ -170,7 +170,7 @@ namespace vibrance.GUI.common
         [MarshalAs(UnmanagedType.U4)]
         public UInt32 dmFields;
 
-        public POINTL dmPosition;
+        public Pointl dmPosition;
 
         [MarshalAs(UnmanagedType.U4)]
         public UInt32 dmDisplayOrientation;
@@ -245,7 +245,7 @@ namespace vibrance.GUI.common
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct POINTL
+    public struct Pointl
     {
         [MarshalAs(UnmanagedType.I4)]
         public int x;
@@ -256,18 +256,18 @@ namespace vibrance.GUI.common
     [Flags()]
     public enum ChangeDisplaySettingsFlags : uint
     {
-        CDS_NONE = 0,
-        CDS_UPDATEREGISTRY = 0x00000001,
-        CDS_TEST = 0x00000002,
-        CDS_FULLSCREEN = 0x00000004,
-        CDS_GLOBAL = 0x00000008,
-        CDS_SET_PRIMARY = 0x00000010,
-        CDS_VIDEOPARAMETERS = 0x00000020,
-        CDS_ENABLE_UNSAFE_MODES = 0x00000100,
-        CDS_DISABLE_UNSAFE_MODES = 0x00000200,
-        CDS_RESET = 0x40000000,
-        CDS_RESET_EX = 0x20000000,
-        CDS_NORESET = 0x10000000
+        CdsNone = 0,
+        CdsUpdateregistry = 0x00000001,
+        CdsTest = 0x00000002,
+        CdsFullscreen = 0x00000004,
+        CdsGlobal = 0x00000008,
+        CdsSetPrimary = 0x00000010,
+        CdsVideoparameters = 0x00000020,
+        CdsEnableUnsafeModes = 0x00000100,
+        CdsDisableUnsafeModes = 0x00000200,
+        CdsReset = 0x40000000,
+        CdsResetEx = 0x20000000,
+        CdsNoreset = 0x10000000
     }
 
 }

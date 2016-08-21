@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using vibrance.GUI.common;
-using vibrance.GUI.NVIDIA;
 
-namespace vibrance.GUI
+namespace vibrance.GUI.NVIDIA
 {
     public class NvidiaVibranceProxy : IVibranceProxy
     {
@@ -52,7 +50,7 @@ namespace vibrance.GUI
             EntryPoint = "?getDVCInfo@vibrance@vibranceDLL@@QAE_NPAUNV_DISPLAY_DVC_INFO@12@H@Z",
             CallingConvention = CallingConvention.StdCall,
             CharSet = CharSet.Ansi)]
-        static extern bool getDVCInfo(ref NV_DISPLAY_DVC_INFO info, int defaultHandle);
+        static extern bool getDVCInfo(ref NvDisplayDvcInfo info, int defaultHandle);
 
         [DllImport(
             "vibranceDLL.dll",
@@ -103,58 +101,58 @@ namespace vibrance.GUI
         static extern int getAssociatedNvidiaDisplayHandle(string deviceName, [In] int length);
 
 
-        public const int NVAPI_MAX_PHYSICAL_GPUS = 64;
-        public const int NVAPI_MAX_LEVEL = 63;
-        public const int NVAPI_DEFAULT_LEVEL = 0;
-        public const int NVAPI_MIN_REFRESH_RATE = 200;
-        public const int NVAPI_DEFAULT_REFRESH_RATE = 5000;
+        public const int NvapiMaxPhysicalGpus = 64;
+        public const int NvapiMaxLevel = 63;
+        public const int NvapiDefaultLevel = 0;
+        public const int NvapiMinRefreshRate = 200;
+        public const int NvapiDefaultRefreshRate = 5000;
 
-        public const string NVAPI_ERROR_INIT_FAILED = "VibranceProxy failed to initialize! Read readme.txt for fix!";
-        public const string NVAPI_ERROR_GET_MONITOR_HANDLE = "Couldn't determine the monitor handle CSGO is running in. :( Using main output!";
-        public const string NVAPI_WARNING_MULTIPLE_MONITORS = "You are using multiple monitors. Start CSGO, Tab out and click ok after. Do this once then keep vibranceGUI open (means you can start and quit CSGO several times).";
-        public const string NVAPI_GLOBAL_OFFENSIVE_WINDOW_NAME = "Counter-Strike: Global Offensive";
+        public const string NvapiErrorInitFailed = "VibranceProxy failed to initialize! Read readme.txt for fix!";
+        public const string NvapiErrorGetMonitorHandle = "Couldn't determine the monitor handle CSGO is running in. :( Using main output!";
+        public const string NvapiWarningMultipleMonitors = "You are using multiple monitors. Start CSGO, Tab out and click ok after. Do this once then keep vibranceGUI open (means you can start and quit CSGO several times).";
+        public const string NvapiGlobalOffensiveWindowName = "Counter-Strike: Global Offensive";
 
-        public VIBRANCE_INFO vibranceInfo;
+        public VibranceInfo VibranceInfo;
 
         public NvidiaVibranceProxy(bool isSilenced = false)
         {
             try
             {
-                vibranceInfo = new VIBRANCE_INFO();
+                VibranceInfo = new VibranceInfo();
                 bool ret = initializeLibrary();
 
-                int[] gpuHandles = new int[NVAPI_MAX_PHYSICAL_GPUS];
-                int[] outputIds = new int[NVAPI_MAX_PHYSICAL_GPUS];
+                int[] gpuHandles = new int[NvapiMaxPhysicalGpus];
+                int[] outputIds = new int[NvapiMaxPhysicalGpus];
                 enumeratePhsyicalGPUs(gpuHandles);
 
-                enumerateDisplayHandles();
+                EnumerateDisplayHandles();
                
-                vibranceInfo.activeOutput = getActiveOutputs(gpuHandles, outputIds);
+                VibranceInfo.activeOutput = getActiveOutputs(gpuHandles, outputIds);
                 StringBuilder buffer = new StringBuilder(64);
                 char[] sz = new char[64];
                 getGpuName(gpuHandles, buffer);
-                vibranceInfo.szGpuName = buffer.ToString();
-                vibranceInfo.defaultHandle = enumerateNvidiaDisplayHandle(0);
+                VibranceInfo.szGpuName = buffer.ToString();
+                VibranceInfo.defaultHandle = enumerateNvidiaDisplayHandle(0);
 
-                NV_DISPLAY_DVC_INFO info = new NV_DISPLAY_DVC_INFO();
-                if (getDVCInfo(ref info, vibranceInfo.defaultHandle))
+                NvDisplayDvcInfo info = new NvDisplayDvcInfo();
+                if (getDVCInfo(ref info, VibranceInfo.defaultHandle))
                 {
-                    if (info.currentLevel != vibranceInfo.userVibranceSettingDefault)
+                    if (info.currentLevel != VibranceInfo.userVibranceSettingDefault)
                     {
-                        setDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault);
+                        setDVCLevel(VibranceInfo.defaultHandle, VibranceInfo.userVibranceSettingDefault);
                     }
                 }
 
-                vibranceInfo.isInitialized = true;
+                VibranceInfo.isInitialized = true;
             }
             catch (Exception)
             {
-                MessageBox.Show(NvidiaVibranceProxy.NVAPI_ERROR_INIT_FAILED);
+                MessageBox.Show(NvidiaVibranceProxy.NvapiErrorInitFailed);
             }
 
         }
 
-        public int getCsgoDisplayHandle()
+        public int GetCsgoDisplayHandle()
         {
             Screen primaryScreen = null;
             IntPtr hwnd = IntPtr.Zero;
@@ -175,40 +173,40 @@ namespace vibrance.GUI
             return -1;
         }
 
-        public void setApplicationSettings(ref List<NvidiaApplicationSetting> refApplicationSettings)
+        public void SetApplicationSettings(List<ApplicationSetting> refApplicationSettings)
         {
             throw new NotImplementedException();
         }
 
-        public void setShouldRun(bool shouldRun)
+        public void SetShouldRun(bool shouldRun)
         {
-            this.vibranceInfo.shouldRun = shouldRun;
+            this.VibranceInfo.shouldRun = shouldRun;
         }
 
-        public void setVibranceWindowsLevel(int vibranceWindowsLevel)
+        public void SetVibranceWindowsLevel(int vibranceWindowsLevel)
         {
-            this.vibranceInfo.userVibranceSettingDefault= vibranceWindowsLevel;
+            this.VibranceInfo.userVibranceSettingDefault= vibranceWindowsLevel;
         }
 
-        public void setVibranceIngameLevel(int vibranceIngameLevel)
+        public void SetVibranceIngameLevel(int vibranceIngameLevel)
         {
-            this.vibranceInfo.userVibranceSettingActive = vibranceIngameLevel;
+            this.VibranceInfo.userVibranceSettingActive = vibranceIngameLevel;
         }
 
-        public void setSleepInterval(int interval)
+        public void SetSleepInterval(int interval)
         {
-            this.vibranceInfo.sleepInterval = interval;
+            this.VibranceInfo.sleepInterval = interval;
         }
 
-        public void setAffectPrimaryMonitorOnly(bool affectPrimaryMonitorOnly)
+        public void SetAffectPrimaryMonitorOnly(bool affectPrimaryMonitorOnly)
         {
-            this.vibranceInfo.affectPrimaryMonitorOnly = affectPrimaryMonitorOnly;
+            this.VibranceInfo.affectPrimaryMonitorOnly = affectPrimaryMonitorOnly;
         }
         
-        public void handleDVC()
+        public void HandleDvc()
         {
             bool isChanged = false;
-            while (vibranceInfo.shouldRun)
+            while (VibranceInfo.shouldRun)
             {
                 IntPtr hwnd = IntPtr.Zero;
                 if (isCsgoStarted(ref hwnd) && hwnd != IntPtr.Zero)
@@ -222,20 +220,20 @@ namespace vibrance.GUI
                             StringBuilder sb = new StringBuilder(length + 1);
                             GetWindowTextA(hwnd, sb, sb.Capacity);
 
-                            if (sb != null && sb.ToString().Equals(NvidiaVibranceProxy.NVAPI_GLOBAL_OFFENSIVE_WINDOW_NAME))
+                            if (sb != null && sb.ToString().Equals(NvidiaVibranceProxy.NvapiGlobalOffensiveWindowName))
                             {
                                 if (Screen.AllScreens.Length > 1)
                                 {
-                                    int csgoHandle = getCsgoDisplayHandle();
+                                    int csgoHandle = GetCsgoDisplayHandle();
                                     if (csgoHandle != -1)
                                     {
-                                        vibranceInfo.defaultHandle = csgoHandle;
+                                        VibranceInfo.defaultHandle = csgoHandle;
                                     }
                                 }
 
-                                if (!equalsDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingActive))
+                                if (!equalsDVCLevel(VibranceInfo.defaultHandle, VibranceInfo.userVibranceSettingActive))
                                 {
-                                    setDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingActive);
+                                    setDVCLevel(VibranceInfo.defaultHandle, VibranceInfo.userVibranceSettingActive);
                                     isChanged = true;
                                 }
                             }
@@ -245,13 +243,13 @@ namespace vibrance.GUI
                     {
                         if (isChanged /*&& !vibranceInfo.keepActive*/)
                         {
-                            if (vibranceInfo.affectPrimaryMonitorOnly)
+                            if (VibranceInfo.affectPrimaryMonitorOnly)
                             {
-                                setDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault);
+                                setDVCLevel(VibranceInfo.defaultHandle, VibranceInfo.userVibranceSettingDefault);
                             }
                             else
                             {
-                                vibranceInfo.displayHandles.ForEach(handle => setDVCLevel(handle, vibranceInfo.userVibranceSettingDefault));
+                                VibranceInfo.displayHandles.ForEach(handle => setDVCLevel(handle, VibranceInfo.userVibranceSettingDefault));
                             }
                             isChanged = false;
                         }
@@ -259,66 +257,66 @@ namespace vibrance.GUI
                 }
                 else
                 {
-                    if (vibranceInfo.affectPrimaryMonitorOnly && !equalsDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault))
+                    if (VibranceInfo.affectPrimaryMonitorOnly && !equalsDVCLevel(VibranceInfo.defaultHandle, VibranceInfo.userVibranceSettingDefault))
                     {
-                        setDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault);
+                        setDVCLevel(VibranceInfo.defaultHandle, VibranceInfo.userVibranceSettingDefault);
                         isChanged = false;
                     }
-                    else if(!vibranceInfo.affectPrimaryMonitorOnly && !vibranceInfo.displayHandles.TrueForAll(handle => equalsDVCLevel(handle, vibranceInfo.userVibranceSettingDefault)))
+                    else if(!VibranceInfo.affectPrimaryMonitorOnly && !VibranceInfo.displayHandles.TrueForAll(handle => equalsDVCLevel(handle, VibranceInfo.userVibranceSettingDefault)))
                     {
-                        vibranceInfo.displayHandles.ForEach(handle => setDVCLevel(handle, vibranceInfo.userVibranceSettingDefault));
+                        VibranceInfo.displayHandles.ForEach(handle => setDVCLevel(handle, VibranceInfo.userVibranceSettingDefault));
                         isChanged = false;
                     }
                 }
-                System.Threading.Thread.Sleep(vibranceInfo.sleepInterval);
+                System.Threading.Thread.Sleep(VibranceInfo.sleepInterval);
             }
-            handleDVCExit();
+            HandleDvcExit();
         }
 
 
-        public bool unloadLibraryEx()
+        public bool UnloadLibraryEx()
         {
             return unloadLibrary();
         }
 
-        public void handleDVCExit()
+        public void HandleDvcExit()
         {
-            if (vibranceInfo.affectPrimaryMonitorOnly)
+            if (VibranceInfo.affectPrimaryMonitorOnly)
             {
-                setDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault);
+                setDVCLevel(VibranceInfo.defaultHandle, VibranceInfo.userVibranceSettingDefault);
             }
-            else if (!vibranceInfo.displayHandles.TrueForAll(handle => equalsDVCLevel(handle, vibranceInfo.userVibranceSettingDefault)))
-                vibranceInfo.displayHandles.ForEach(handle => setDVCLevel(handle, vibranceInfo.userVibranceSettingDefault));
+            else if (!VibranceInfo.displayHandles.TrueForAll(handle => equalsDVCLevel(handle, VibranceInfo.userVibranceSettingDefault)))
+                VibranceInfo.displayHandles.ForEach(handle => setDVCLevel(handle, VibranceInfo.userVibranceSettingDefault));
         }
 
-        private void enumerateDisplayHandles()
+        private void EnumerateDisplayHandles()
         {
             for (int i = 0, displayHandle = 0; displayHandle != -1; i++)
             {
-                if (vibranceInfo.displayHandles == null)
-                    vibranceInfo.displayHandles = new List<int>();
+                if (VibranceInfo.displayHandles == null)
+                    VibranceInfo.displayHandles = new List<int>();
 
                 displayHandle = enumerateNvidiaDisplayHandle(i);
                 if (displayHandle != -1)
-                    vibranceInfo.displayHandles.Add(displayHandle);
+                    VibranceInfo.displayHandles.Add(displayHandle);
             }
         }
 
-        public VIBRANCE_INFO getVibranceInfo()
+        public VibranceInfo GetVibranceInfo()
         {
-            return vibranceInfo;
+            return VibranceInfo;
         }
 
         public bool setDVCLevel_extern(int defaultHandle, int level)
         {
-            if(vibranceInfo.isInitialized)
+            if(VibranceInfo.isInitialized)
                 return setDVCLevel(defaultHandle, level);
             return false;
         }
 
         public bool equalsDVCLevel_extern(int defaultHandle, int level)
         {
-            if (vibranceInfo.isInitialized)
+            if (VibranceInfo.isInitialized)
                 return equalsDVCLevel(defaultHandle, level);
             return false;
         }

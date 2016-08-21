@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using vibrance.GUI.common;
+using vibrance.GUI.NVIDIA;
 
-namespace vibrance.GUI.NVIDIA
+namespace vibrance.GUI.AMD
 {
     public partial class VibranceSettings : Form
     {
@@ -37,11 +33,8 @@ namespace vibrance.GUI.NVIDIA
 
         private void trackBarIngameLevel_Scroll(object sender, EventArgs e)
         {
-            NvidiaVibranceValueWrapper vibranceValue = NvidiaVibranceValueWrapper.Find(trackBarIngameLevel.Value);
-            if (vibranceValue == null)
-                return;
             _v.SetVibranceIngameLevel(trackBarIngameLevel.Value);
-            labelIngameLevel.Text = vibranceValue.GetPercentage;
+            labelIngameLevel.Text = trackBarIngameLevel.Value.ToString();
         }
 
         private void buttonSave_Click(object sender, EventArgs e)

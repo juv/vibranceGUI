@@ -5,8 +5,8 @@ namespace vibrance.GUI.common
 {
     internal interface ISettingsController
     {
-        bool setVibranceSettings(string windowsLevel, string affectPrimaryMonitorOnly, List<NvidiaApplicationSetting> applicationSettings);
-        bool setVibranceSetting(string szKeyName, string value);
-        void readVibranceSettings(GraphicsAdapter graphicsAdapter, out int vibranceWindowsLevel, out bool affectPrimaryMonitorOnly, out List<NvidiaApplicationSetting> applicationSettings);
+        bool SetVibranceSettings(string windowsLevel, string affectPrimaryMonitorOnly, List<ApplicationSetting> applicationSettings);
+        bool SetVibranceSetting(string szKeyName, string value);
+        void ReadVibranceSettings(GraphicsAdapter graphicsAdapter, out int vibranceWindowsLevel, out bool affectPrimaryMonitorOnly, out List<ApplicationSetting> applicationSettings);
     }
 }

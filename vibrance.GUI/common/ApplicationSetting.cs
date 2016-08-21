@@ -1,17 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Xml.Serialization;
-using vibrance.GUI.common;
+﻿using System.Xml.Serialization;
 
-namespace vibrance.GUI.NVIDIA
+namespace vibrance.GUI.common
 {
-    public class NvidiaApplicationSetting
+    public class ApplicationSetting
     {
         public string Name { get; set; }
         public string FileName { get; set; }
@@ -20,9 +11,9 @@ namespace vibrance.GUI.NVIDIA
         [XmlElement(IsNullable = true)]
         public ResolutionModeWrapper ResolutionSettings { get; set; }
 
-        public NvidiaApplicationSetting(){ }
+        public ApplicationSetting(){ }
 
-        public NvidiaApplicationSetting(string name, string fileName, int ingameLevel, ResolutionModeWrapper resolutionSettings, bool isResolutionChangeNeeded)
+        public ApplicationSetting(string name, string fileName, int ingameLevel, ResolutionModeWrapper resolutionSettings, bool isResolutionChangeNeeded)
         {
             this.Name = name;
             this.FileName = fileName;

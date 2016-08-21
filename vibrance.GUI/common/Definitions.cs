@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 namespace vibrance.GUI.common
 {
     [StructLayout(LayoutKind.Sequential)]
-    public struct VIBRANCE_INFO
+    public struct VibranceInfo
     {
         public bool isInitialized;
         public int activeOutput;

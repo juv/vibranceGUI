@@ -5,24 +5,24 @@ namespace vibrance.GUI.common
 {
     class RegistryController : IRegistryController
     {
-        private const string runKey = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
-        private const string vcKey = "SOFTWARE\\Microsoft\\DevDiv\\VC\\Servicing\\11.0\\RuntimeMinimum";
+        private const string RunKey = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
+        private const string VcKey = "SOFTWARE\\Microsoft\\DevDiv\\VC\\Servicing\\11.0\\RuntimeMinimum";
 
-        private RegistryKey startupKey;
+        private RegistryKey _startupKey;
 
         public RegistryController()
         {
 
         }
 
-        public bool registerProgram(string appName, string pathToExe)
+        public bool RegisterProgram(string appName, string pathToExe)
         {
             try
             {
-                startupKey = Registry.CurrentUser.OpenSubKey(runKey, true);
-                if (startupKey == null)
+                _startupKey = Registry.CurrentUser.OpenSubKey(RunKey, true);
+                if (_startupKey == null)
                     return false;
-                startupKey.SetValue(appName, pathToExe);
+                _startupKey.SetValue(appName, pathToExe);
             }
             catch (Exception)
             {
@@ -30,17 +30,17 @@ namespace vibrance.GUI.common
             }
             finally
             {
-                startupKey.Close();
+                _startupKey.Close();
             }
             return true;
         }
 
-        public bool unregisterProgram(string appName)
+        public bool UnregisterProgram(string appName)
         {
             try
             {
-                startupKey = Registry.CurrentUser.OpenSubKey(runKey, true);
-                startupKey.DeleteValue(appName, true);
+                _startupKey = Registry.CurrentUser.OpenSubKey(RunKey, true);
+                _startupKey.DeleteValue(appName, true);
             }
             catch (Exception)
             {
@@ -48,17 +48,17 @@ namespace vibrance.GUI.common
             }
             finally
             {
-                startupKey.Close();
+                _startupKey.Close();
             }
             return true;
         }
 
-        public bool isProgramRegistered(string appName)
+        public bool IsProgramRegistered(string appName)
         {
             try
             {
-                startupKey = Registry.CurrentUser.OpenSubKey(runKey, true);
-                if (startupKey.GetValue(appName) != null)
+                _startupKey = Registry.CurrentUser.OpenSubKey(RunKey, true);
+                if (_startupKey.GetValue(appName) != null)
                     return true;
             }
             catch (Exception)
@@ -68,17 +68,17 @@ namespace vibrance.GUI.common
             return false;
         }
 
-        public bool isStartupPathUnchanged(string appName, string pathToExe)
+        public bool IsStartupPathUnchanged(string appName, string pathToExe)
         {
             try
             {
-                startupKey = Registry.CurrentUser.OpenSubKey(runKey);
-                if (startupKey == null)
+                _startupKey = Registry.CurrentUser.OpenSubKey(RunKey);
+                if (_startupKey == null)
                 {
                     return false;
                 }
 
-                string startUpValue = startupKey.GetValue(appName).ToString();
+                string startUpValue = _startupKey.GetValue(appName).ToString();
                 if (startUpValue == pathToExe)
                 {
                     return true;
@@ -91,7 +91,7 @@ namespace vibrance.GUI.common
             }
             finally
             {
-                startupKey.Close();
+                _startupKey.Close();
             }
         }
     }

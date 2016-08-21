@@ -1,4 +1,4 @@
-﻿namespace vibrance.GUI
+﻿namespace vibrance.GUI.NVIDIA
 {
     partial class NvidiaVibranceGUI
     {
@@ -312,7 +312,7 @@
             this.Controls.Add(this.linkLabelTwitter);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Name = "NvidiaVibranceGUI";
+            this.Name = "NvidiaVibranceGui";
             this.Text = "vibranceGUI";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);

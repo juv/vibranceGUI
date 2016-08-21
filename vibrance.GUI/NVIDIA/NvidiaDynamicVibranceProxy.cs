@@ -55,7 +55,7 @@ namespace vibrance.GUI.NVIDIA
             EntryPoint = "?getDVCInfo@vibrance@vibranceDLL@@QAE_NPAUNV_DISPLAY_DVC_INFO@12@H@Z",
             CallingConvention = CallingConvention.StdCall,
             CharSet = CharSet.Ansi)]
-        static extern bool getDVCInfo(ref NV_DISPLAY_DVC_INFO info, int defaultHandle);
+        static extern bool getDVCInfo(ref NvDisplayDvcInfo info, int defaultHandle);
 
         [DllImport(
             "vibranceDLL.dll",
@@ -97,7 +97,7 @@ namespace vibrance.GUI.NVIDIA
             EntryPoint = "?getGpuSystemType@vibrance@vibranceDLL@@QAEHPAH@Z",
             CallingConvention = CallingConvention.StdCall,
             CharSet = CharSet.Auto)]
-        static extern NV_SYSTEM_TYPE getGpuSystemType(int gpuHandle);
+        static extern NvSystemType getGpuSystemType(int gpuHandle);
 
         [DllImport("user32.dll", CharSet = CharSet.Ansi)]
         static extern int GetWindowTextLength([In] IntPtr hWnd);
@@ -114,122 +114,122 @@ namespace vibrance.GUI.NVIDIA
         #endregion
 
 
-        public const int NVAPI_MAX_PHYSICAL_GPUS = 64;
-        public const int NVAPI_MAX_LEVEL = 63;
-        public const int NVAPI_DEFAULT_LEVEL = 0;
+        public const int NvapiMaxPhysicalGpus = 64;
+        public const int NvapiMaxLevel = 63;
+        public const int NvapiDefaultLevel = 0;
 
-        public const string NVAPI_ERROR_INIT_FAILED = "VibranceProxy failed to initialize! Read readme.txt for fix!";
-        public const string NVAPI_ERROR_SYSTYPE_UNSUPPORTED = "VibranceProxy detected that you are running a Laptop with integrated NVIDIA card. " +
+        public const string NvapiErrorInitFailed = "VibranceProxy failed to initialize! Read readme.txt for fix!";
+        public const string NvapiErrorSystypeUnsupported = "VibranceProxy detected that you are running a Laptop with integrated NVIDIA card. " +
             "NVIDIA Laptops are not supported because their NVIDIA drivers do not contain Digital Vibrance! " +
             "You are missing the Digital Vibrance option in your NVIDIA Control Panel. VibranceGUI can not run on your system.";
-        public const string NVAPI_ERROR_SYSTYPE_UNKNOWN = "VibranceProxy failed to initialize! Graphics card system type (Desktop / Laptop) is unknown!";
+        public const string NvapiErrorSystypeUnknown = "VibranceProxy failed to initialize! Graphics card system type (Desktop / Laptop) is unknown!";
 
-        private static VIBRANCE_INFO vibranceInfo;
-        private static List<NvidiaApplicationSetting> applicationSettings;
-        private static ResolutionModeWrapper windowsResolutionSettings;
-        private WinEventHook hook;
-        private static Screen gameScreen;
+        private static VibranceInfo _vibranceInfo;
+        private static List<ApplicationSetting> _applicationSettings;
+        private static ResolutionModeWrapper _windowsResolutionSettings;
+        private WinEventHook _hook;
+        private static Screen _gameScreen;
 
-        public NvidiaDynamicVibranceProxy(ref List<NvidiaApplicationSetting> savedApplicationSettings, ResolutionModeWrapper currentWindowsResolutionSettings)
+        public NvidiaDynamicVibranceProxy(List<ApplicationSetting> savedApplicationSettings, ResolutionModeWrapper currentWindowsResolutionSettings)
         {
             try
             {
-                applicationSettings = savedApplicationSettings;
-                windowsResolutionSettings = currentWindowsResolutionSettings;
-                vibranceInfo = new VIBRANCE_INFO();
+                _applicationSettings = savedApplicationSettings;
+                _windowsResolutionSettings = currentWindowsResolutionSettings;
+                _vibranceInfo = new VibranceInfo();
                 if (initializeLibrary())
                 {
-                    initializeProxy();
+                    InitializeProxy();
                 }
 
-                if (vibranceInfo.isInitialized)
+                if (_vibranceInfo.isInitialized)
                 {
-                    hook = WinEventHook.GetInstance();
-                    hook.WinEventHookHandler += OnWinEventHook;
+                    _hook = WinEventHook.GetInstance();
+                    _hook.WinEventHookHandler += OnWinEventHook;
                 }
 
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.ToString());
-                MessageBox.Show(NvidiaDynamicVibranceProxy.NVAPI_ERROR_INIT_FAILED, "vibranceGUI Error", 
+                MessageBox.Show(NvidiaDynamicVibranceProxy.NvapiErrorInitFailed, "vibranceGUI Error", 
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
-        private void initializeProxy()
+        private void InitializeProxy()
         {
-            int[] gpuHandles = new int[NVAPI_MAX_PHYSICAL_GPUS];
-            int[] outputIds = new int[NVAPI_MAX_PHYSICAL_GPUS];
+            int[] gpuHandles = new int[NvapiMaxPhysicalGpus];
+            int[] outputIds = new int[NvapiMaxPhysicalGpus];
             enumeratePhsyicalGPUs(gpuHandles);
 
             foreach (int gpuHandle in gpuHandles)
             {
                 if(gpuHandle != 0)
                 {
-                    NV_SYSTEM_TYPE systemType = getGpuSystemType(gpuHandle);
-                    if (systemType == NV_SYSTEM_TYPE.NV_SYSTEM_TYPE_UNKNOWN)
+                    NvSystemType systemType = getGpuSystemType(gpuHandle);
+                    if (systemType == NvSystemType.NvSystemTypeUnknown)
                     {
-                        MessageBox.Show(NvidiaDynamicVibranceProxy.NVAPI_ERROR_SYSTYPE_UNKNOWN, "vibranceGUI Error", 
+                        MessageBox.Show(NvidiaDynamicVibranceProxy.NvapiErrorSystypeUnknown, "vibranceGUI Error", 
                             MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        vibranceInfo.isInitialized = false; 
+                        _vibranceInfo.isInitialized = false; 
                         return;
                     }
-                    else if (systemType == NV_SYSTEM_TYPE.NV_SYSTEM_TYPE_LAPTOP)
+                    else if (systemType == NvSystemType.NvSystemTypeLaptop)
                     {
-                        MessageBox.Show(NvidiaDynamicVibranceProxy.NVAPI_ERROR_SYSTYPE_UNSUPPORTED, "vibranceGUI Error",
+                        MessageBox.Show(NvidiaDynamicVibranceProxy.NvapiErrorSystypeUnsupported, "vibranceGUI Error",
                             MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        vibranceInfo.isInitialized = false;
+                        _vibranceInfo.isInitialized = false;
                         return;
                     }
                 }
             }
 
-            enumerateDisplayHandles();
+            EnumerateDisplayHandles();
 
-            vibranceInfo.activeOutput = getActiveOutputs(gpuHandles, outputIds);
+            _vibranceInfo.activeOutput = getActiveOutputs(gpuHandles, outputIds);
             StringBuilder buffer = new StringBuilder(64);
             char[] sz = new char[64];
             getGpuName(gpuHandles, buffer);
-            vibranceInfo.szGpuName = buffer.ToString();
-            vibranceInfo.defaultHandle = enumerateNvidiaDisplayHandle(0);
+            _vibranceInfo.szGpuName = buffer.ToString();
+            _vibranceInfo.defaultHandle = enumerateNvidiaDisplayHandle(0);
 
-            NV_DISPLAY_DVC_INFO info = new NV_DISPLAY_DVC_INFO();
-            if (getDVCInfo(ref info, vibranceInfo.defaultHandle))
+            NvDisplayDvcInfo info = new NvDisplayDvcInfo();
+            if (getDVCInfo(ref info, _vibranceInfo.defaultHandle))
             {
-                if (info.currentLevel != vibranceInfo.userVibranceSettingDefault)
+                if (info.currentLevel != _vibranceInfo.userVibranceSettingDefault)
                 {
-                    setDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault);
+                    setDVCLevel(_vibranceInfo.defaultHandle, _vibranceInfo.userVibranceSettingDefault);
                 }
             }
 
-            vibranceInfo.isInitialized = true;
+            _vibranceInfo.isInitialized = true;
         }
 
         private static void OnWinEventHook(object sender, WinEventHookEventArgs e)
         {
-            if (applicationSettings.Count > 0)
+            if (_applicationSettings.Count > 0)
             {
-                NvidiaApplicationSetting applicationSetting = applicationSettings.FirstOrDefault(x => x.Name.Equals(e.ProcessName));
+                ApplicationSetting applicationSetting = _applicationSettings.FirstOrDefault(x => x.Name.Equals(e.ProcessName));
                 if (applicationSetting != null)
                 {
                     //test if a resolution change is needed
                     Screen screen = Screen.FromHandle(e.Handle);
-                    if (applicationSetting.IsResolutionChangeNeeded && isResolutionChangeNeeded(screen, applicationSetting.ResolutionSettings))
+                    if (applicationSetting.IsResolutionChangeNeeded && IsResolutionChangeNeeded(screen, applicationSetting.ResolutionSettings))
                     {
-                        gameScreen = screen;
-                        performResolutionChange(screen, applicationSetting.ResolutionSettings);
+                        _gameScreen = screen;
+                        PerformResolutionChange(screen, applicationSetting.ResolutionSettings);
                     }
 
                     //test if changing the vibrance value is needed
-                    if (!equalsDVCLevel(vibranceInfo.defaultHandle, applicationSetting.IngameLevel))
+                    if (!equalsDVCLevel(_vibranceInfo.defaultHandle, applicationSetting.IngameLevel))
                     {
-                        int displayHandle = getApplicationDisplayHandle(e.Handle);
+                        int displayHandle = GetApplicationDisplayHandle(e.Handle);
                         if (displayHandle != -1)
                         {
-                            vibranceInfo.defaultHandle = displayHandle;
+                            _vibranceInfo.defaultHandle = displayHandle;
                         }
-                        setDVCLevel(vibranceInfo.defaultHandle, applicationSetting.IngameLevel);
+                        setDVCLevel(_vibranceInfo.defaultHandle, applicationSetting.IngameLevel);
                     }
                 }
                 else
@@ -240,27 +240,27 @@ namespace vibrance.GUI.NVIDIA
 
                     //test if a resolution change is needed
                     Screen screen = Screen.FromHandle(processHandle);
-                    if (gameScreen != null && gameScreen.Equals(screen) && isResolutionChangeNeeded(screen, windowsResolutionSettings))
+                    if (_gameScreen != null && _gameScreen.Equals(screen) && IsResolutionChangeNeeded(screen, _windowsResolutionSettings))
                     {
-                        performResolutionChange(screen, windowsResolutionSettings);
+                        PerformResolutionChange(screen, _windowsResolutionSettings);
                     }
 
                     //test if changing the vibrance value is needed
-                    if (vibranceInfo.affectPrimaryMonitorOnly && !equalsDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault))
+                    if (_vibranceInfo.affectPrimaryMonitorOnly && !equalsDVCLevel(_vibranceInfo.defaultHandle, _vibranceInfo.userVibranceSettingDefault))
                     {
-                        setDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault);
+                        setDVCLevel(_vibranceInfo.defaultHandle, _vibranceInfo.userVibranceSettingDefault);
                     }
-                    else if (!vibranceInfo.affectPrimaryMonitorOnly && !vibranceInfo.displayHandles.TrueForAll(handle => equalsDVCLevel(handle, vibranceInfo.userVibranceSettingDefault)))
+                    else if (!_vibranceInfo.affectPrimaryMonitorOnly && !_vibranceInfo.displayHandles.TrueForAll(handle => equalsDVCLevel(handle, _vibranceInfo.userVibranceSettingDefault)))
                     {
-                        vibranceInfo.displayHandles.ForEach(handle => setDVCLevel(handle, vibranceInfo.userVibranceSettingDefault));
+                        _vibranceInfo.displayHandles.ForEach(handle => setDVCLevel(handle, _vibranceInfo.userVibranceSettingDefault));
                     }
                 }
             }
         }
 
-        private static bool isResolutionChangeNeeded(Screen screen, ResolutionModeWrapper resolutionSettings)
+        private static bool IsResolutionChangeNeeded(Screen screen, ResolutionModeWrapper resolutionSettings)
         {
-            DEVMODE mode;            
+            Devmode mode;            
             if (resolutionSettings != null && ResolutionHelper.GetCurrentResolutionSettings(out mode, screen.DeviceName) && !resolutionSettings.Equals(mode))
             {
                 return true;
@@ -268,25 +268,25 @@ namespace vibrance.GUI.NVIDIA
             return false;
         }
 
-        private static void performResolutionChange(Screen screen, ResolutionModeWrapper resolutionSettings)
+        private static void PerformResolutionChange(Screen screen, ResolutionModeWrapper resolutionSettings)
         {
             ResolutionHelper.ChangeResolutionEx(resolutionSettings, screen.DeviceName);
         }
 
-        private void enumerateDisplayHandles()
+        private void EnumerateDisplayHandles()
         {
             for (int i = 0, displayHandle = 0; displayHandle != -1; i++)
             {
-                if (vibranceInfo.displayHandles == null)
-                    vibranceInfo.displayHandles = new List<int>();
+                if (_vibranceInfo.displayHandles == null)
+                    _vibranceInfo.displayHandles = new List<int>();
 
                 displayHandle = enumerateNvidiaDisplayHandle(i);
                 if (displayHandle != -1)
-                    vibranceInfo.displayHandles.Add(displayHandle);
+                    _vibranceInfo.displayHandles.Add(displayHandle);
             }
         }
 
-        private static int getApplicationDisplayHandle(IntPtr hWnd)
+        private static int GetApplicationDisplayHandle(IntPtr hWnd)
         {
             if (hWnd != IntPtr.Zero)
             {
@@ -304,60 +304,60 @@ namespace vibrance.GUI.NVIDIA
             return -1;
         }
 
-        public void setApplicationSettings(ref List<NvidiaApplicationSetting> refApplicationSettings)
+        public void SetApplicationSettings(List<ApplicationSetting> refApplicationSettings)
         {
-            applicationSettings = refApplicationSettings;
+            _applicationSettings = refApplicationSettings;
         }
 
-        public void setShouldRun(bool shouldRun)
+        public void SetShouldRun(bool shouldRun)
         {
-            vibranceInfo.shouldRun = shouldRun;
+            _vibranceInfo.shouldRun = shouldRun;
         }
 
-        public void setVibranceWindowsLevel(int vibranceWindowsLevel)
+        public void SetVibranceWindowsLevel(int vibranceWindowsLevel)
         {
-            vibranceInfo.userVibranceSettingDefault = vibranceWindowsLevel;
+            _vibranceInfo.userVibranceSettingDefault = vibranceWindowsLevel;
         }
 
-        public void setVibranceIngameLevel(int vibranceIngameLevel)
+        public void SetVibranceIngameLevel(int vibranceIngameLevel)
         {
-            vibranceInfo.userVibranceSettingActive = vibranceIngameLevel;
+            _vibranceInfo.userVibranceSettingActive = vibranceIngameLevel;
         }
 
-        public void setSleepInterval(int interval)
+        public void SetSleepInterval(int interval)
         {
-            vibranceInfo.sleepInterval = interval;
+            _vibranceInfo.sleepInterval = interval;
         }
 
-        public void handleDVC()
+        public void HandleDvc()
         {
             //throw new NotImplementedException();
         }
 
-        public void setAffectPrimaryMonitorOnly(bool affectPrimaryMonitorOnly)
+        public void SetAffectPrimaryMonitorOnly(bool affectPrimaryMonitorOnly)
         {
-            vibranceInfo.affectPrimaryMonitorOnly = affectPrimaryMonitorOnly;
+            _vibranceInfo.affectPrimaryMonitorOnly = affectPrimaryMonitorOnly;
         }
 
-        public VIBRANCE_INFO getVibranceInfo()
+        public VibranceInfo GetVibranceInfo()
         {
-            return vibranceInfo;
+            return _vibranceInfo;
         }
 
-        public bool unloadLibraryEx()
+        public bool UnloadLibraryEx()
         {
-            hook.removeWinEventHook();
+            _hook.RemoveWinEventHook();
             return unloadLibrary();
         }
 
-        public void handleDVCExit()
+        public void HandleDvcExit()
         {
-            if (vibranceInfo.affectPrimaryMonitorOnly)
+            if (_vibranceInfo.affectPrimaryMonitorOnly)
             {
-                setDVCLevel(vibranceInfo.defaultHandle, vibranceInfo.userVibranceSettingDefault);
+                setDVCLevel(_vibranceInfo.defaultHandle, _vibranceInfo.userVibranceSettingDefault);
             }
-            else if (!vibranceInfo.displayHandles.TrueForAll(handle => equalsDVCLevel(handle, vibranceInfo.userVibranceSettingDefault)))
-                vibranceInfo.displayHandles.ForEach(handle => setDVCLevel(handle, vibranceInfo.userVibranceSettingDefault));
+            else if (!_vibranceInfo.displayHandles.TrueForAll(handle => equalsDVCLevel(handle, _vibranceInfo.userVibranceSettingDefault)))
+                _vibranceInfo.displayHandles.ForEach(handle => setDVCLevel(handle, _vibranceInfo.userVibranceSettingDefault));
         }
     }
 }

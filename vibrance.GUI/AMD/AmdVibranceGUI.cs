@@ -1,70 +1,84 @@
-﻿using gui.app.gpucontroller.amd;
-using gui.app.gpucontroller.amd32;
-using gui.app.gpucontroller.amd64;
-using gui.app.mvvm.model;
-using gui.app.mvvm.viewmodel;
-using System;
-using System.Collections;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using vibrance.GUI.AMD.vendor;
+using vibrance.GUI.AMD.vendor.utils;
 using vibrance.GUI.common;
+using Application = System.Windows.Forms.Application;
+using MessageBox = System.Windows.Forms.MessageBox;
 
-namespace vibrance.GUI
+namespace vibrance.GUI.AMD
 {
-    public partial class AmdVibranceGUI : Form
+    public partial class AmdVibranceGui : Form
     {
-        private AmdVibranceAdapter v;
-        private RegistryController registryController;
-        private AutoResetEvent resetEvent;
-        public bool silenced = false;
-        private const string appName = "vibranceGUI";
-        private const string twitterLink = "https://twitter.com/juvlarN";
-        private const string paypalDonationLink = "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=JDQFNKNNEW356";
-        private const string steamDonationLink = "https://steamcommunity.com/tradeoffer/new/?partner=92410529&token=Oas6jXrc";
+        private readonly IVibranceProxy _v;
+        private IRegistryController _registryController;
+        public bool Silenced = false;
+        private const string AppName = "vibranceGUI";
+        private const string TwitterLink = "https://twitter.com/juvlarN";
+        private const string PaypalDonationLink = "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=JDQFNKNNEW356";
+        private const string SteamDonationLink = "https://steamcommunity.com/tradeoffer/new/?partner=92410529&token=Oas6jXrc";
 
-        private bool allowVisible;
+        private bool _allowVisible;
+        private List<ApplicationSetting> _applicationSettings;
+        private readonly List<ResolutionModeWrapper> _supportedResolutionList;
+        private readonly ResolutionModeWrapper _windowsResolutionSettings;
 
-        public AmdVibranceGUI()
+        public AmdVibranceGui(IAmdAdapter amdAdapter)
         {
+            _allowVisible = true;
             InitializeComponent();
-            allowVisible = true;
-            v = new AmdVibranceAdapter(silenced, this.AddLogItem);
 
-            resetEvent = new AutoResetEvent(false);
+            _supportedResolutionList = ResolutionHelper.EnumerateSupportedResolutionModes();
+
+            Devmode currentResolutionMode;
+            if (ResolutionHelper.GetCurrentResolutionSettings(out currentResolutionMode, null))
+            {
+                _windowsResolutionSettings = new ResolutionModeWrapper(currentResolutionMode);
+            }
+            else
+            {
+                MessageBox.Show("Current resolution mode could not be determined. Switching back to your Windows resolution will not work.");
+            }
+
+            _applicationSettings = new List<ApplicationSetting>();
+            _v = new AmdDynamicVibranceProxy(amdAdapter, _applicationSettings, _windowsResolutionSettings);
+
             backgroundWorker.WorkerReportsProgress = true;
             settingsBackgroundWorker.WorkerReportsProgress = true;
 
             backgroundWorker.RunWorkerAsync();
         }
 
-        private void AddLogItem(string logItem)
-        {
-            Debug.WriteLine(logItem);
-        }
-
         protected override void SetVisibleCore(bool value)
         {
-            if (!allowVisible)
+            if (!_allowVisible)
             {
                 value = false;
-                if (!this.IsHandleCreated) CreateHandle();
+                if (!this.IsHandleCreated)
+                {
+                    CreateHandle();
+                }
             }
             base.SetVisibleCore(value);
         }
 
         public void SetAllowVisible(bool value)
         {
-            allowVisible = value;
+            _allowVisible = value;
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            setGuiEnabledFlag(false);
+            SetGuiEnabledFlag(false);
         }
 
         private void Form1_Resize(object sender, EventArgs e)
@@ -72,6 +86,7 @@ namespace vibrance.GUI
             if (this.WindowState == FormWindowState.Minimized)
             {
                 this.notifyIcon.Visible = true;
+                this.notifyIcon.BalloonTipText = "Running minimized... Like the program? Consider donating!";
                 this.notifyIcon.ShowBalloonTip(250);
                 this.Hide();
             }
@@ -79,58 +94,50 @@ namespace vibrance.GUI
 
         private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            int vibranceIngameLevel = v.MaxLevel, vibranceWindowsLevel = v.DefaultLevel, refreshRate = 5000;
-            bool keepActive = false;
+            int vibranceWindowsLevel = 100;
+            bool affectPrimaryMonitorOnly = false;
 
             while (!this.IsHandleCreated)
             {
-                System.Threading.Thread.Sleep(500);
+                Thread.Sleep(500);
             }
-
 
             if (this.InvokeRequired)
             {
                 this.Invoke((MethodInvoker)delegate
                 {
-                    readVibranceSettings(out vibranceIngameLevel, out vibranceWindowsLevel, out keepActive, out refreshRate);
+                    ReadVibranceSettings(out vibranceWindowsLevel, out affectPrimaryMonitorOnly);
                 });
             }
             else
             {
-                readVibranceSettings(out vibranceIngameLevel, out vibranceWindowsLevel, out keepActive, out refreshRate);
+                ReadVibranceSettings(out vibranceWindowsLevel, out affectPrimaryMonitorOnly);
             }
 
-            if (v.amdViewModel != null)
+            if (_v.GetVibranceInfo().isInitialized)
             {
                 backgroundWorker.ReportProgress(1);
 
-                setGuiEnabledFlag(true);
+                SetGuiEnabledFlag(true);
 
-                v.setKeepActive(keepActive);
-                v.setVibranceIngameLevel(vibranceIngameLevel);
-                v.setVibranceWindowsLevel(vibranceWindowsLevel);
-                v.setSleepInterval(refreshRate);
-                v.setShouldRun(true);
-
-                bool unload = v.unloadLibraryEx();
-
-                backgroundWorker.ReportProgress(2, unload);
-                resetEvent.Set();
-                Application.DoEvents();
+                _v.SetApplicationSettings(_applicationSettings);
+                _v.SetShouldRun(true);
+                _v.SetVibranceWindowsLevel(vibranceWindowsLevel);
+                _v.SetAffectPrimaryMonitorOnly(affectPrimaryMonitorOnly);
             }
         }
 
         private void Form1_Shown(object sender, EventArgs e)
         {
-            if (v.amdViewModel != null)
+            if (_v != null && _v.GetVibranceInfo().isInitialized)
             {
-                setGuiEnabledFlag(true);
+                SetGuiEnabledFlag(true);
             }
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            cleanUp();
+            CleanUp();
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -138,20 +145,10 @@ namespace vibrance.GUI
             this.Close();
         }
 
-        private void trackBarIngameLevel_Scroll(object sender, EventArgs e)
-        {
-            labelIngameLevel.Text = trackBarIngameLevel.Value.ToString();
-
-            if (!settingsBackgroundWorker.IsBusy)
-            {
-                settingsBackgroundWorker.RunWorkerAsync();
-            }
-        }
-
         private void trackBarWindowsLevel_Scroll(object sender, EventArgs e)
         {
+            _v.SetVibranceWindowsLevel(trackBarWindowsLevel.Value);
             labelWindowsLevel.Text = trackBarWindowsLevel.Value.ToString();
-
             if (!settingsBackgroundWorker.IsBusy)
             {
                 settingsBackgroundWorker.RunWorkerAsync();
@@ -160,31 +157,28 @@ namespace vibrance.GUI
 
         private void settingsBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            Thread.Sleep(1000);
-            int ingameLevel = 0, windowsLevel = 0, refreshRate = 0;
-            bool keepActive = false;
+            Thread.Sleep(5000);
+            Console.WriteLine("save");
+            int windowsLevel = 0;
+            bool affectPrimaryMonitorOnly = false;
             this.Invoke((MethodInvoker)delegate
             {
-                ingameLevel = trackBarIngameLevel.Value;
                 windowsLevel = trackBarWindowsLevel.Value;
-                keepActive = checkBoxKeepActive.Checked;
-                refreshRate = int.Parse(textBoxRefreshRate.Text);
+                affectPrimaryMonitorOnly = checkBoxPrimaryMonitorOnly.Checked;
             });
-            saveVibranceSettings(ingameLevel, windowsLevel, keepActive, refreshRate);
+            SaveVibranceSettings(windowsLevel, affectPrimaryMonitorOnly);
         }
 
         private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             if (e.ProgressPercentage == 1)
             {
-                listBoxLog.Items.Add("vibranceInfo.isInitialized: " + (v.amdViewModel != null));
-
-                listBoxLog.Items.Add("vibranceInfo.userVibranceSettingActive: " + v.amdViewModel.VibranceSettingsViewModel.Model.IngameVibranceLevel);
-                listBoxLog.Items.Add("vibranceInfo.userVibranceSettingDefault: " + v.amdViewModel.VibranceSettingsViewModel.Model.WindowsVibranceLevel);
-                listBoxLog.Items.Add("");
-                listBoxLog.Items.Add("");
                 this.statusLabel.Text = "Running!";
                 this.statusLabel.ForeColor = Color.Green;
+            }
+            else if (e.ProgressPercentage == 2)
+            {
+                this.statusLabel.Text = $"NVAPI Unloaded: {e.UserState}";
             }
         }
 
@@ -194,7 +188,7 @@ namespace vibrance.GUI
 
         private void notifyIcon_MouseClick(object sender, MouseEventArgs e)
         {
-            allowVisible = true;
+            _allowVisible = true;
             this.Show();
 
             this.WindowState = FormWindowState.Normal;
@@ -204,46 +198,22 @@ namespace vibrance.GUI
             this.ShowInTaskbar = true;
         }
 
-        private void textBoxRefreshRate_TextChanged(object sender, EventArgs e)
+        private void checkBoxPrimaryMonitorOnly_CheckedChanged(object sender, EventArgs e)
         {
-            if (v != null)
+            if (this._v == null)
             {
-                int refreshRate = -1;
-
-                if (!int.TryParse(textBoxRefreshRate.Text, out refreshRate))
-                {
-                    textBoxRefreshRate.Text = "5000";
-                }
-                else if (refreshRate > 200)
-                {
-                    if (v != null)
-                    {
-                        v.setSleepInterval(refreshRate);
-                        if (!settingsBackgroundWorker.IsBusy)
-                        {
-                            settingsBackgroundWorker.RunWorkerAsync();
-                        }
-                        listBoxLog.Items.Add("Refresh rate has been set to: " + refreshRate + " ms");
-                    }
-                }
-                else
-                {
-                    listBoxLog.Items.Add("The refresh rate must be greater than 200 ms!");
-                }
+                return;
             }
-        }
 
-        private void checkBoxKeepActive_CheckedChanged(object sender, EventArgs e)
-        {
-            if (v != null)
+            this._v.SetAffectPrimaryMonitorOnly(this.checkBoxPrimaryMonitorOnly.Checked);
+            if (!this.settingsBackgroundWorker.IsBusy)
             {
-                v.setKeepActive(checkBoxKeepActive.Checked);
-                if (!settingsBackgroundWorker.IsBusy)
-                {
-                    settingsBackgroundWorker.RunWorkerAsync();
-                }
-                if (checkBoxKeepActive.Checked)
-                    listBoxLog.Items.Add("Vibrance stays at ingame level when tabbed out.");
+                this.settingsBackgroundWorker.RunWorkerAsync();
+            }
+            if (this.checkBoxPrimaryMonitorOnly.Checked)
+            {
+                this.notifyIcon.BalloonTipText = "vibranceGUI will only affect your primary monitor now.";
+                this.notifyIcon.ShowBalloonTip(250);
             }
         }
 
@@ -252,202 +222,246 @@ namespace vibrance.GUI
             RegistryController autostartController = new RegistryController();
             if (this.checkBoxAutostart.Checked)
             {
-                string pathToExe = "\"" + Application.ExecutablePath.ToString() + "\" -minimized";
-                if (!autostartController.isProgramRegistered(appName))
+                string pathToExe = "\"" + Application.ExecutablePath + "\" -minimized";
+                if (!autostartController.IsProgramRegistered(AppName))
                 {
-                    if (autostartController.registerProgram(appName, pathToExe))
-                        listBoxLog.Items.Add("Registered to Autostart!");
-                    else
-                        listBoxLog.Items.Add("Registering to Autostart failed!");
+                    this.notifyIcon.BalloonTipText = autostartController.RegisterProgram(AppName, pathToExe) 
+                        ? "Registered to Autostart!" 
+                        : "Registering to Autostart failed!";
                 }
-                else if (!autostartController.isStartupPathUnchanged(appName, pathToExe))
+                else if (!autostartController.IsStartupPathUnchanged(AppName, pathToExe))
                 {
-                    if (autostartController.registerProgram(appName, pathToExe))
-                        listBoxLog.Items.Add("Updated Autostart Path!");
-                    else
-                        listBoxLog.Items.Add("Updating Autostart Path failed!");
+                    this.notifyIcon.BalloonTipText = autostartController.RegisterProgram(AppName, pathToExe)
+                        ? "Updated Autostart Path!"
+                        : "Updating Autostart Path failed!";
+                }
+                else
+                {
+                    return;
                 }
             }
             else
             {
-                if (autostartController.unregisterProgram(appName))
-                    listBoxLog.Items.Add("Unregistered from Autostart!");
-                else
-                    listBoxLog.Items.Add("Unregistering from Autostart failed!");
+                this.notifyIcon.BalloonTipText = autostartController.UnregisterProgram(AppName) 
+                    ? "Unregistered from Autostart!" 
+                    : "Unregistering from Autostart failed!";
             }
+
+            notifyIcon.ShowBalloonTip(250);
         }
 
         private void twitterToolStripTextBox_Click(object sender, EventArgs e)
         {
-            System.Diagnostics.Process.Start(AmdVibranceGUI.twitterLink);
+            Process.Start(TwitterLink);
         }
 
         private void linkLabelTwitter_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            System.Diagnostics.Process.Start(AmdVibranceGUI.twitterLink);
+            Process.Start(TwitterLink);
         }
 
-        private void setGuiEnabledFlag(bool flag)
+        private void SetGuiEnabledFlag(bool flag)
         {
             this.Invoke((MethodInvoker)delegate
             {
-                this.checkBoxKeepActive.Enabled = flag;
                 this.trackBarWindowsLevel.Enabled = flag;
-                this.trackBarIngameLevel.Enabled = flag;
-                this.textBoxRefreshRate.Enabled = flag;
                 this.checkBoxAutostart.Enabled = flag;
+                this.checkBoxPrimaryMonitorOnly.Enabled = flag;
             });
         }
 
-        private void cleanUp()
+        private void CleanUp()
         {
-            this.statusLabel.Text = "Closing...";
-            this.statusLabel.ForeColor = Color.Red;
-            this.Update();
-            listBoxLog.Items.Add("Initiating observer thread exit... ");
-            if (v != null && v.amdViewModel != null)
+            try
             {
-                v.setShouldRun(false);
-                resetEvent.WaitOne();
-                listBoxLog.Items.Add("Unloading NVAPI... ");
+                this.statusLabel.Text = "Closing...";
+                this.statusLabel.ForeColor = Color.Red;
+                this.Update();
+                if (_v != null && _v.GetVibranceInfo().isInitialized)
+                {
+                    _v.SetShouldRun(false);
+                    _v.UnloadLibraryEx();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
             }
         }
 
-        private void readVibranceSettings(out int vibranceIngameLevel, out int vibranceWindowsLevel, out bool keepActive, out int refreshRate)
+        public static void Log(Exception ex)
         {
-            registryController = new RegistryController();
-            this.checkBoxAutostart.Checked = registryController.isProgramRegistered(appName);
+            using (StreamWriter w = File.AppendText("vibranceGUI_log.txt"))
+            {
+                w.Write("\r\nLog Entry : ");
+                w.WriteLine("{0} {1}", DateTime.Now.ToLongTimeString(),
+                    DateTime.Now.ToLongDateString());
+                w.WriteLine("Exception Found:\nType: {0}", ex.GetType().FullName);
+                w.WriteLine("Message: {0}", ex.Message);
+                w.WriteLine("Source: {0}", ex.Source);
+                w.WriteLine("Stacktrace: {0}", ex.StackTrace);
+                w.WriteLine("Exception String: {0}", ex.ToString());
 
-            vibranceIngameLevel = v.amdViewModel.VibranceSettingsViewModel.Model.IngameVibranceLevel;
-            vibranceWindowsLevel = v.amdViewModel.VibranceSettingsViewModel.Model.WindowsVibranceLevel;
-            keepActive = v.amdViewModel.VibranceSettingsViewModel.Model.KeepVibranceOnWhenCsGoIsStarted;
-            refreshRate = v.amdViewModel.VibranceSettingsViewModel.Model.RefreshRate;
-
-            labelWindowsLevel.Text = vibranceWindowsLevel.ToString();
-            labelIngameLevel.Text = vibranceIngameLevel.ToString();
-
-            trackBarWindowsLevel.Value = vibranceWindowsLevel;
-            trackBarIngameLevel.Value = vibranceIngameLevel;
-            checkBoxKeepActive.Checked = keepActive;
-            textBoxRefreshRate.Text = refreshRate.ToString();
+                w.WriteLine("-------------------------------");
+            }
         }
 
-        private void saveVibranceSettings(int ingameLevel, int windowsLevel, bool keepActive, int refreshRate)
+        public static void Log(string msg)
         {
-            v.amdViewModel.VibranceSettingsViewModel.Model.IngameVibranceLevel = ingameLevel;
-            v.amdViewModel.VibranceSettingsViewModel.Model.WindowsVibranceLevel = windowsLevel;
-            v.amdViewModel.VibranceSettingsViewModel.Model.KeepVibranceOnWhenCsGoIsStarted = keepActive;
-            v.amdViewModel.VibranceSettingsViewModel.Model.RefreshRate = refreshRate;
-            v.amdViewModel.VibranceSettingsViewModel.SaveVibranceSettings();
+            using (StreamWriter w = File.AppendText("vibranceGUI_log.txt"))
+            {
+                w.Write("\r\nLog Entry : ");
+                w.WriteLine("{0} {1}", DateTime.Now.ToLongTimeString(),
+                    DateTime.Now.ToLongDateString());
+                w.WriteLine(msg);
+                w.WriteLine("-------------------------------");
+            }
+        }
+
+        private void ReadVibranceSettings(out int vibranceWindowsLevel, out bool affectPrimaryMonitorOnly)
+        {
+            _registryController = new RegistryController();
+            this.checkBoxAutostart.Checked = _registryController.IsProgramRegistered(AppName);
+
+            SettingsController settingsController = new SettingsController();
+            settingsController.ReadVibranceSettings(GraphicsAdapter.Amd, out vibranceWindowsLevel, out affectPrimaryMonitorOnly, out _applicationSettings);
+
+            if (this.IsHandleCreated)
+            {
+                //no null check needed, SettingsController will always return matching values.
+                labelWindowsLevel.Text = vibranceWindowsLevel.ToString();
+
+                trackBarWindowsLevel.Value = vibranceWindowsLevel;
+                checkBoxPrimaryMonitorOnly.Checked = affectPrimaryMonitorOnly;
+                foreach (ApplicationSetting application in _applicationSettings)
+                {
+                    if (!File.Exists(application.FileName))
+                        continue;
+                    if (this.listApplications.LargeImageList == null)
+                    {
+                        ImageList imageList = new ImageList();
+                        imageList.ImageSize = new Size(48, 48);
+                        imageList.ColorDepth = ColorDepth.Depth32Bit;
+                        this.listApplications.LargeImageList = imageList;
+                        ListViewItem_SetSpacing(this.listApplications, 48 + 24, 48 + 6 + 16);
+                    }
+
+                    Icon icon = Icon.ExtractAssociatedIcon(application.FileName);
+                    if (icon != null)
+                    {
+                        this.listApplications.LargeImageList.Images.Add(icon);
+                        ListViewItem lvi = new ListViewItem(application.Name);
+                        lvi.ImageIndex = this.listApplications.Items.Count;
+                        lvi.Tag = application.FileName;
+                        this.listApplications.Items.Add(lvi);
+                    }
+                }
+            }
+        }
+
+        private void SaveVibranceSettings(int windowsLevel, bool affectPrimaryMonitorOnly)
+        {
+            SettingsController settingsController = new SettingsController();
+
+            settingsController.SetVibranceSettings(
+                windowsLevel.ToString(),
+                affectPrimaryMonitorOnly.ToString(),
+                _applicationSettings
+            );
         }
 
         private void buttonPaypal_Click(object sender, EventArgs e)
         {
-            System.Diagnostics.Process.Start(AmdVibranceGUI.paypalDonationLink);
+            Process.Start(PaypalDonationLink);
         }
 
         private void buttonSteam_Click(object sender, EventArgs e)
         {
-            System.Diagnostics.Process.Start(AmdVibranceGUI.steamDonationLink);
-        }
-    }
-
-    public class AmdVibranceAdapter
-    {
-        public AmdViewModel amdViewModel;
-
-        private bool silenced;
-
-        public AmdVibranceAdapter(bool silenced, Action<string> addLogItem)
-        {
-            this.amdViewModel = new AmdViewModel(addLogItem, Environment.Is64BitOperatingSystem ? (IAmdAdapter)new AmdAdapter64() : new AmdAdapter32());
-            this.silenced = silenced;
+            Process.Start(SteamDonationLink);
         }
 
-        public int DefaultLevel
+        private void buttonAddProgram_Click(object sender, EventArgs e)
         {
-            get
+            if (this.listApplications.LargeImageList == null)
             {
-                return this.amdViewModel.MinimumVibranceLevel;
+                ImageList imageList = new ImageList();
+                imageList.ImageSize = new Size(48, 48);
+                imageList.ColorDepth = ColorDepth.Depth32Bit;
+                this.listApplications.LargeImageList = imageList;
+                ListViewItem_SetSpacing(this.listApplications, 48 + 24, 48 + 6 + 16);
             }
-        }
-
-        public int MaxLevel
-        {
-            get
+            OpenFileDialog fileDialog = new OpenFileDialog();
+            DialogResult result = fileDialog.ShowDialog();
+            if (result == DialogResult.OK && fileDialog.CheckFileExists && fileDialog.SafeFileName != null) // Test result.
             {
-                return this.amdViewModel.MaximumVibranceLevel;
-            }
-        }
-
-        public void setKeepActive(bool value)
-        {
-            this.amdViewModel.VibranceSettingsViewModel.Model.KeepVibranceOnWhenCsGoIsStarted = value;
-        }
-
-        CancellationTokenSource cancellationTokenSource;
-
-        private Task task;
-
-        public void setShouldRun(bool value)
-        {
-            if (value)
-            {
-                this.cancellationTokenSource = new CancellationTokenSource();
-                var cancellationToken = this.cancellationTokenSource.Token;
-
-                task = Task.Factory.StartNew(new Action(() =>
+                Icon icon = Icon.ExtractAssociatedIcon(fileDialog.FileName);
+                if (icon != null)
                 {
-                    cancellationToken.ThrowIfCancellationRequested();
+                    this.listApplications.LargeImageList.Images.Add(icon);
+                    ListViewItem lvi = new ListViewItem(Path.GetFileNameWithoutExtension(fileDialog.FileName));
+                    lvi.ImageIndex = this.listApplications.Items.Count;
+                    lvi.Tag = fileDialog.FileName;
+                    this.listApplications.Items.Add(lvi);
+                }
+            }
+        }
 
-                    bool moreToDo = true;
-                    while (moreToDo)
+        [DllImport("user32.dll")]
+        public static extern int SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
+
+        public int MakeLong(short lowPart, short highPart)
+        {
+            return (int)(((ushort)lowPart) | (uint)(highPart << 16));
+        }
+
+        public void ListViewItem_SetSpacing(ListView listview, short leftPadding, short topPadding)
+        {
+            const int lvmFirst = 0x1000;
+            const int lvmSeticonspacing = lvmFirst + 53;
+            SendMessage(listview.Handle, lvmSeticonspacing, IntPtr.Zero, (IntPtr)MakeLong(leftPadding, topPadding));
+        }
+
+        private void listApplications_DoubleClick(object sender, EventArgs e)
+        {
+            ListViewItem selectedItem = this.listApplications.SelectedItems[0];
+            if (selectedItem != null)
+            {
+                ApplicationSetting actualSetting = _applicationSettings.FirstOrDefault(x => x.FileName == selectedItem.Tag.ToString());
+                VibranceSettings settingsWindow = new VibranceSettings(_v, selectedItem, actualSetting, _supportedResolutionList);
+                DialogResult result = settingsWindow.ShowDialog();
+                if (result == DialogResult.OK)
+                {
+                    ApplicationSetting newSetting = settingsWindow.GetApplicationSetting();
+                    if (_applicationSettings.FirstOrDefault(x => x.FileName == newSetting.FileName) != null)
+                        _applicationSettings.Remove(_applicationSettings.First(x => x.FileName == newSetting.FileName));
+                    _applicationSettings.Add(newSetting);
+                    if (!settingsBackgroundWorker.IsBusy)
                     {
-                        this.amdViewModel.VibranceSettingsViewModel.RefreshVibranceStatus(VibranceSettingsViewModel.GetForegroundWindow());
-
-                        if (cancellationToken.IsCancellationRequested)
-                        {
-                            cancellationToken.ThrowIfCancellationRequested();
-                        }
-
-                        Thread.Sleep(this.amdViewModel.VibranceSettingsViewModel.Model.RefreshRate);
+                        settingsBackgroundWorker.RunWorkerAsync();
                     }
-                }), cancellationTokenSource.Token);
+                }
             }
-            else if (this.cancellationTokenSource != null)
+        }
+
+        private void buttonRemoveProgram_Click(object sender, EventArgs e)
+        {
+            foreach (ListViewItem eachItem in listApplications.SelectedItems)
             {
-                this.cancellationTokenSource.Cancel();
+                for (int i = eachItem.Index + 1; i < listApplications.Items.Count; i++)
+                    listApplications.Items[i].ImageIndex--;
+                Image img = this.listApplications.LargeImageList.Images[eachItem.ImageIndex];
+                this.listApplications.LargeImageList.Images.RemoveAt(eachItem.ImageIndex);
+                img.Dispose();
 
-                try
-                {
-                    task.Wait();
-                }
-                catch (Exception ex)
-                {
-                    this.amdViewModel.VibranceSettingsViewModel.ResetVibrance();
-                }
+                listApplications.Items.Remove(eachItem);
+
+                _applicationSettings.Remove(_applicationSettings.FirstOrDefault(x => x.FileName.Equals(eachItem.Tag.ToString())));
             }
-        }
 
-        public void setSleepInterval(int refreshRate)
-        {
-            this.amdViewModel.VibranceSettingsViewModel.Model.RefreshRate = refreshRate;
-        }
-
-
-        internal void setVibranceWindowsLevel(int vibranceWindowsLevel)
-        {
-            this.amdViewModel.VibranceSettingsViewModel.Model.WindowsVibranceLevel = vibranceWindowsLevel;
-        }
-
-        internal void setVibranceIngameLevel(int vibranceIngameLevel)
-        {
-            this.amdViewModel.VibranceSettingsViewModel.Model.IngameVibranceLevel = vibranceIngameLevel;
-        }
-
-        internal bool unloadLibraryEx()
-        {
-            return false;
+            if (!settingsBackgroundWorker.IsBusy)
+            {
+                settingsBackgroundWorker.RunWorkerAsync();
+            }
         }
     }
 }

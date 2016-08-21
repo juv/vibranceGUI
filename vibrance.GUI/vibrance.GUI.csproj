@@ -126,6 +126,12 @@
     <Compile Include="AMD\VibranceSettings.Designer.cs">
       <DependentUpon>VibranceSettings.cs</DependentUpon>
     </Compile>
+    <Compile Include="common\ProcessExplorer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="common\ProcessExplorer.Designer.cs">
+      <DependentUpon>ProcessExplorer.cs</DependentUpon>
+    </Compile>
     <Compile Include="common\ResolutionHelper.cs" />
     <Compile Include="common\ResolutionModeWrapper.cs" />
     <Compile Include="common\VersionCheckHelper.cs" />
@@ -163,6 +169,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="AMD\VibranceSettings.resx">
       <DependentUpon>VibranceSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="common\ProcessExplorer.resx">
+      <DependentUpon>ProcessExplorer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="NVIDIA\NvidiaVibranceGUI.resx">
       <DependentUpon>NvidiaVibranceGUI.cs</DependentUpon>

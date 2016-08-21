@@ -30,7 +30,6 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AmdVibranceGui));
-            this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.twitterToolStripTextBox = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -60,17 +59,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.trackBarWindowsLevel)).BeginInit();
             this.groupBox5.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // notifyIcon
-            // 
-            this.notifyIcon.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
-            this.notifyIcon.BalloonTipText = "Running minimized... Like the program? Consider donating!";
-            this.notifyIcon.BalloonTipTitle = "vibranceGUI";
-            this.notifyIcon.ContextMenuStrip = this.contextMenuStrip;
-            this.notifyIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon.Icon")));
-            this.notifyIcon.Text = "vibranceGUI";
-            this.notifyIcon.Visible = true;
-            this.notifyIcon.MouseClick += new System.Windows.Forms.MouseEventHandler(this.notifyIcon_MouseClick);
             // 
             // contextMenuStrip
             // 
@@ -331,8 +319,6 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.NotifyIcon notifyIcon;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip;
         private System.Windows.Forms.ToolStripMenuItem twitterToolStripTextBox;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;

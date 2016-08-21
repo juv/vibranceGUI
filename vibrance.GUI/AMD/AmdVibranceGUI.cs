@@ -85,9 +85,6 @@ namespace vibrance.GUI.AMD
         {
             if (this.WindowState == FormWindowState.Minimized)
             {
-                this.notifyIcon.Visible = true;
-                this.notifyIcon.BalloonTipText = "Running minimized... Like the program? Consider donating!";
-                this.notifyIcon.ShowBalloonTip(250);
                 this.Hide();
             }
         }
@@ -211,8 +208,6 @@ namespace vibrance.GUI.AMD
             }
             if (this.checkBoxPrimaryMonitorOnly.Checked)
             {
-                this.notifyIcon.BalloonTipText = "vibranceGUI will only affect your primary monitor now.";
-                this.notifyIcon.ShowBalloonTip(250);
             }
         }
 
@@ -224,15 +219,11 @@ namespace vibrance.GUI.AMD
                 string pathToExe = "\"" + Application.ExecutablePath + "\" -minimized";
                 if (!autostartController.IsProgramRegistered(AppName))
                 {
-                    this.notifyIcon.BalloonTipText = autostartController.RegisterProgram(AppName, pathToExe) 
-                        ? "Registered to Autostart!" 
-                        : "Registering to Autostart failed!";
+                    autostartController.RegisterProgram(AppName, pathToExe);
                 }
                 else if (!autostartController.IsStartupPathUnchanged(AppName, pathToExe))
                 {
-                    this.notifyIcon.BalloonTipText = autostartController.RegisterProgram(AppName, pathToExe)
-                        ? "Updated Autostart Path!"
-                        : "Updating Autostart Path failed!";
+                    autostartController.RegisterProgram(AppName, pathToExe);
                 }
                 else
                 {
@@ -241,12 +232,8 @@ namespace vibrance.GUI.AMD
             }
             else
             {
-                this.notifyIcon.BalloonTipText = autostartController.UnregisterProgram(AppName) 
-                    ? "Unregistered from Autostart!" 
-                    : "Unregistering from Autostart failed!";
+                autostartController.UnregisterProgram(AppName);
             }
-
-            notifyIcon.ShowBalloonTip(250);
         }
 
         private void twitterToolStripTextBox_Click(object sender, EventArgs e)

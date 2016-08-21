@@ -158,7 +158,6 @@ namespace vibrance.GUI.AMD
         private void settingsBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             Thread.Sleep(5000);
-            Console.WriteLine("save");
             int windowsLevel = 0;
             bool affectPrimaryMonitorOnly = false;
             this.Invoke((MethodInvoker)delegate

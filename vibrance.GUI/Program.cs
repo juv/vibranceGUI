@@ -56,7 +56,6 @@ namespace vibrance.GUI
             if (args.Contains("-minimized"))
             {
                 vibranceGui.WindowState = FormWindowState.Minimized;
-                vibranceGui.ShowInTaskbar = false;
                 if (vibranceGui is AmdVibranceGui)
                 {
                     ((AmdVibranceGui) vibranceGui).SetAllowVisible(false);

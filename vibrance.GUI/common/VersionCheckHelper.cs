@@ -9,9 +9,9 @@ namespace vibrance.GUI.common
 {
     class VersionCheckHelper
     {
-        /*private static readonly Uri url = new Uri("http://vibrancegui.com/update");
+        private static readonly Uri url = new Uri("http://vibrancegui.com/update");
   
-        public async static void PerformVersionCheck()
+        public static void PerformVersionCheck()
         {
             WebClient webClient = new WebClient();
             webClient.QueryString.Add("GUID", Guid.NewGuid().ToString());
@@ -22,13 +22,13 @@ namespace vibrance.GUI.common
         private static void WebClient_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
         {
             Version retrievedVersion = new Version(e.Result.Trim());
-            if(retrievedVersion != null && NewVersionAvailable(retrievedVersion))
+            if(retrievedVersion != null && IsNewVersionAvailable(retrievedVersion))
             {
                 
             }
         }
 
-        private static bool NewVersionAvailable(Version retrievedVersion)
+        private static bool IsNewVersionAvailable(Version retrievedVersion)
         {
             Assembly assem = Assembly.GetEntryAssembly();
             AssemblyName assemName = assem.GetName();
@@ -40,6 +40,6 @@ namespace vibrance.GUI.common
                 return true;
             }
             return false;
-        }*/
+        }
     }
 }

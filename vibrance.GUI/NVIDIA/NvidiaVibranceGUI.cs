@@ -396,7 +396,7 @@ namespace vibrance.GUI.NVIDIA
             OpenFileDialog fileDialog = new OpenFileDialog();
             DialogResult result = fileDialog.ShowDialog();
             if (result == DialogResult.OK && fileDialog.CheckFileExists && fileDialog.SafeFileName != null 
-                && !applicationSettings.Any(x => x.FileName.Equals(fileDialog.FileName)))
+                && !applicationSettings.Any(x => x.FileName.ToLower() == fileDialog.FileName.ToLower()))
             {
                 Icon icon = Icon.ExtractAssociatedIcon(fileDialog.FileName);
                 if (icon != null)
@@ -430,7 +430,7 @@ namespace vibrance.GUI.NVIDIA
         {
             InitializeApplicationList();
             
-            if(!File.Exists(processExplorerEntry.Path) || applicationSettings.Any(x => x.FileName.Equals(processExplorerEntry.Path)))
+            if(!File.Exists(processExplorerEntry.Path) || applicationSettings.Any(x => x.FileName.ToLower() == processExplorerEntry.Path.ToLower()))
             {
                 return; 
             }

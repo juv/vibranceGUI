@@ -347,14 +347,8 @@ namespace vibrance.GUI.NVIDIA
                 {
                     if (!File.Exists(application.FileName))
                         continue;
-                    if (this.listApplications.LargeImageList == null)
-                    {
-                        ImageList imageList = new ImageList();
-                        imageList.ImageSize = new Size(48, 48);
-                        imageList.ColorDepth = ColorDepth.Depth32Bit;
-                        this.listApplications.LargeImageList = imageList;
-                        ListViewItem_SetSpacing(this.listApplications, 48 + 24, 48 + 6 + 16);
-                    }
+
+                    InitializeApplicationList();
 
                     Icon icon = Icon.ExtractAssociatedIcon(application.FileName);
                     if (icon != null)
@@ -392,14 +386,8 @@ namespace vibrance.GUI.NVIDIA
 
         private void buttonAddProgram_Click(object sender, EventArgs e)
         {
-            if (this.listApplications.LargeImageList == null)
-            {
-                ImageList imageList = new ImageList();
-                imageList.ImageSize = new Size(48, 48);
-                imageList.ColorDepth = ColorDepth.Depth32Bit;
-                this.listApplications.LargeImageList = imageList;
-                ListViewItem_SetSpacing(this.listApplications, 48 + 24, 48 + 6 + 16);
-            }
+            InitializeApplicationList();
+
             OpenFileDialog fileDialog = new OpenFileDialog();
             DialogResult result = fileDialog.ShowDialog();
             if (result == DialogResult.OK && fileDialog.CheckFileExists && fileDialog.SafeFileName != null)
@@ -413,6 +401,33 @@ namespace vibrance.GUI.NVIDIA
                     lvi.Tag = fileDialog.FileName;
                     this.listApplications.Items.Add(lvi);
                 }
+            }
+        }
+
+        public void AddProgramExtern(ProcessExplorerEntry processExplorerEntry)
+        {
+            InitializeApplicationList();
+
+            Icon icon = processExplorerEntry.Icon;
+            if (icon != null)
+            {
+                this.listApplications.LargeImageList.Images.Add(icon);
+                ListViewItem lvi = new ListViewItem(Path.GetFileNameWithoutExtension(processExplorerEntry.Path));
+                lvi.ImageIndex = this.listApplications.Items.Count;
+                lvi.Tag = processExplorerEntry.Path;
+                this.listApplications.Items.Add(lvi);
+            }
+        }
+
+        private void InitializeApplicationList()
+        {
+            if (this.listApplications.LargeImageList == null)
+            {
+                ImageList imageList = new ImageList();
+                imageList.ImageSize = new Size(48, 48);
+                imageList.ColorDepth = ColorDepth.Depth32Bit;
+                this.listApplications.LargeImageList = imageList;
+                ListViewItem_SetSpacing(this.listApplications, 48 + 24, 48 + 6 + 16);
             }
         }
 

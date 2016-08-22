@@ -8,12 +8,17 @@ using System.Linq;
 using System.Management;
 using System.Text;
 using System.Windows.Forms;
+using vibrance.GUI.AMD;
+using vibrance.GUI.NVIDIA;
 
 namespace vibrance.GUI.common
 {
     public partial class ProcessExplorer : Form
     {
-        public ProcessExplorer()
+
+        Form vibranceGui;
+
+        public ProcessExplorer(Form vibranceGui)
         {
             InitializeComponent();
 
@@ -23,6 +28,8 @@ namespace vibrance.GUI.common
             listView.FullRowSelect = true;
             listView.View = View.Tile;
             listView.HeaderStyle = ColumnHeaderStyle.Nonclickable;
+
+            this.vibranceGui = vibranceGui;
 
             backgroundWorker.WorkerReportsProgress = true;
             backgroundWorker.RunWorkerAsync();
@@ -84,6 +91,20 @@ namespace vibrance.GUI.common
         {
             if (listView.SelectedItems.Count == 1)
             {
+                ProcessExplorerEntry processExplorerEntry = (ProcessExplorerEntry)listView.SelectedItems[0].Tag;
+                if (processExplorerEntry == null)
+                {
+                    return;
+                }
+
+                if (vibranceGui is AmdVibranceGui)
+                {
+                    //((AmdVibranceGui)vibranceGui).AddProgramExtern(false);
+                }
+                else
+                {
+                    ((NvidiaVibranceGUI)vibranceGui).AddProgramExtern(processExplorerEntry);
+                }
             }
         }
 
@@ -107,25 +128,9 @@ namespace vibrance.GUI.common
             ProcessExplorerEntry processEntry = (ProcessExplorerEntry)e.UserState;
             iconList.Images.Add(processEntry.Icon);
             var listItem = new ListViewItem(processEntry.Process.ProcessName, iconList.Images.Count - 1);
-            listItem.Tag = processEntry.Process;
+            listItem.Tag = processEntry;
             listItem.SubItems.Add(processEntry.Path);
             listView.Items.Add(listItem);
-        }
-    }
-
-    class ProcessExplorerEntry
-    {
-        public string Path { get; set; }
-
-        public Icon Icon { get; set; }
-
-        public Process Process { get; set; }
-
-        public ProcessExplorerEntry(string path, Icon icon, Process process)
-        {
-            this.Path = path;
-            this.Icon = icon;
-            this.Process = process;
         }
     }
 }

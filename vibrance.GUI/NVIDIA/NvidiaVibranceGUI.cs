@@ -406,6 +406,21 @@ namespace vibrance.GUI.NVIDIA
 
         public void AddProgramExtern(ProcessExplorerEntry processExplorerEntry)
         {
+            if(this.InvokeRequired)
+            {
+                this.Invoke((MethodInvoker)delegate
+                {
+                    AddProgramIntern(processExplorerEntry);
+                });
+            }
+            else
+            {
+                AddProgramIntern(processExplorerEntry);
+            }
+        }
+
+        private void AddProgramIntern(ProcessExplorerEntry processExplorerEntry)
+        {
             InitializeApplicationList();
 
             Icon icon = processExplorerEntry.Icon;
@@ -491,7 +506,7 @@ namespace vibrance.GUI.NVIDIA
 
         private void buttonProcessExplorer_Click(object sender, EventArgs e)
         {
-            ProcessExplorer ex = new ProcessExplorer();
+            ProcessExplorer ex = new ProcessExplorer(this);
             ex.Show();
         }
     }

@@ -41,7 +41,7 @@ namespace vibrance.GUI.common
             int activeApplicationCount = 0;
             foreach (Process process in activeProcceses)
             {
-                if (process.MainWindowHandle != IntPtr.Zero)
+                if (process.MainWindowHandle != IntPtr.Zero && process.Id != Process.GetCurrentProcess().Id)
                 {
                     string path = string.Empty;
                     try

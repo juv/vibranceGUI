@@ -169,6 +169,11 @@ namespace vibrance.GUI.NVIDIA
         private void settingsBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             Thread.Sleep(5000);
+            PrepareSaveVibranceSettings();
+        }
+
+        private void PrepareSaveVibranceSettings()
+        {
             int windowsLevel = 0;
             bool affectPrimaryMonitorOnly = false;
             this.Invoke((MethodInvoker)delegate
@@ -400,6 +405,7 @@ namespace vibrance.GUI.NVIDIA
                     lvi.ImageIndex = this.listApplications.Items.Count;
                     lvi.Tag = fileDialog.FileName;
                     this.listApplications.Items.Add(lvi);
+                    PrepareSaveVibranceSettings();
                 }
             }
         }
@@ -431,6 +437,7 @@ namespace vibrance.GUI.NVIDIA
                 lvi.ImageIndex = this.listApplications.Items.Count;
                 lvi.Tag = processExplorerEntry.Path;
                 this.listApplications.Items.Add(lvi);
+                PrepareSaveVibranceSettings();
             }
         }
 
@@ -475,10 +482,7 @@ namespace vibrance.GUI.NVIDIA
                     if (applicationSettings.FirstOrDefault(x => x.FileName == newSetting.FileName) != null)
                         applicationSettings.Remove(applicationSettings.First(x => x.FileName == newSetting.FileName));
                     applicationSettings.Add(newSetting);
-                    if (!settingsBackgroundWorker.IsBusy)
-                    {
-                        settingsBackgroundWorker.RunWorkerAsync();
-                    }
+                    PrepareSaveVibranceSettings();
                 }
             }
         }
@@ -498,10 +502,7 @@ namespace vibrance.GUI.NVIDIA
                 applicationSettings.Remove(applicationSettings.FirstOrDefault(x => x.FileName.Equals(eachItem.Tag.ToString())));
             }
 
-            if (!settingsBackgroundWorker.IsBusy)
-            {
-                settingsBackgroundWorker.RunWorkerAsync();
-            }
+            PrepareSaveVibranceSettings();
         }
 
         private void buttonProcessExplorer_Click(object sender, EventArgs e)

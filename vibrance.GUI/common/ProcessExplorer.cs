@@ -24,29 +24,30 @@ namespace vibrance.GUI.common
             listView.View = View.Tile;
             listView.HeaderStyle = ColumnHeaderStyle.Nonclickable;
 
+            backgroundWorker.WorkerReportsProgress = true;
             backgroundWorker.RunWorkerAsync();
         }
 
         private void GetAllProcesses()
         {
             var activeProcceses = Process.GetProcesses();
-            foreach(Process process in activeProcceses)
+            int activeApplicationCount = 0;
+            foreach (Process process in activeProcceses)
             {
-                if(process.MainWindowHandle != IntPtr.Zero)
+                if (process.MainWindowHandle != IntPtr.Zero)
                 {
                     Console.WriteLine(String.Format("ProcessName: {0}\tMainWindowHandle {1}: ", process.ProcessName, process.MainWindowHandle));
-                    string path = string.Empty; 
+                    string path = string.Empty;
                     try
                     {
                         path = GetPathFromProcessId(process);
                         if (path != string.Empty)
                         {
-                            iconList.Images.Add(Icon.ExtractAssociatedIcon(path));
-                            var listItem = new ListViewItem(process.ProcessName, iconList.Images.Count - 1);
-                            listItem.Tag = process;
-                            listItem.SubItems.Add(path);
-                            listView.Items.Add(listItem);
+
+                            ProcessExplorerEntry processEntry = new ProcessExplorerEntry(path, Icon.ExtractAssociatedIcon(path), process);
+                            backgroundWorker.ReportProgress(++activeApplicationCount, processEntry);
                         }
+
                     }
                     catch (Exception ex)
                     {
@@ -56,27 +57,33 @@ namespace vibrance.GUI.common
             }
         }
 
+        /// <summary>
+        /// Safely gets the executable path from the specified process.
+        /// Process.MainModule.FileName crashes when called on a x64 process because vibranceGUI is running as x86 process.
+        /// </summary>
+        /// <param name="process">the process to read out the executable path of</param>
+        /// <returns>the fully qualified executable path</returns>
         private string GetPathFromProcessId(Process process)
         {
             var query = "SELECT ProcessId, ExecutablePath, CommandLine FROM Win32_Process WHERE ProcessId = " + process.Id;
 
             using (var searcher = new ManagementObjectSearcher(query))
-            foreach (ManagementObject item in searcher.Get())
-            {
-                object id = item["ProcessID"];
-                object path = item["ExecutablePath"];
-
-                if (path != null && id.ToString() == process.Id.ToString())
+                foreach (ManagementObject item in searcher.Get())
                 {
-                    return path.ToString();
+                    object id = item["ProcessID"];
+                    object path = item["ExecutablePath"];
+
+                    if (path != null && id.ToString() == process.Id.ToString())
+                    {
+                        return path.ToString();
+                    }
                 }
-            }
             return string.Empty;
         }
 
         private void listView_DoubleClick(object sender, EventArgs e)
         {
-            if(listView.SelectedItems.Count == 1)
+            if (listView.SelectedItems.Count == 1)
             {
                 Console.WriteLine(listView.SelectedItems[0].Text);
                 Console.WriteLine(listView.SelectedItems[0].Tag);
@@ -87,22 +94,42 @@ namespace vibrance.GUI.common
         private void button_Click(object sender, EventArgs e)
         {
             listView.Items.Clear();
-            GetAllProcesses();
+            backgroundWorker.RunWorkerAsync();
         }
 
         private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            if(this.InvokeRequired)
+            GetAllProcesses();
+        }
+
+        private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            if(!(e.UserState is ProcessExplorerEntry))
             {
-                this.Invoke((MethodInvoker)delegate
-                {
-                    GetAllProcesses();
-                });
+                return;
             }
-            else
-            {
-                GetAllProcesses();
-            }
+            ProcessExplorerEntry processEntry = (ProcessExplorerEntry)e.UserState;
+            iconList.Images.Add(processEntry.Icon);
+            var listItem = new ListViewItem(processEntry.Process.ProcessName, iconList.Images.Count - 1);
+            listItem.Tag = processEntry.Process;
+            listItem.SubItems.Add(processEntry.Path);
+            listView.Items.Add(listItem);
+        }
+    }
+
+    class ProcessExplorerEntry
+    {
+        public string Path { get; set; }
+
+        public Icon Icon { get; set; }
+
+        public Process Process { get; set; }
+
+        public ProcessExplorerEntry(string path, Icon icon, Process process)
+        {
+            this.Path = path;
+            this.Icon = icon;
+            this.Process = process;
         }
     }
 }

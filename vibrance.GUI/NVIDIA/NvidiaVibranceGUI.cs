@@ -402,7 +402,7 @@ namespace vibrance.GUI.NVIDIA
             }
             OpenFileDialog fileDialog = new OpenFileDialog();
             DialogResult result = fileDialog.ShowDialog();
-            if (result == DialogResult.OK && fileDialog.CheckFileExists && fileDialog.SafeFileName != null) // Test result.
+            if (result == DialogResult.OK && fileDialog.CheckFileExists && fileDialog.SafeFileName != null)
             {
                 Icon icon = Icon.ExtractAssociatedIcon(fileDialog.FileName);
                 if (icon != null)

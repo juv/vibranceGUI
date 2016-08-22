@@ -51,10 +51,10 @@
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.buttonSteam = new System.Windows.Forms.Button();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.buttonProcessExplorer = new System.Windows.Forms.Button();
             this.buttonRemoveProgram = new System.Windows.Forms.Button();
             this.listApplications = new System.Windows.Forms.ListView();
             this.buttonAddProgram = new System.Windows.Forms.Button();
-            this.buttonProcessExplorer = new System.Windows.Forms.Button();
             this.contextMenuStrip.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -269,9 +269,19 @@
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Program Settings";
             // 
+            // buttonProcessExplorer
+            // 
+            this.buttonProcessExplorer.Location = new System.Drawing.Point(7, 20);
+            this.buttonProcessExplorer.Name = "buttonProcessExplorer";
+            this.buttonProcessExplorer.Size = new System.Drawing.Size(75, 23);
+            this.buttonProcessExplorer.TabIndex = 3;
+            this.buttonProcessExplorer.Text = "Add";
+            this.buttonProcessExplorer.UseVisualStyleBackColor = true;
+            this.buttonProcessExplorer.Click += new System.EventHandler(this.buttonProcessExplorer_Click);
+            // 
             // buttonRemoveProgram
             // 
-            this.buttonRemoveProgram.Location = new System.Drawing.Point(94, 19);
+            this.buttonRemoveProgram.Location = new System.Drawing.Point(186, 20);
             this.buttonRemoveProgram.Name = "buttonRemoveProgram";
             this.buttonRemoveProgram.Size = new System.Drawing.Size(75, 23);
             this.buttonRemoveProgram.TabIndex = 2;
@@ -290,23 +300,13 @@
             // 
             // buttonAddProgram
             // 
-            this.buttonAddProgram.Location = new System.Drawing.Point(6, 19);
+            this.buttonAddProgram.Location = new System.Drawing.Point(88, 20);
             this.buttonAddProgram.Name = "buttonAddProgram";
-            this.buttonAddProgram.Size = new System.Drawing.Size(75, 23);
+            this.buttonAddProgram.Size = new System.Drawing.Size(92, 23);
             this.buttonAddProgram.TabIndex = 0;
-            this.buttonAddProgram.Text = "Add";
+            this.buttonAddProgram.Text = "Add manually";
             this.buttonAddProgram.UseVisualStyleBackColor = true;
             this.buttonAddProgram.Click += new System.EventHandler(this.buttonAddProgram_Click);
-            // 
-            // buttonProcessExplorer
-            // 
-            this.buttonProcessExplorer.Location = new System.Drawing.Point(183, 19);
-            this.buttonProcessExplorer.Name = "buttonProcessExplorer";
-            this.buttonProcessExplorer.Size = new System.Drawing.Size(133, 23);
-            this.buttonProcessExplorer.TabIndex = 3;
-            this.buttonProcessExplorer.Text = "Show Process Explorer";
-            this.buttonProcessExplorer.UseVisualStyleBackColor = true;
-            this.buttonProcessExplorer.Click += new System.EventHandler(this.buttonProcessExplorer_Click);
             // 
             // NvidiaVibranceGUI
             // 

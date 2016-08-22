@@ -104,6 +104,7 @@ namespace vibrance.GUI.common
                 else
                 {
                     ((NvidiaVibranceGUI)vibranceGui).AddProgramExtern(processExplorerEntry);
+                    this.Close();
                 }
             }
         }

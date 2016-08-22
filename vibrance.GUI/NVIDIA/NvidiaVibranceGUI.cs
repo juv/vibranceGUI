@@ -169,10 +169,10 @@ namespace vibrance.GUI.NVIDIA
         private void settingsBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             Thread.Sleep(5000);
-            PrepareSaveVibranceSettings();
+            ForceSaveVibranceSettings();
         }
 
-        private void PrepareSaveVibranceSettings()
+        private void ForceSaveVibranceSettings()
         {
             int windowsLevel = 0;
             bool affectPrimaryMonitorOnly = false;
@@ -405,7 +405,7 @@ namespace vibrance.GUI.NVIDIA
                     lvi.ImageIndex = this.listApplications.Items.Count;
                     lvi.Tag = fileDialog.FileName;
                     this.listApplications.Items.Add(lvi);
-                    PrepareSaveVibranceSettings();
+                    ForceSaveVibranceSettings();
                 }
             }
         }
@@ -437,7 +437,7 @@ namespace vibrance.GUI.NVIDIA
                 lvi.ImageIndex = this.listApplications.Items.Count;
                 lvi.Tag = processExplorerEntry.Path;
                 this.listApplications.Items.Add(lvi);
-                PrepareSaveVibranceSettings();
+                ForceSaveVibranceSettings();
             }
         }
 
@@ -482,7 +482,7 @@ namespace vibrance.GUI.NVIDIA
                     if (applicationSettings.FirstOrDefault(x => x.FileName == newSetting.FileName) != null)
                         applicationSettings.Remove(applicationSettings.First(x => x.FileName == newSetting.FileName));
                     applicationSettings.Add(newSetting);
-                    PrepareSaveVibranceSettings();
+                    ForceSaveVibranceSettings();
                 }
             }
         }
@@ -502,7 +502,7 @@ namespace vibrance.GUI.NVIDIA
                 applicationSettings.Remove(applicationSettings.FirstOrDefault(x => x.FileName.Equals(eachItem.Tag.ToString())));
             }
 
-            PrepareSaveVibranceSettings();
+            ForceSaveVibranceSettings();
         }
 
         private void buttonProcessExplorer_Click(object sender, EventArgs e)

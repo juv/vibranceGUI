@@ -36,7 +36,6 @@ namespace vibrance.GUI.common
             {
                 if (process.MainWindowHandle != IntPtr.Zero)
                 {
-                    Console.WriteLine(String.Format("ProcessName: {0}\tMainWindowHandle {1}: ", process.ProcessName, process.MainWindowHandle));
                     string path = string.Empty;
                     try
                     {
@@ -85,9 +84,6 @@ namespace vibrance.GUI.common
         {
             if (listView.SelectedItems.Count == 1)
             {
-                Console.WriteLine(listView.SelectedItems[0].Text);
-                Console.WriteLine(listView.SelectedItems[0].Tag);
-
             }
         }
 

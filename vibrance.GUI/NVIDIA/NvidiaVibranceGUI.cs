@@ -395,7 +395,8 @@ namespace vibrance.GUI.NVIDIA
 
             OpenFileDialog fileDialog = new OpenFileDialog();
             DialogResult result = fileDialog.ShowDialog();
-            if (result == DialogResult.OK && fileDialog.CheckFileExists && fileDialog.SafeFileName != null)
+            if (result == DialogResult.OK && fileDialog.CheckFileExists && fileDialog.SafeFileName != null 
+                && !applicationSettings.Any(x => x.FileName.Equals(fileDialog.FileName)))
             {
                 Icon icon = Icon.ExtractAssociatedIcon(fileDialog.FileName);
                 if (icon != null)
@@ -428,14 +429,20 @@ namespace vibrance.GUI.NVIDIA
         private void AddProgramIntern(ProcessExplorerEntry processExplorerEntry)
         {
             InitializeApplicationList();
+            
+            if(!File.Exists(processExplorerEntry.Path) || applicationSettings.Any(x => x.FileName.Equals(processExplorerEntry.Path)))
+            {
+                return; 
+            }
 
             Icon icon = processExplorerEntry.Icon;
+            string path = processExplorerEntry.Path;
             if (icon != null)
             {
                 this.listApplications.LargeImageList.Images.Add(icon);
-                ListViewItem lvi = new ListViewItem(Path.GetFileNameWithoutExtension(processExplorerEntry.Path));
+                ListViewItem lvi = new ListViewItem(Path.GetFileNameWithoutExtension(path));
                 lvi.ImageIndex = this.listApplications.Items.Count;
-                lvi.Tag = processExplorerEntry.Path;
+                lvi.Tag = path;
                 this.listApplications.Items.Add(lvi);
                 ForceSaveVibranceSettings();
             }

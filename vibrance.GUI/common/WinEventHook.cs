@@ -216,12 +216,12 @@ namespace vibrance.GUI.common
                 bool result = UnhookWinEvent(_winEventHookHandle);
                 if (!result)
                 {
-                    AmdVibranceGui.Log(new Exception("UnhookWinEvent(winEventHookHandle) failed. winEventHookHandle = " + _winEventHookHandle));
+                    VibranceGUI.Log(new Exception("UnhookWinEvent(winEventHookHandle) failed. winEventHookHandle = " + _winEventHookHandle));
                 }
             }
             catch (Exception ex)
             {
-                AmdVibranceGui.Log(new Exception("UnhookWinEvent(winEventHookHandle) failed."));
+                VibranceGUI.Log(new Exception("UnhookWinEvent(winEventHookHandle) failed."));
             }
             finally
             {

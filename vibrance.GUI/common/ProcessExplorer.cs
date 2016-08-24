@@ -96,15 +96,8 @@ namespace vibrance.GUI.common
                     return;
                 }
 
-                if (vibranceGui is AmdVibranceGui)
-                {
-                    //((AmdVibranceGui)vibranceGui).AddProgramExtern(false);
-                }
-                else
-                {
-                    ((NvidiaVibranceGUI)vibranceGui).AddProgramExtern(processExplorerEntry);
-                    this.Close();
-                }
+                ((VibranceGUI)vibranceGui).AddProgramExtern(processExplorerEntry);
+                this.Close();
             }
         }
 

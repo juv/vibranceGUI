@@ -41,7 +41,7 @@ namespace vibrance.GUI
                 Func<List<ApplicationSetting>, ResolutionModeWrapper, IVibranceProxy> getProxy = (x, y) => new AmdDynamicVibranceProxy(Environment.Is64BitOperatingSystem
                     ? new AmdAdapter64()
                     : (IAmdAdapter)new AmdAdapter32(), x, y);
-                vibranceGui = new NvidiaVibranceGUI(getProxy, 
+                vibranceGui = new VibranceGUI(getProxy, 
                     100, 
                     0,
                     300,
@@ -57,11 +57,11 @@ namespace vibrance.GUI
                     nvidiaAdapterName);
                 Marshal.PrelinkAll(typeof(NvidiaDynamicVibranceProxy));
 
-                vibranceGui = new NvidiaVibranceGUI(
+                vibranceGui = new VibranceGUI(
                     (x, y) => new NvidiaDynamicVibranceProxy(x, y), 
-                    NvidiaVibranceProxy.NvapiDefaultLevel, 
-                    0,
-                    63,
+                    NvidiaVibranceProxy.NvapiDefaultLevel,
+                    NvidiaVibranceProxy.NvapiDefaultLevel,
+                    NvidiaVibranceProxy.NvapiMaxLevel,
                     x => NvidiaVibranceValueWrapper.Find(x).GetPercentage);
             }
             else if (adapter == GraphicsAdapter.Unknown)
@@ -77,14 +77,7 @@ namespace vibrance.GUI
             if (args.Contains("-minimized"))
             {
                 vibranceGui.WindowState = FormWindowState.Minimized;
-                if (vibranceGui is AmdVibranceGui)
-                {
-                    ((AmdVibranceGui) vibranceGui).SetAllowVisible(false);
-                }
-                else
-                {
-                    ((NvidiaVibranceGUI) vibranceGui).SetAllowVisible(false);
-                }
+                ((VibranceGUI)vibranceGui).SetAllowVisible(false);
             }
             Application.Run(vibranceGui);
 

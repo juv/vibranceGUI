@@ -114,12 +114,12 @@ namespace vibrance.GUI.NVIDIA
 
         public VibranceInfo VibranceInfo;
 
-        public NvidiaVibranceProxy(bool isSilenced = false)
+        public NvidiaVibranceProxy()
         {
             try
             {
                 VibranceInfo = new VibranceInfo();
-                bool ret = initializeLibrary();
+                initializeLibrary();
 
                 int[] gpuHandles = new int[NvapiMaxPhysicalGpus];
                 int[] outputIds = new int[NvapiMaxPhysicalGpus];
@@ -129,7 +129,6 @@ namespace vibrance.GUI.NVIDIA
                
                 VibranceInfo.activeOutput = getActiveOutputs(gpuHandles, outputIds);
                 StringBuilder buffer = new StringBuilder(64);
-                char[] sz = new char[64];
                 getGpuName(gpuHandles, buffer);
                 VibranceInfo.szGpuName = buffer.ToString();
                 VibranceInfo.defaultHandle = enumerateNvidiaDisplayHandle(0);

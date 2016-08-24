@@ -331,7 +331,6 @@ namespace vibrance.GUI.NVIDIA
 
         public void HandleDvc()
         {
-            //throw new NotImplementedException();
         }
 
         public void SetAffectPrimaryMonitorOnly(bool affectPrimaryMonitorOnly)

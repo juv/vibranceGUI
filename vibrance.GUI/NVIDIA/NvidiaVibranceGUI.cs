@@ -481,7 +481,7 @@ namespace vibrance.GUI.NVIDIA
             if (selectedItem != null)
             {
                 ApplicationSetting actualSetting = applicationSettings.FirstOrDefault(x => x.FileName == selectedItem.Tag.ToString());
-                VibranceSettings settingsWindow = new VibranceSettings(v, selectedItem, actualSetting, supportedResolutionList);
+                VibranceSettings settingsWindow = new VibranceSettings(v, 0, 63, selectedItem, actualSetting, supportedResolutionList, x => NvidiaVibranceValueWrapper.Find(x).GetPercentage);
                 DialogResult result = settingsWindow.ShowDialog();
                 if (result == DialogResult.OK)
                 {

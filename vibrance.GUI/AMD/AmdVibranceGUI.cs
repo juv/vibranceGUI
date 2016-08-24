@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using vibrance.GUI.AMD.vendor;
 using vibrance.GUI.AMD.vendor.utils;
 using vibrance.GUI.common;
+using vibrance.GUI.NVIDIA;
 using Application = System.Windows.Forms.Application;
 using MessageBox = System.Windows.Forms.MessageBox;
 
@@ -426,7 +427,7 @@ namespace vibrance.GUI.AMD
             if (selectedItem != null)
             {
                 ApplicationSetting actualSetting = _applicationSettings.FirstOrDefault(x => x.FileName == selectedItem.Tag.ToString());
-                VibranceSettings settingsWindow = new VibranceSettings(_v, selectedItem, actualSetting, _supportedResolutionList);
+                VibranceSettings settingsWindow = new VibranceSettings(_v, 0, 300, selectedItem, actualSetting, _supportedResolutionList, x => x.ToString());
                 DialogResult result = settingsWindow.ShowDialog();
                 if (result == DialogResult.OK)
                 {

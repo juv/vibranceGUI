@@ -307,6 +307,8 @@ namespace vibrance.GUI.NVIDIA
             return VibranceInfo;
         }
 
+        public GraphicsAdapter GraphicsAdapter { get; } = GraphicsAdapter.Nvidia;
+
         public bool setDVCLevel_extern(int defaultHandle, int level)
         {
             if(VibranceInfo.isInitialized)

@@ -49,7 +49,6 @@ namespace vibrance.GUI.common
                         path = GetPathFromProcessId(process);
                         if (path != string.Empty)
                         {
-
                             ProcessExplorerEntry processEntry = new ProcessExplorerEntry(path, Icon.ExtractAssociatedIcon(path), process);
                             backgroundWorker.ReportProgress(++activeApplicationCount, processEntry);
                         }

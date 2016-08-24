@@ -13,5 +13,6 @@ namespace vibrance.GUI.common
         void HandleDvcExit();
         void SetAffectPrimaryMonitorOnly(bool affectPrimaryMonitorOnly);
         VibranceInfo GetVibranceInfo();
+        GraphicsAdapter GraphicsAdapter { get; }
     }
 }

@@ -344,6 +344,8 @@ namespace vibrance.GUI.NVIDIA
             return _vibranceInfo;
         }
 
+        public GraphicsAdapter GraphicsAdapter { get; } = GraphicsAdapter.Nvidia;
+
         public bool UnloadLibraryEx()
         {
             _hook.RemoveWinEventHook();

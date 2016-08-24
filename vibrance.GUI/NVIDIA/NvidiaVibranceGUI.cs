@@ -18,47 +18,54 @@ namespace vibrance.GUI.NVIDIA
 {
     public partial class NvidiaVibranceGUI : Form
     {
-        private readonly IVibranceProxy v;
-        private IRegistryController registryController;
-        public bool silenced = false;
-        private const string appName = "vibranceGUI";
-        private const string twitterLink = "https://twitter.com/juvlarN";
-        private const string paypalDonationLink = "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=JDQFNKNNEW356";
-        private const string steamDonationLink = "https://steamcommunity.com/tradeoffer/new/?partner=92410529&token=Oas6jXrc";
+        private readonly int _defaultWindowsLevel;
+        private readonly int _minValue;
+        private readonly int _maxValue;
+        private readonly Func<int, string> _resolveLabelLevel;
+        private readonly IVibranceProxy _v;
+        private IRegistryController _registryController;
+        private const string AppName = "vibranceGUI";
+        private const string TwitterLink = "https://twitter.com/juvlarN";
+        private const string PaypalDonationLink = "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=JDQFNKNNEW356";
+        private const string SteamDonationLink = "https://steamcommunity.com/tradeoffer/new/?partner=92410529&token=Oas6jXrc";
 
-        private bool allowVisible;
-        private List<ApplicationSetting> applicationSettings;
-        private readonly List<ResolutionModeWrapper> supportedResolutionList;
-        private readonly ResolutionModeWrapper WindowsResolutionSettings;
+        private bool _allowVisible;
+        private List<ApplicationSetting> _applicationSettings;
+        private readonly List<ResolutionModeWrapper> _supportedResolutionList;
+        private readonly ResolutionModeWrapper _windowsResolutionSettings;
 
-        public NvidiaVibranceGUI()
+        public NvidiaVibranceGUI(
+            Func<List<ApplicationSetting>, ResolutionModeWrapper, IVibranceProxy> getProxy, 
+            int defaultWindowsLevel, 
+            int minValue,
+            int maxValue,
+            Func<int, string> resolveLabelLevel)
         {
-            const string nvidiaAdapterName = "vibranceDLL.dll";
-            string resourceName = $"{typeof(Program).Namespace}.NVIDIA.{nvidiaAdapterName}";
-            
-            string dllPath = CommonUtils.LoadUnmanagedLibraryFromResource(
-                Assembly.GetExecutingAssembly(),
-                resourceName,
-                nvidiaAdapterName);
+            _defaultWindowsLevel = defaultWindowsLevel;
+            _minValue = minValue;
+            _maxValue = maxValue;
+            _resolveLabelLevel = resolveLabelLevel;
+            _allowVisible = true;
 
-            allowVisible = true;
             InitializeComponent();
-            Marshal.PrelinkAll(typeof(NvidiaDynamicVibranceProxy));
 
-            supportedResolutionList = ResolutionHelper.EnumerateSupportedResolutionModes();
+            trackBarWindowsLevel.Minimum = minValue;
+            trackBarWindowsLevel.Maximum = maxValue;
+
+            _supportedResolutionList = ResolutionHelper.EnumerateSupportedResolutionModes();
 
             Devmode currentResolutionMode;
             if (ResolutionHelper.GetCurrentResolutionSettings(out currentResolutionMode, null))
             {
-                WindowsResolutionSettings = new ResolutionModeWrapper(currentResolutionMode);
+                _windowsResolutionSettings = new ResolutionModeWrapper(currentResolutionMode);
             }
             else
             {
                 MessageBox.Show("Current resolution mode could not be determined. Switching back to your Windows resolution will not work.");
             }
 
-            applicationSettings = new List<ApplicationSetting>();
-            v = new NvidiaDynamicVibranceProxy(applicationSettings, WindowsResolutionSettings);
+            _applicationSettings = new List<ApplicationSetting>();
+            _v = getProxy(_applicationSettings, _windowsResolutionSettings);
 
             backgroundWorker.WorkerReportsProgress = true;
             settingsBackgroundWorker.WorkerReportsProgress = true;
@@ -68,7 +75,7 @@ namespace vibrance.GUI.NVIDIA
 
         protected override void SetVisibleCore(bool value)
         {
-            if (!allowVisible)
+            if (!_allowVisible)
             {
                 value = false;
                 if (!this.IsHandleCreated)
@@ -81,12 +88,12 @@ namespace vibrance.GUI.NVIDIA
 
         public void SetAllowVisible(bool value)
         {
-            allowVisible = value;
+            _allowVisible = value;
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            setGuiEnabledFlag(false);
+            SetGuiEnabledFlag(false);
         }
 
         private void Form1_Resize(object sender, EventArgs e)
@@ -102,7 +109,7 @@ namespace vibrance.GUI.NVIDIA
 
         private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            int vibranceWindowsLevel = NvidiaVibranceProxy.NvapiDefaultLevel;
+            int vibranceWindowsLevel = _defaultWindowsLevel;
             bool affectPrimaryMonitorOnly = false;
 
             while (!this.IsHandleCreated)
@@ -114,38 +121,38 @@ namespace vibrance.GUI.NVIDIA
             {
                 this.Invoke((MethodInvoker)delegate
                 {
-                    readVibranceSettings(out vibranceWindowsLevel, out affectPrimaryMonitorOnly);
+                    ReadVibranceSettings(out vibranceWindowsLevel, out affectPrimaryMonitorOnly);
                 });
             }
             else
             {
-                readVibranceSettings(out vibranceWindowsLevel, out affectPrimaryMonitorOnly);
+                ReadVibranceSettings(out vibranceWindowsLevel, out affectPrimaryMonitorOnly);
             }
 
-            if (v.GetVibranceInfo().isInitialized)
+            if (_v.GetVibranceInfo().isInitialized)
             {
                 backgroundWorker.ReportProgress(1);
 
-                setGuiEnabledFlag(true);
+                SetGuiEnabledFlag(true);
 
-                v.SetApplicationSettings(applicationSettings);
-                v.SetShouldRun(true);
-                v.SetVibranceWindowsLevel(vibranceWindowsLevel);
-                v.SetAffectPrimaryMonitorOnly(affectPrimaryMonitorOnly);
+                _v.SetApplicationSettings(_applicationSettings);
+                _v.SetShouldRun(true);
+                _v.SetVibranceWindowsLevel(vibranceWindowsLevel);
+                _v.SetAffectPrimaryMonitorOnly(affectPrimaryMonitorOnly);
             }
         }
 
         private void Form1_Shown(object sender, EventArgs e)
         {
-            if (v != null && v.GetVibranceInfo().isInitialized)
+            if (_v != null && _v.GetVibranceInfo().isInitialized)
             {
-                setGuiEnabledFlag(true);
+                SetGuiEnabledFlag(true);
             }
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            cleanUp();
+            CleanUp();
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -155,11 +162,8 @@ namespace vibrance.GUI.NVIDIA
 
         private void trackBarWindowsLevel_Scroll(object sender, EventArgs e)
         {
-            NvidiaVibranceValueWrapper vibranceValue = NvidiaVibranceValueWrapper.Find(trackBarWindowsLevel.Value);
-            if (vibranceValue == null)
-                return;
-            v.SetVibranceWindowsLevel(trackBarWindowsLevel.Value);
-            labelWindowsLevel.Text = vibranceValue.GetPercentage;
+            _v.SetVibranceWindowsLevel(trackBarWindowsLevel.Value);
+            labelWindowsLevel.Text = _resolveLabelLevel(trackBarWindowsLevel.Value);
             if (!settingsBackgroundWorker.IsBusy)
             {
                 settingsBackgroundWorker.RunWorkerAsync();
@@ -181,7 +185,7 @@ namespace vibrance.GUI.NVIDIA
                 windowsLevel = trackBarWindowsLevel.Value;
                 affectPrimaryMonitorOnly = checkBoxPrimaryMonitorOnly.Checked;
             });
-            saveVibranceSettings(windowsLevel, affectPrimaryMonitorOnly);
+            SaveVibranceSettings(windowsLevel, affectPrimaryMonitorOnly);
         }
 
         private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -203,7 +207,7 @@ namespace vibrance.GUI.NVIDIA
 
         private void notifyIcon_MouseClick(object sender, MouseEventArgs e)
         {
-            allowVisible = true;
+            _allowVisible = true;
             this.Show();
 
             this.WindowState = FormWindowState.Normal;
@@ -215,12 +219,12 @@ namespace vibrance.GUI.NVIDIA
 
         private void checkBoxPrimaryMonitorOnly_CheckedChanged(object sender, EventArgs e)
         {
-            if (this.v == null)
+            if (this._v == null)
             {
                 return;
             }
 
-            this.v.SetAffectPrimaryMonitorOnly(this.checkBoxPrimaryMonitorOnly.Checked);
+            this._v.SetAffectPrimaryMonitorOnly(this.checkBoxPrimaryMonitorOnly.Checked);
             if (!this.settingsBackgroundWorker.IsBusy)
             {
                 this.settingsBackgroundWorker.RunWorkerAsync();
@@ -238,15 +242,15 @@ namespace vibrance.GUI.NVIDIA
             if (this.checkBoxAutostart.Checked)
             {
                 string pathToExe = "\"" + Application.ExecutablePath + "\" -minimized";
-                if (!autostartController.IsProgramRegistered(appName))
+                if (!autostartController.IsProgramRegistered(AppName))
                 {
-                    this.notifyIcon.BalloonTipText = autostartController.RegisterProgram(appName, pathToExe) 
+                    this.notifyIcon.BalloonTipText = autostartController.RegisterProgram(AppName, pathToExe) 
                         ? "Registered to Autostart!" 
                         : "Registering to Autostart failed!";
                 }
-                else if (!autostartController.IsStartupPathUnchanged(appName, pathToExe))
+                else if (!autostartController.IsStartupPathUnchanged(AppName, pathToExe))
                 {
-                    this.notifyIcon.BalloonTipText = autostartController.RegisterProgram(appName, pathToExe)
+                    this.notifyIcon.BalloonTipText = autostartController.RegisterProgram(AppName, pathToExe)
                         ? "Updated Autostart Path!"
                         : "Updating Autostart Path failed!";
                 }
@@ -257,7 +261,7 @@ namespace vibrance.GUI.NVIDIA
             }
             else
             {
-                this.notifyIcon.BalloonTipText = autostartController.UnregisterProgram(appName) 
+                this.notifyIcon.BalloonTipText = autostartController.UnregisterProgram(AppName) 
                     ? "Unregistered from Autostart!" 
                     : "Unregistering from Autostart failed!";
             }
@@ -267,15 +271,15 @@ namespace vibrance.GUI.NVIDIA
 
         private void twitterToolStripTextBox_Click(object sender, EventArgs e)
         {
-            Process.Start(twitterLink);
+            Process.Start(TwitterLink);
         }
 
         private void linkLabelTwitter_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            Process.Start(twitterLink);
+            Process.Start(TwitterLink);
         }
 
-        private void setGuiEnabledFlag(bool flag)
+        private void SetGuiEnabledFlag(bool flag)
         {
             this.Invoke((MethodInvoker)delegate
             {
@@ -285,17 +289,17 @@ namespace vibrance.GUI.NVIDIA
             });
         }
 
-        private void cleanUp()
+        private void CleanUp()
         {
             try
             {
                 this.statusLabel.Text = "Closing...";
                 this.statusLabel.ForeColor = Color.Red;
                 this.Update();
-                if (v != null && v.GetVibranceInfo().isInitialized)
+                if (_v != null && _v.GetVibranceInfo().isInitialized)
                 {
-                    v.SetShouldRun(false);
-                    v.UnloadLibraryEx();
+                    _v.SetShouldRun(false);
+                    _v.UnloadLibraryEx();
                 }
             }
             catch (Exception ex)
@@ -333,22 +337,22 @@ namespace vibrance.GUI.NVIDIA
             }
         }
 
-        private void readVibranceSettings(out int vibranceWindowsLevel, out bool affectPrimaryMonitorOnly)
+        private void ReadVibranceSettings(out int vibranceWindowsLevel, out bool affectPrimaryMonitorOnly)
         {
-            registryController = new RegistryController();
-            this.checkBoxAutostart.Checked = registryController.IsProgramRegistered(appName);
+            _registryController = new RegistryController();
+            this.checkBoxAutostart.Checked = _registryController.IsProgramRegistered(AppName);
 
             SettingsController settingsController = new SettingsController();
-            settingsController.ReadVibranceSettings(GraphicsAdapter.Nvidia, out vibranceWindowsLevel, out affectPrimaryMonitorOnly, out applicationSettings);
+            settingsController.ReadVibranceSettings(_v.GraphicsAdapter, out vibranceWindowsLevel, out affectPrimaryMonitorOnly, out _applicationSettings);
 
             if (this.IsHandleCreated)
             {
                 //no null check needed, SettingsController will always return matching values.
-                labelWindowsLevel.Text = NvidiaVibranceValueWrapper.Find(vibranceWindowsLevel).GetPercentage;
+                labelWindowsLevel.Text = _resolveLabelLevel(vibranceWindowsLevel);
 
                 trackBarWindowsLevel.Value = vibranceWindowsLevel;
                 checkBoxPrimaryMonitorOnly.Checked = affectPrimaryMonitorOnly;
-                foreach (ApplicationSetting application in applicationSettings)
+                foreach (ApplicationSetting application in _applicationSettings)
                 {
                     if (!File.Exists(application.FileName))
                         continue;
@@ -368,25 +372,25 @@ namespace vibrance.GUI.NVIDIA
             }
         }
 
-        private void saveVibranceSettings(int windowsLevel, bool affectPrimaryMonitorOnly)
+        private void SaveVibranceSettings(int windowsLevel, bool affectPrimaryMonitorOnly)
         {
             SettingsController settingsController = new SettingsController();
 
             settingsController.SetVibranceSettings(
                 windowsLevel.ToString(),
                 affectPrimaryMonitorOnly.ToString(),
-                applicationSettings
+                _applicationSettings
             );
         }
 
         private void buttonPaypal_Click(object sender, EventArgs e)
         {
-            Process.Start(paypalDonationLink);
+            Process.Start(PaypalDonationLink);
         }
 
         private void buttonSteam_Click(object sender, EventArgs e)
         {
-            Process.Start(steamDonationLink);
+            Process.Start(SteamDonationLink);
         }
 
         private void buttonAddProgram_Click(object sender, EventArgs e)
@@ -396,7 +400,7 @@ namespace vibrance.GUI.NVIDIA
             OpenFileDialog fileDialog = new OpenFileDialog();
             DialogResult result = fileDialog.ShowDialog();
             if (result == DialogResult.OK && fileDialog.CheckFileExists && fileDialog.SafeFileName != null 
-                && !applicationSettings.Any(x => x.FileName.ToLower() == fileDialog.FileName.ToLower()))
+                && !_applicationSettings.Any(x => x.FileName.ToLower() == fileDialog.FileName.ToLower()))
             {
                 Icon icon = Icon.ExtractAssociatedIcon(fileDialog.FileName);
                 if (icon != null)
@@ -430,7 +434,7 @@ namespace vibrance.GUI.NVIDIA
         {
             InitializeApplicationList();
             
-            if(!File.Exists(processExplorerEntry.Path) || applicationSettings.Any(x => x.FileName.ToLower() == processExplorerEntry.Path.ToLower()))
+            if(!File.Exists(processExplorerEntry.Path) || _applicationSettings.Any(x => x.FileName.ToLower() == processExplorerEntry.Path.ToLower()))
             {
                 return; 
             }
@@ -480,15 +484,15 @@ namespace vibrance.GUI.NVIDIA
             ListViewItem selectedItem = this.listApplications.SelectedItems[0];
             if (selectedItem != null)
             {
-                ApplicationSetting actualSetting = applicationSettings.FirstOrDefault(x => x.FileName == selectedItem.Tag.ToString());
-                VibranceSettings settingsWindow = new VibranceSettings(v, 0, 63, selectedItem, actualSetting, supportedResolutionList, x => NvidiaVibranceValueWrapper.Find(x).GetPercentage);
+                ApplicationSetting actualSetting = _applicationSettings.FirstOrDefault(x => x.FileName == selectedItem.Tag.ToString());
+                VibranceSettings settingsWindow = new VibranceSettings(_v, _minValue, _maxValue, selectedItem, actualSetting, _supportedResolutionList, _resolveLabelLevel);
                 DialogResult result = settingsWindow.ShowDialog();
                 if (result == DialogResult.OK)
                 {
                     ApplicationSetting newSetting = settingsWindow.GetApplicationSetting();
-                    if (applicationSettings.FirstOrDefault(x => x.FileName == newSetting.FileName) != null)
-                        applicationSettings.Remove(applicationSettings.First(x => x.FileName == newSetting.FileName));
-                    applicationSettings.Add(newSetting);
+                    if (_applicationSettings.FirstOrDefault(x => x.FileName == newSetting.FileName) != null)
+                        _applicationSettings.Remove(_applicationSettings.First(x => x.FileName == newSetting.FileName));
+                    _applicationSettings.Add(newSetting);
                     ForceSaveVibranceSettings();
                 }
             }
@@ -506,7 +510,7 @@ namespace vibrance.GUI.NVIDIA
 
                 listApplications.Items.Remove(eachItem);
 
-                applicationSettings.Remove(applicationSettings.FirstOrDefault(x => x.FileName.Equals(eachItem.Tag.ToString())));
+                _applicationSettings.Remove(_applicationSettings.FirstOrDefault(x => x.FileName.Equals(eachItem.Tag.ToString())));
             }
 
             ForceSaveVibranceSettings();

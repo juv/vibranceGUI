@@ -1,11 +1,14 @@
 ﻿using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
 using vibrance.GUI.AMD;
 using vibrance.GUI.AMD.vendor;
+using vibrance.GUI.AMD.vendor.utils;
 using vibrance.GUI.common;
 using vibrance.GUI.NVIDIA;
 
@@ -13,7 +16,7 @@ namespace vibrance.GUI
 {
     static class Program
     {
-        private const string ErrorGraphicsAdapterUnknown = "Failed to determine your Graphic Adapter type (NVIDIA/AMD). Please contact @juvlarN at twitter. Press Yes to open twitter in your browser now. Error: ";
+        private const string ErrorGraphicsAdapterUnknown = "Failed to determine your Graphic GraphicsAdapter type (NVIDIA/AMD). Please contact @juvlarN at twitter. Press Yes to open twitter in your browser now. Error: ";
         private const string MessageBoxCaption = "vibranceGUI Error";
 
         [STAThread]
@@ -35,13 +38,31 @@ namespace vibrance.GUI
 
             if (adapter == GraphicsAdapter.Amd)
             {
-                vibranceGui = new AmdVibranceGui(Environment.Is64BitOperatingSystem 
-                    ? new AmdAdapter64() 
-                    : (IAmdAdapter)new AmdAdapter32());
+                Func<List<ApplicationSetting>, ResolutionModeWrapper, IVibranceProxy> getProxy = (x, y) => new AmdDynamicVibranceProxy(Environment.Is64BitOperatingSystem
+                    ? new AmdAdapter64()
+                    : (IAmdAdapter)new AmdAdapter32(), x, y);
+                vibranceGui = new NvidiaVibranceGUI(getProxy, 
+                    100, 
+                    0,
+                    300,
+                    x => x.ToString());
             }
             else if (adapter == GraphicsAdapter.Nvidia)
             {
-                vibranceGui = new NvidiaVibranceGUI();
+                const string nvidiaAdapterName = "vibranceDLL.dll";
+                string resourceName = $"{typeof(Program).Namespace}.NVIDIA.{nvidiaAdapterName}";
+                CommonUtils.LoadUnmanagedLibraryFromResource(
+                    Assembly.GetExecutingAssembly(),
+                    resourceName,
+                    nvidiaAdapterName);
+                Marshal.PrelinkAll(typeof(NvidiaDynamicVibranceProxy));
+
+                vibranceGui = new NvidiaVibranceGUI(
+                    (x, y) => new NvidiaDynamicVibranceProxy(x, y), 
+                    NvidiaVibranceProxy.NvapiDefaultLevel, 
+                    0,
+                    63,
+                    x => NvidiaVibranceValueWrapper.Find(x).GetPercentage);
             }
             else if (adapter == GraphicsAdapter.Unknown)
             {

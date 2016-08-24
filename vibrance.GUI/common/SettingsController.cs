@@ -97,8 +97,8 @@ namespace vibrance.GUI.common
             int maxLevel = 0;
             if (graphicsAdapter == GraphicsAdapter.Nvidia)
             {
-                defaultLevel = NvidiaVibranceProxy.NvapiDefaultLevel;
-                maxLevel = NvidiaVibranceProxy.NvapiMaxLevel;
+                defaultLevel = NvidiaDynamicVibranceProxy.NvapiDefaultLevel;
+                maxLevel = NvidiaDynamicVibranceProxy.NvapiMaxLevel;
             }
             if (graphicsAdapter == GraphicsAdapter.Amd)
             {

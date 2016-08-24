@@ -58,10 +58,10 @@ namespace vibrance.GUI
                 Marshal.PrelinkAll(typeof(NvidiaDynamicVibranceProxy));
 
                 vibranceGui = new VibranceGUI(
-                    (x, y) => new NvidiaDynamicVibranceProxy(x, y), 
-                    NvidiaVibranceProxy.NvapiDefaultLevel,
-                    NvidiaVibranceProxy.NvapiDefaultLevel,
-                    NvidiaVibranceProxy.NvapiMaxLevel,
+                    (x, y) => new NvidiaDynamicVibranceProxy(x, y),
+                    NvidiaDynamicVibranceProxy.NvapiDefaultLevel,
+                    NvidiaDynamicVibranceProxy.NvapiDefaultLevel,
+                    NvidiaDynamicVibranceProxy.NvapiMaxLevel,
                     x => NvidiaVibranceValueWrapper.Find(x).Percentage);
             }
             else if (adapter == GraphicsAdapter.Unknown)

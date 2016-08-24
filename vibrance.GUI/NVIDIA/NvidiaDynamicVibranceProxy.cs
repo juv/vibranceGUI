@@ -331,7 +331,6 @@ namespace vibrance.GUI.NVIDIA
 
         public void HandleDvc()
         {
-            //throw new NotImplementedException();
         }
 
         public void SetAffectPrimaryMonitorOnly(bool affectPrimaryMonitorOnly)
@@ -343,6 +342,8 @@ namespace vibrance.GUI.NVIDIA
         {
             return _vibranceInfo;
         }
+
+        public GraphicsAdapter GraphicsAdapter { get; } = GraphicsAdapter.Nvidia;
 
         public bool UnloadLibraryEx()
         {

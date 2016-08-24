@@ -92,12 +92,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AMD\AmdVibranceGUI.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="AMD\AmdVibranceGUI.Designer.cs">
-      <DependentUpon>AmdVibranceGUI.cs</DependentUpon>
-    </Compile>
     <Compile Include="AMD\AmdDynamicVibranceProxy.cs" />
     <Compile Include="AMD\vendor\adl32\ADL.cs" />
     <Compile Include="AMD\vendor\adl32\ADLAdapterInfo.cs" />
@@ -120,12 +114,6 @@
     <Compile Include="AMD\vendor\IAmdAdapter.cs" />
     <Compile Include="AMD\vendor\utils\CommonUtils.cs" />
     <Compile Include="AMD\vendor\utils\NativeMethods.cs" />
-    <Compile Include="AMD\VibranceSettings.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="AMD\VibranceSettings.Designer.cs">
-      <DependentUpon>VibranceSettings.cs</DependentUpon>
-    </Compile>
     <Compile Include="common\ProcessExplorer.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -135,7 +123,6 @@
     <Compile Include="common\ProcessExplorerEntry.cs" />
     <Compile Include="common\ResolutionHelper.cs" />
     <Compile Include="common\ResolutionModeWrapper.cs" />
-    <Compile Include="common\VersionCheckHelper.cs" />
     <Compile Include="common\WinEventHook.cs" />
     <Compile Include="common\WinEventHookEventArgs.cs" />
     <Compile Include="common\Definitions.cs" />
@@ -147,38 +134,31 @@
     <Compile Include="NVIDIA\NvidiaDynamicVibranceProxy.cs" />
     <Compile Include="NVIDIA\NvidiaTypes.cs" />
     <Compile Include="common\RegistryController.cs" />
-    <Compile Include="NVIDIA\NvidiaVibranceGUI.cs">
+    <Compile Include="common\VibranceGUI.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="NVIDIA\NvidiaVibranceGUI.Designer.cs">
-      <DependentUpon>NvidiaVibranceGUI.cs</DependentUpon>
+    <Compile Include="common\VibranceGUI.Designer.cs">
+      <DependentUpon>VibranceGUI.cs</DependentUpon>
     </Compile>
     <Compile Include="NVIDIA\NvidiaVibranceValueWrapper.cs" />
-    <Compile Include="NVIDIA\VibranceSettings.cs">
+    <Compile Include="common\VibranceSettings.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="NVIDIA\VibranceSettings.Designer.cs">
+    <Compile Include="common\VibranceSettings.Designer.cs">
       <DependentUpon>VibranceSettings.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="common\SettingsController.cs" />
     <Compile Include="NVIDIA\NvidiaVibranceProxy.cs" />
-    <EmbeddedResource Include="AMD\AmdVibranceGUI.resx">
-      <DependentUpon>AmdVibranceGUI.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="AMD\VibranceSettings.resx">
-      <DependentUpon>VibranceSettings.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="common\ProcessExplorer.resx">
       <DependentUpon>ProcessExplorer.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="NVIDIA\NvidiaVibranceGUI.resx">
-      <DependentUpon>NvidiaVibranceGUI.cs</DependentUpon>
+    <EmbeddedResource Include="common\VibranceGUI.resx">
+      <DependentUpon>VibranceGUI.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="NVIDIA\VibranceSettings.resx">
+    <EmbeddedResource Include="common\VibranceSettings.resx">
       <DependentUpon>VibranceSettings.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">

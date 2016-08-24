@@ -16,11 +16,11 @@ using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace vibrance.GUI.NVIDIA
 {
-    public partial class NvidiaVibranceGUI : Form
+    public partial class VibranceGUI : Form
     {
         private readonly int _defaultWindowsLevel;
-        private readonly int _minValue;
-        private readonly int _maxValue;
+        private readonly int _minTrackBarValue;
+        private readonly int _maxTrackBarValue;
         private readonly Func<int, string> _resolveLabelLevel;
         private readonly IVibranceProxy _v;
         private IRegistryController _registryController;
@@ -34,23 +34,23 @@ namespace vibrance.GUI.NVIDIA
         private readonly List<ResolutionModeWrapper> _supportedResolutionList;
         private readonly ResolutionModeWrapper _windowsResolutionSettings;
 
-        public NvidiaVibranceGUI(
+        public VibranceGUI(
             Func<List<ApplicationSetting>, ResolutionModeWrapper, IVibranceProxy> getProxy, 
             int defaultWindowsLevel, 
-            int minValue,
-            int maxValue,
+            int minTrackBarValue,
+            int maxTrackBarValue,
             Func<int, string> resolveLabelLevel)
         {
             _defaultWindowsLevel = defaultWindowsLevel;
-            _minValue = minValue;
-            _maxValue = maxValue;
+            _minTrackBarValue = minTrackBarValue;
+            _maxTrackBarValue = maxTrackBarValue;
             _resolveLabelLevel = resolveLabelLevel;
             _allowVisible = true;
 
             InitializeComponent();
 
-            trackBarWindowsLevel.Minimum = minValue;
-            trackBarWindowsLevel.Maximum = maxValue;
+            trackBarWindowsLevel.Minimum = minTrackBarValue;
+            trackBarWindowsLevel.Maximum = maxTrackBarValue;
 
             _supportedResolutionList = ResolutionHelper.EnumerateSupportedResolutionModes();
 
@@ -485,7 +485,7 @@ namespace vibrance.GUI.NVIDIA
             if (selectedItem != null)
             {
                 ApplicationSetting actualSetting = _applicationSettings.FirstOrDefault(x => x.FileName == selectedItem.Tag.ToString());
-                VibranceSettings settingsWindow = new VibranceSettings(_v, _minValue, _maxValue, selectedItem, actualSetting, _supportedResolutionList, _resolveLabelLevel);
+                VibranceSettings settingsWindow = new VibranceSettings(_v, _minTrackBarValue, _maxTrackBarValue, selectedItem, actualSetting, _supportedResolutionList, _resolveLabelLevel);
                 DialogResult result = settingsWindow.ShowDialog();
                 if (result == DialogResult.OK)
                 {

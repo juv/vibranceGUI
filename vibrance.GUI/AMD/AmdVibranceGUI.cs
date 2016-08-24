@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using vibrance.GUI.AMD.vendor;
 using vibrance.GUI.AMD.vendor.utils;
 using vibrance.GUI.common;
+using vibrance.GUI.NVIDIA;
 using Application = System.Windows.Forms.Application;
 using MessageBox = System.Windows.Forms.MessageBox;
 
@@ -19,9 +20,10 @@ namespace vibrance.GUI.AMD
 {
     public partial class AmdVibranceGui : Form
     {
+        private readonly int _defaultWindowsLevel;
+        private readonly Func<int, string> _resolveLabelLevel;
         private readonly IVibranceProxy _v;
         private IRegistryController _registryController;
-        public bool Silenced = false;
         private const string AppName = "vibranceGUI";
         private const string TwitterLink = "https://twitter.com/juvlarN";
         private const string PaypalDonationLink = "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=JDQFNKNNEW356";
@@ -32,8 +34,13 @@ namespace vibrance.GUI.AMD
         private readonly List<ResolutionModeWrapper> _supportedResolutionList;
         private readonly ResolutionModeWrapper _windowsResolutionSettings;
 
-        public AmdVibranceGui(IAmdAdapter amdAdapter)
+        public AmdVibranceGui(
+            Func<List<ApplicationSetting>, ResolutionModeWrapper, IVibranceProxy> getProxy, 
+            int defaultWindowsLevel, 
+            Func<int, string> resolveLabelLevel)
         {
+            _defaultWindowsLevel = defaultWindowsLevel;
+            _resolveLabelLevel = resolveLabelLevel;
             _allowVisible = true;
             InitializeComponent();
 
@@ -50,7 +57,7 @@ namespace vibrance.GUI.AMD
             }
 
             _applicationSettings = new List<ApplicationSetting>();
-            _v = new AmdDynamicVibranceProxy(amdAdapter, _applicationSettings, _windowsResolutionSettings);
+            _v = getProxy(_applicationSettings, _windowsResolutionSettings);
 
             backgroundWorker.WorkerReportsProgress = true;
             settingsBackgroundWorker.WorkerReportsProgress = true;
@@ -94,7 +101,7 @@ namespace vibrance.GUI.AMD
 
         private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            int vibranceWindowsLevel = 100;
+            int vibranceWindowsLevel = _defaultWindowsLevel;
             bool affectPrimaryMonitorOnly = false;
 
             while (!this.IsHandleCreated)
@@ -148,7 +155,7 @@ namespace vibrance.GUI.AMD
         private void trackBarWindowsLevel_Scroll(object sender, EventArgs e)
         {
             _v.SetVibranceWindowsLevel(trackBarWindowsLevel.Value);
-            labelWindowsLevel.Text = trackBarWindowsLevel.Value.ToString();
+            labelWindowsLevel.Text = _resolveLabelLevel(trackBarWindowsLevel.Value);
             if (!settingsBackgroundWorker.IsBusy)
             {
                 settingsBackgroundWorker.RunWorkerAsync();
@@ -323,7 +330,7 @@ namespace vibrance.GUI.AMD
             this.checkBoxAutostart.Checked = _registryController.IsProgramRegistered(AppName);
 
             SettingsController settingsController = new SettingsController();
-            settingsController.ReadVibranceSettings(GraphicsAdapter.Amd, out vibranceWindowsLevel, out affectPrimaryMonitorOnly, out _applicationSettings);
+            settingsController.ReadVibranceSettings(_v.GraphicsAdapter, out vibranceWindowsLevel, out affectPrimaryMonitorOnly, out _applicationSettings);
 
             if (this.IsHandleCreated)
             {
@@ -426,7 +433,7 @@ namespace vibrance.GUI.AMD
             if (selectedItem != null)
             {
                 ApplicationSetting actualSetting = _applicationSettings.FirstOrDefault(x => x.FileName == selectedItem.Tag.ToString());
-                VibranceSettings settingsWindow = new VibranceSettings(_v, selectedItem, actualSetting, _supportedResolutionList);
+                VibranceSettings settingsWindow = new VibranceSettings(_v, 0, 300, selectedItem, actualSetting, _supportedResolutionList, x => x.ToString());
                 DialogResult result = settingsWindow.ShowDialog();
                 if (result == DialogResult.OK)
                 {

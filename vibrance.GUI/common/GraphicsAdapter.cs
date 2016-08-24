@@ -20,7 +20,7 @@ namespace vibrance.GUI.common
         private static extern IntPtr LoadLibrary(string dllToLoad);
 
         private const string NvidiaDllName = "nvapi.dll";
-        private static string _amdDllName = Environment.Is64BitOperatingSystem 
+        private static readonly string _amdDllName = Environment.Is64BitOperatingSystem 
             ? AdlImport.AtiadlFileName 
             : AMD.vendor.adl64.AdlImport.AtiadlFileName;
 

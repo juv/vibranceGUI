@@ -90,6 +90,8 @@ namespace vibrance.GUI.AMD
             return _vibranceInfo;
         }
 
+        public GraphicsAdapter GraphicsAdapter { get; } = GraphicsAdapter.Amd;
+
         [DllImport("user32.dll")]
         public static extern IntPtr GetForegroundWindow();
 

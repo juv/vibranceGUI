@@ -14,11 +14,15 @@ namespace vibrance.GUI.NVIDIA
     {
         private IVibranceProxy _v;
         private ListViewItem _sender;
+        private readonly Func<int, string> _resolveLabelLevel;
 
-        public VibranceSettings(IVibranceProxy v, ListViewItem sender, ApplicationSetting setting, List<ResolutionModeWrapper> supportedResolutionList)
+        public VibranceSettings(IVibranceProxy v, int minValue, int maxValue, ListViewItem sender, ApplicationSetting setting, List<ResolutionModeWrapper> supportedResolutionList, Func<int, string> resolveLabelLevel)
         {
             InitializeComponent();
+            this.trackBarIngameLevel.Minimum = minValue;
+            this.trackBarIngameLevel.Maximum = maxValue;
             this._sender = sender;
+            _resolveLabelLevel = resolveLabelLevel;
             this._v = v;
             this.labelTitle.Text += "\"" + sender.Text + "\"";
             this.pictureBox.Image = this._sender.ListView.LargeImageList.Images[this._sender.ImageIndex];
@@ -37,11 +41,8 @@ namespace vibrance.GUI.NVIDIA
 
         private void trackBarIngameLevel_Scroll(object sender, EventArgs e)
         {
-            NvidiaVibranceValueWrapper vibranceValue = NvidiaVibranceValueWrapper.Find(trackBarIngameLevel.Value);
-            if (vibranceValue == null)
-                return;
             _v.SetVibranceIngameLevel(trackBarIngameLevel.Value);
-            labelIngameLevel.Text = vibranceValue.GetPercentage;
+            labelIngameLevel.Text = _resolveLabelLevel(trackBarIngameLevel.Value);
         }
 
         private void buttonSave_Click(object sender, EventArgs e)

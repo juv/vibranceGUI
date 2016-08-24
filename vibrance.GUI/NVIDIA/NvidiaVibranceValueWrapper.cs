@@ -4,29 +4,19 @@ namespace vibrance.GUI.NVIDIA
 {
     class NvidiaVibranceValueWrapper
     {
-        private int _value;
-        private string _percentage = string.Empty;
         private const int NvapiDefaultLevel = 50;
 
         private static List<NvidiaVibranceValueWrapper> _settingsList;
 
         public NvidiaVibranceValueWrapper(int value, string percentage)
         {
-            this._value = value;
-            this._percentage = percentage;
+            this.Value = value;
+            this.Percentage = percentage;
         }
 
-        public int GetValue
-        {
-            get { return this._value; }
-            set { this._value = value; }
-        }
+        public int Value { get; set; }
 
-        public string GetPercentage
-        {
-            get { return this._percentage; }
-            set { this._percentage = value; }
-        }
+        public string Percentage { get; set; } = string.Empty;
 
         private static List<NvidiaVibranceValueWrapper> GenerateSettingsWrapper()
         {
@@ -34,7 +24,7 @@ namespace vibrance.GUI.NVIDIA
             List<int> staticValues = new List<int> {0,1,3,4,5,6,8,9,10,11,13,14,15,16,18,19,20,21,23,24,25,26,28,29,30,32,33,34,35,37,38,39,40,42,43,44,45,
                 47,48,49,50,52,53,54,55,57,58,59,60,62,63};
 
-            int percentageValue = NvidiaVibranceValueWrapper.NvapiDefaultLevel;
+            int percentageValue = NvapiDefaultLevel;
             foreach (int value in staticValues)
             {
                 settingsWrapperList.Add(new NvidiaVibranceValueWrapper(value, percentageValue + "%"));
@@ -47,13 +37,8 @@ namespace vibrance.GUI.NVIDIA
         {
             if (_settingsList == null)
                 _settingsList = GenerateSettingsWrapper();
-            NvidiaVibranceValueWrapper returnWrapper = _settingsList.Find(x => x.GetValue == value);
+            NvidiaVibranceValueWrapper returnWrapper = _settingsList.Find(x => x.Value == value) ?? Find(value + 1);
 
-            //some values are not stored by nvidia internally. use the value below that. 
-            if (returnWrapper == null)
-            {
-                returnWrapper = Find(value + 1);
-            }
             return returnWrapper;
         }
     }

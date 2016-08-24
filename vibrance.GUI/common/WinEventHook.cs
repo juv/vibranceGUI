@@ -189,26 +189,6 @@ namespace vibrance.GUI.common
             _winEventHookHandle = SetWinEventHook(WinEvent.EventSystemForeground, WinEvent.EventSystemForeground, IntPtr.Zero, _procDelegate, 0, 0, WinEvent.WineventOutofcontext);
         }
 
-        ~WinEventHook()
-        {
-            //try
-            //{
-            //    bool result = UnhookWinEvent(winEventHookHandle);
-            //    if (!result)
-            //    {
-            //        AmdVibranceGUI.Log(new Exception("UnhookWinEvent(winEventHookHandle) failed. winEventHookHandle = " + winEventHookHandle));
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    AmdVibranceGUI.Log(new Exception("UnhookWinEvent(winEventHookHandle) failed."));
-            //}
-            //finally
-            //{
-                
-            //}
-        }
-
         public void RemoveWinEventHook()
         {
             try
@@ -216,12 +196,12 @@ namespace vibrance.GUI.common
                 bool result = UnhookWinEvent(_winEventHookHandle);
                 if (!result)
                 {
-                    AmdVibranceGui.Log(new Exception("UnhookWinEvent(winEventHookHandle) failed. winEventHookHandle = " + _winEventHookHandle));
+                    VibranceGUI.Log(new Exception("UnhookWinEvent(winEventHookHandle) failed. winEventHookHandle = " + _winEventHookHandle));
                 }
             }
             catch (Exception ex)
             {
-                AmdVibranceGui.Log(new Exception("UnhookWinEvent(winEventHookHandle) failed."));
+                VibranceGUI.Log(new Exception("UnhookWinEvent(winEventHookHandle) failed."));
             }
             finally
             {

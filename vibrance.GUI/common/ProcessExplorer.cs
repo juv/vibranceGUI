@@ -49,7 +49,6 @@ namespace vibrance.GUI.common
                         path = GetPathFromProcessId(process);
                         if (path != string.Empty)
                         {
-
                             ProcessExplorerEntry processEntry = new ProcessExplorerEntry(path, Icon.ExtractAssociatedIcon(path), process);
                             backgroundWorker.ReportProgress(++activeApplicationCount, processEntry);
                         }
@@ -97,15 +96,8 @@ namespace vibrance.GUI.common
                     return;
                 }
 
-                if (vibranceGui is AmdVibranceGui)
-                {
-                    //((AmdVibranceGui)vibranceGui).AddProgramExtern(false);
-                }
-                else
-                {
-                    ((NvidiaVibranceGUI)vibranceGui).AddProgramExtern(processExplorerEntry);
-                    this.Close();
-                }
+                ((VibranceGUI)vibranceGui).AddProgramExtern(processExplorerEntry);
+                this.Close();
             }
         }
 

@@ -132,14 +132,6 @@ namespace vibrance.GUI.AMD
                     }
 
                     _amdAdapter.SetSaturationOnAllDisplays(_vibranceInfo.userVibranceSettingDefault);
-                    if (_vibranceInfo.affectPrimaryMonitorOnly)
-                    {
-                        _amdAdapter.SetSaturationOnDisplay(_vibranceInfo.userVibranceSettingDefault, Screen.PrimaryScreen.DeviceName);
-                    }
-                    else
-                    {
-                        _amdAdapter.SetSaturationOnAllDisplays(_vibranceInfo.userVibranceSettingDefault);
-                    }
                 }
             }
         }

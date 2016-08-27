@@ -45,6 +45,7 @@ namespace vibrance.GUI
                     100, 
                     0,
                     300,
+                    100,
                     x => x.ToString());
             }
             else if (adapter == GraphicsAdapter.Nvidia)
@@ -62,6 +63,7 @@ namespace vibrance.GUI
                     NvidiaDynamicVibranceProxy.NvapiDefaultLevel,
                     NvidiaDynamicVibranceProxy.NvapiDefaultLevel,
                     NvidiaDynamicVibranceProxy.NvapiMaxLevel,
+                    NvidiaDynamicVibranceProxy.NvapiDefaultLevel,
                     x => NvidiaVibranceValueWrapper.Find(x).Percentage);
             }
             else if (adapter == GraphicsAdapter.Unknown)

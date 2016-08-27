@@ -5,22 +5,20 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
-using vibrance.GUI.AMD.vendor.utils;
-using vibrance.GUI.common;
 using Application = System.Windows.Forms.Application;
 using MessageBox = System.Windows.Forms.MessageBox;
 
-namespace vibrance.GUI.NVIDIA
+namespace vibrance.GUI.common
 {
     public partial class VibranceGUI : Form
     {
         private readonly int _defaultWindowsLevel;
         private readonly int _minTrackBarValue;
         private readonly int _maxTrackBarValue;
+        private readonly int _defaultIngameValue;
         private readonly Func<int, string> _resolveLabelLevel;
         private readonly IVibranceProxy _v;
         private IRegistryController _registryController;
@@ -39,11 +37,13 @@ namespace vibrance.GUI.NVIDIA
             int defaultWindowsLevel, 
             int minTrackBarValue,
             int maxTrackBarValue,
+            int defaultIngameValue,
             Func<int, string> resolveLabelLevel)
         {
             _defaultWindowsLevel = defaultWindowsLevel;
             _minTrackBarValue = minTrackBarValue;
             _maxTrackBarValue = maxTrackBarValue;
+            _defaultIngameValue = defaultIngameValue;
             _resolveLabelLevel = resolveLabelLevel;
             _allowVisible = true;
 
@@ -485,7 +485,7 @@ namespace vibrance.GUI.NVIDIA
             if (selectedItem != null)
             {
                 ApplicationSetting actualSetting = _applicationSettings.FirstOrDefault(x => x.FileName == selectedItem.Tag.ToString());
-                VibranceSettings settingsWindow = new VibranceSettings(_v, _minTrackBarValue, _maxTrackBarValue, selectedItem, actualSetting, _supportedResolutionList, _resolveLabelLevel);
+                VibranceSettings settingsWindow = new VibranceSettings(_v, _minTrackBarValue, _maxTrackBarValue, _defaultIngameValue, selectedItem, actualSetting, _supportedResolutionList, _resolveLabelLevel);
                 DialogResult result = settingsWindow.ShowDialog();
                 if (result == DialogResult.OK)
                 {

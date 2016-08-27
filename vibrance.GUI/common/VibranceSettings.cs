@@ -1,14 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using vibrance.GUI.common;
 
-namespace vibrance.GUI.NVIDIA
+namespace vibrance.GUI.common
 {
     public partial class VibranceSettings : Form
     {
@@ -16,15 +10,17 @@ namespace vibrance.GUI.NVIDIA
         private ListViewItem _sender;
         private readonly Func<int, string> _resolveLabelLevel;
 
-        public VibranceSettings(IVibranceProxy v, int minValue, int maxValue, ListViewItem sender, ApplicationSetting setting, List<ResolutionModeWrapper> supportedResolutionList, Func<int, string> resolveLabelLevel)
+        public VibranceSettings(IVibranceProxy v, int minValue, int maxValue, int defaultValue, ListViewItem sender, ApplicationSetting setting, List<ResolutionModeWrapper> supportedResolutionList, Func<int, string> resolveLabelLevel)
         {
             InitializeComponent();
             this.trackBarIngameLevel.Minimum = minValue;
             this.trackBarIngameLevel.Maximum = maxValue;
+            this.trackBarIngameLevel.Value = defaultValue;
             this._sender = sender;
             _resolveLabelLevel = resolveLabelLevel;
             this._v = v;
-            this.labelTitle.Text += "\"" + sender.Text + "\"";
+            labelIngameLevel.Text = _resolveLabelLevel(trackBarIngameLevel.Value);
+            this.labelTitle.Text += $@"""{sender.Text}""";
             this.pictureBox.Image = this._sender.ListView.LargeImageList.Images[this._sender.ImageIndex];
             this.cBoxResolution.DataSource = supportedResolutionList;
             // If the setting is new, we don't need to set the progress bar value

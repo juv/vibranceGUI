@@ -5,7 +5,7 @@ namespace vibrance.GUI.AMD.vendor.utils
 {
     public static class NativeMethods
     {
-        public static void NativeMethods()
+        static NativeMethods()
         {
             SetDllDirectory(CommonUtils.GetVibrance_GUI_AppDataPath());
         }

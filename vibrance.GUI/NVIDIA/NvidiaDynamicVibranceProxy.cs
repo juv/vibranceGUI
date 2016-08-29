@@ -175,13 +175,6 @@ namespace vibrance.GUI.NVIDIA
                         _vibranceInfo.isInitialized = false; 
                         return;
                     }
-                    else if (systemType == NvSystemType.NvSystemTypeLaptop)
-                    {
-                        MessageBox.Show(NvidiaDynamicVibranceProxy.NvapiErrorSystypeUnsupported, "vibranceGUI Error",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        _vibranceInfo.isInitialized = false;
-                        return;
-                    }
                 }
             }
 

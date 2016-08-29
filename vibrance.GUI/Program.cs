@@ -32,6 +32,7 @@ namespace vibrance.GUI
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            NativeMethods.SetDllDirectory(CommonUtils.GetVibrance_GUI_AppDataPath());
 
             GraphicsAdapter adapter = GraphicsAdapterHelper.GetAdapter();
             Form vibranceGui = null;

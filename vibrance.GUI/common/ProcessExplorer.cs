@@ -56,7 +56,7 @@ namespace vibrance.GUI.common
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show("Retrieving the active processes failed! Exception: " + ex.ToString());
+                        VibranceGUI.Log(ex);
                     }
                 }
             }

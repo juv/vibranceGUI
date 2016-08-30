@@ -95,7 +95,7 @@ namespace vibrance.GUI.common
                 {
                     return;
                 }
-
+                this.Hide();
                 ((VibranceGUI)vibranceGui).AddProgramExtern(processExplorerEntry);
                 this.Close();
             }
@@ -120,7 +120,7 @@ namespace vibrance.GUI.common
             }
             ProcessExplorerEntry processEntry = (ProcessExplorerEntry)e.UserState;
             iconList.Images.Add(processEntry.Icon);
-            var listItem = new ListViewItem(processEntry.Process.ProcessName, iconList.Images.Count - 1);
+            var listItem = new ListViewItem(processEntry.ProcessName, iconList.Images.Count - 1);
             listItem.Tag = processEntry;
             listItem.SubItems.Add(processEntry.Path);
             listView.Items.Add(listItem);

@@ -286,6 +286,9 @@ namespace vibrance.GUI.common
                 this.trackBarWindowsLevel.Enabled = flag;
                 this.checkBoxAutostart.Enabled = flag;
                 this.checkBoxPrimaryMonitorOnly.Enabled = flag;
+                this.buttonAddProgram.Enabled = flag;
+                this.buttonProcessExplorer.Enabled = flag;
+                this.buttonRemoveProgram.Enabled = flag;
             });
         }
 
@@ -400,17 +403,13 @@ namespace vibrance.GUI.common
             OpenFileDialog fileDialog = new OpenFileDialog();
             DialogResult result = fileDialog.ShowDialog();
             if (result == DialogResult.OK && fileDialog.CheckFileExists && fileDialog.SafeFileName != null 
-                && !_applicationSettings.Any(x => x.FileName.ToLower() == fileDialog.FileName.ToLower()))
+                && _applicationSettings.FirstOrDefault(x => x.FileName.ToLower() == fileDialog.FileName.ToLower()) == null)
             {
                 Icon icon = Icon.ExtractAssociatedIcon(fileDialog.FileName);
                 if (icon != null)
                 {
-                    this.listApplications.LargeImageList.Images.Add(icon);
-                    ListViewItem lvi = new ListViewItem(Path.GetFileNameWithoutExtension(fileDialog.FileName));
-                    lvi.ImageIndex = this.listApplications.Items.Count;
-                    lvi.Tag = fileDialog.FileName;
-                    this.listApplications.Items.Add(lvi);
-                    ForceSaveVibranceSettings();
+                    ProcessExplorerEntry processExplorerEntry = new ProcessExplorerEntry(fileDialog.FileName, icon, Path.GetFileNameWithoutExtension(fileDialog.FileName));
+                    AddProgramIntern(processExplorerEntry);
                 }
             }
         }
@@ -434,8 +433,9 @@ namespace vibrance.GUI.common
         {
             InitializeApplicationList();
             
-            if(!File.Exists(processExplorerEntry.Path) || _applicationSettings.Any(x => x.FileName.ToLower() == processExplorerEntry.Path.ToLower()))
+            if(!File.Exists(processExplorerEntry.Path) || _applicationSettings.FirstOrDefault(x => x.FileName.ToLower() == processExplorerEntry.Path.ToLower()) != null)
             {
+                this.listApplications.SelectedIndices.Clear();
                 return; 
             }
 
@@ -448,7 +448,9 @@ namespace vibrance.GUI.common
                 lvi.ImageIndex = this.listApplications.Items.Count;
                 lvi.Tag = path;
                 this.listApplications.Items.Add(lvi);
-                ForceSaveVibranceSettings();
+                this.listApplications.SelectedIndices.Clear();
+                lvi.Selected = true;
+                listApplications_DoubleClick(this, EventArgs.Empty);
             }
         }
 
@@ -491,9 +493,15 @@ namespace vibrance.GUI.common
                 {
                     ApplicationSetting newSetting = settingsWindow.GetApplicationSetting();
                     if (_applicationSettings.FirstOrDefault(x => x.FileName == newSetting.FileName) != null)
+                    {
                         _applicationSettings.Remove(_applicationSettings.First(x => x.FileName == newSetting.FileName));
+                    }
                     _applicationSettings.Add(newSetting);
                     ForceSaveVibranceSettings();
+                }
+                else if(actualSetting == null)
+                {
+                    removeApplicationListItem(selectedItem);
                 }
             }
         }
@@ -504,16 +512,20 @@ namespace vibrance.GUI.common
             {
                 for (int i = eachItem.Index + 1; i < listApplications.Items.Count; i++)
                     listApplications.Items[i].ImageIndex--;
-                Image img = this.listApplications.LargeImageList.Images[eachItem.ImageIndex];
-                this.listApplications.LargeImageList.Images.RemoveAt(eachItem.ImageIndex);
-                img.Dispose();
 
-                listApplications.Items.Remove(eachItem);
-
+                removeApplicationListItem(eachItem);
                 _applicationSettings.Remove(_applicationSettings.FirstOrDefault(x => x.FileName.Equals(eachItem.Tag.ToString())));
             }
 
             ForceSaveVibranceSettings();
+        }
+
+        private void removeApplicationListItem(ListViewItem item)
+        {
+            Image img = this.listApplications.LargeImageList.Images[item.ImageIndex];
+            this.listApplications.LargeImageList.Images.RemoveAt(item.ImageIndex);
+            img.Dispose();
+            this.listApplications.Items.Remove(item);
         }
 
         private void buttonProcessExplorer_Click(object sender, EventArgs e)

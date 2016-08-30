@@ -14,13 +14,20 @@ namespace vibrance.GUI.common
 
         public Icon Icon { get; set; }
 
-        public Process Process { get; set; }
+        public string ProcessName { get; set; }
 
         public ProcessExplorerEntry(string path, Icon icon, Process process)
         {
             this.Path = path;
             this.Icon = icon;
-            this.Process = process;
+            this.ProcessName = process.ProcessName;
+        }
+
+        public ProcessExplorerEntry(string path, Icon icon, string processName)
+        {
+            this.Path = path;
+            this.Icon = icon;
+            this.ProcessName = processName;
         }
     }
 }

@@ -215,13 +215,10 @@ namespace vibrance.GUI.NVIDIA
                     }
 
                     //test if changing the vibrance value is needed
-                    if (!equalsDVCLevel(_vibranceInfo.defaultHandle, applicationSetting.IngameLevel))
+                    int displayHandle = GetApplicationDisplayHandle(e.Handle);
+                    if (displayHandle != -1 && !equalsDVCLevel(displayHandle, applicationSetting.IngameLevel))
                     {
-                        int displayHandle = GetApplicationDisplayHandle(e.Handle);
-                        if (displayHandle != -1)
-                        {
-                            _vibranceInfo.defaultHandle = displayHandle;
-                        }
+                        _vibranceInfo.defaultHandle = displayHandle;
                         setDVCLevel(_vibranceInfo.defaultHandle, applicationSetting.IngameLevel);
                     }
                 }

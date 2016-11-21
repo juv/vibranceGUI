@@ -54,7 +54,7 @@
             this.groupBox2.Size = new System.Drawing.Size(246, 72);
             this.groupBox2.TabIndex = 13;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Ingame Vibrance Level";
+            this.groupBox2.Text = "Nivel in-game";
             // 
             // trackBarIngameLevel
             // 
@@ -80,7 +80,7 @@
             this.buttonSave.Name = "buttonSave";
             this.buttonSave.Size = new System.Drawing.Size(75, 23);
             this.buttonSave.TabIndex = 14;
-            this.buttonSave.Text = "Save";
+            this.buttonSave.Text = "Salvar";
             this.buttonSave.UseVisualStyleBackColor = true;
             this.buttonSave.Click += new System.EventHandler(this.buttonSave_Click);
             // 
@@ -90,9 +90,9 @@
             this.labelTitle.Location = new System.Drawing.Point(66, 9);
             this.labelTitle.MaximumSize = new System.Drawing.Size(150, 0);
             this.labelTitle.Name = "labelTitle";
-            this.labelTitle.Size = new System.Drawing.Size(63, 13);
+            this.labelTitle.Size = new System.Drawing.Size(99, 13);
             this.labelTitle.TabIndex = 15;
-            this.labelTitle.Text = "Settings for ";
+            this.labelTitle.Text = "Configurações para";
             // 
             // pictureBox
             // 
@@ -121,7 +121,7 @@
             this.groupBox1.Size = new System.Drawing.Size(246, 84);
             this.groupBox1.TabIndex = 19;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Ingame Resolution";
+            this.groupBox1.Text = "Resolução in-game";
             // 
             // labelResolution
             // 
@@ -129,18 +129,18 @@
             this.labelResolution.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelResolution.Location = new System.Drawing.Point(4, 18);
             this.labelResolution.Name = "labelResolution";
-            this.labelResolution.Size = new System.Drawing.Size(225, 13);
+            this.labelResolution.Size = new System.Drawing.Size(215, 13);
             this.labelResolution.TabIndex = 19;
-            this.labelResolution.Text = "For (Borderless) Windowed Mode players only!";
+            this.labelResolution.Text = "Para (sem bordas) em modo janela somente!";
             // 
             // checkBoxResolution
             // 
             this.checkBoxResolution.AutoSize = true;
             this.checkBoxResolution.Location = new System.Drawing.Point(6, 34);
             this.checkBoxResolution.Name = "checkBoxResolution";
-            this.checkBoxResolution.Size = new System.Drawing.Size(183, 17);
+            this.checkBoxResolution.Size = new System.Drawing.Size(185, 17);
             this.checkBoxResolution.TabIndex = 18;
-            this.checkBoxResolution.Text = "Change Resolution when Ingame";
+            this.checkBoxResolution.Text = "Alterar a resolução quando o jogo";
             this.checkBoxResolution.UseVisualStyleBackColor = true;
             this.checkBoxResolution.CheckedChanged += new System.EventHandler(this.checkBoxResolution_CheckedChanged);
             // 

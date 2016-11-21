@@ -44,7 +44,7 @@ namespace vibrance.GUI.AMD
             catch (Exception ex)
             {
                 MessageBox.Show(ex.ToString());
-                MessageBox.Show(NvidiaDynamicVibranceProxy.NvapiErrorInitFailed, "vibranceGUI Error",
+                MessageBox.Show(NvidiaDynamicVibranceProxy.NvapiErrorInitFailed, "vibranceGUI Erro",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }

@@ -61,7 +61,7 @@ namespace vibrance.GUI.common
             }
             else
             {
-                MessageBox.Show("Current resolution mode could not be determined. Switching back to your Windows resolution will not work.");
+                MessageBox.Show("Não foi possível determinar o modo de resolução atual. A mudança para a resolução do Windows não funcionará.");
             }
 
             _applicationSettings = new List<ApplicationSetting>();
@@ -192,12 +192,12 @@ namespace vibrance.GUI.common
         {
             if (e.ProgressPercentage == 1)
             {
-                this.statusLabel.Text = "Running!";
+                this.statusLabel.Text = "Executando!";
                 this.statusLabel.ForeColor = Color.Green;
             }
             else if (e.ProgressPercentage == 2)
             {
-                this.statusLabel.Text = $"NVAPI Unloaded: {e.UserState}";
+                this.statusLabel.Text = $"NVAPI descarregado: {e.UserState}";
             }
         }
 
@@ -231,7 +231,7 @@ namespace vibrance.GUI.common
             }
             if (this.checkBoxPrimaryMonitorOnly.Checked)
             {
-                this.notifyIcon.BalloonTipText = "vibranceGUI will only affect your primary monitor now.";
+                this.notifyIcon.BalloonTipText = "vibranceGUI só afetará seu monitor principal.";
                 this.notifyIcon.ShowBalloonTip(250);
             }
         }
@@ -245,14 +245,14 @@ namespace vibrance.GUI.common
                 if (!autostartController.IsProgramRegistered(AppName))
                 {
                     this.notifyIcon.BalloonTipText = autostartController.RegisterProgram(AppName, pathToExe) 
-                        ? "Registered to Autostart!" 
-                        : "Registering to Autostart failed!";
+                        ? "Irá iniciar automaticamente" 
+                        : "Iniciar automaticamente falhou!";
                 }
                 else if (!autostartController.IsStartupPathUnchanged(AppName, pathToExe))
                 {
                     this.notifyIcon.BalloonTipText = autostartController.RegisterProgram(AppName, pathToExe)
-                        ? "Updated Autostart Path!"
-                        : "Updating Autostart Path failed!";
+                        ? "Diretório de auto-incio atualizado!"
+                        : "Atualizãção do diretório de auto-incio falhou!";
                 }
                 else
                 {
@@ -262,8 +262,8 @@ namespace vibrance.GUI.common
             else
             {
                 this.notifyIcon.BalloonTipText = autostartController.UnregisterProgram(AppName) 
-                    ? "Unregistered from Autostart!" 
-                    : "Unregistering from Autostart failed!";
+                    ? "Não irá iniciar automaticamente" 
+                    : "Impedir auto-inicio falhou";
             }
 
             notifyIcon.ShowBalloonTip(250);
@@ -296,7 +296,7 @@ namespace vibrance.GUI.common
         {
             try
             {
-                this.statusLabel.Text = "Closing...";
+                this.statusLabel.Text = "Fechando...";
                 this.statusLabel.ForeColor = Color.Red;
                 this.Update();
                 if (_v != null && _v.GetVibranceInfo().isInitialized)
@@ -532,6 +532,16 @@ namespace vibrance.GUI.common
         {
             ProcessExplorer ex = new ProcessExplorer(this);
             ex.Show();
+        }
+
+        private void labelPaypal_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void statusLabel_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

@@ -118,11 +118,11 @@ namespace vibrance.GUI.NVIDIA
         public const int NvapiMaxLevel = 63;
         public const int NvapiDefaultLevel = 0;
 
-        public const string NvapiErrorInitFailed = "VibranceProxy failed to initialize! Read readme.txt for fix!";
-        public const string NvapiErrorSystypeUnsupported = "VibranceProxy detected that you are running a Laptop with integrated NVIDIA card. " +
-            "NVIDIA Laptops are not supported because their NVIDIA drivers do not contain Digital Vibrance! " +
-            "You are missing the Digital Vibrance option in your NVIDIA Control Panel. VibranceGUI can not run on your system.";
-        public const string NvapiErrorSystypeUnknown = "VibranceProxy failed to initialize! Graphics card system type (Desktop / Laptop) is unknown!";
+        public const string NvapiErrorInitFailed = "Falha ao iniciar o vibranceProxy! Leia readme.txt para corrigir!";
+        public const string NvapiErrorSystypeUnsupported = "VibranceProxy detectado que você está executando um notebook com uma GPU NVIDIA. " +
+            "NVIDIA GPU para notebook não suportam vibrance pois os drivers não contêm Digital Vibrance! " +
+            "Está faltando a opção Vibrance Digital em seu painel de controla NVIDIA. VibranceGUI não pode ser executado em seu sistema.";
+        public const string NvapiErrorSystypeUnknown = "Falha ao inicializar VibranceProxy! Seu tipo de GPU (Desktop / Laptop) é desconhecido!";
 
         private static VibranceInfo _vibranceInfo;
         private static List<ApplicationSetting> _applicationSettings;
@@ -152,7 +152,7 @@ namespace vibrance.GUI.NVIDIA
             catch (Exception ex)
             {
                 MessageBox.Show(ex.ToString());
-                MessageBox.Show(NvidiaDynamicVibranceProxy.NvapiErrorInitFailed, "vibranceGUI Error", 
+                MessageBox.Show(NvidiaDynamicVibranceProxy.NvapiErrorInitFailed, "vibranceGUI Erro", 
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
@@ -170,7 +170,7 @@ namespace vibrance.GUI.NVIDIA
                     NvSystemType systemType = getGpuSystemType(gpuHandle);
                     if (systemType == NvSystemType.NvSystemTypeUnknown)
                     {
-                        MessageBox.Show(NvidiaDynamicVibranceProxy.NvapiErrorSystypeUnknown, "vibranceGUI Error", 
+                        MessageBox.Show(NvidiaDynamicVibranceProxy.NvapiErrorSystypeUnknown, "vibranceGUI Erro", 
                             MessageBoxButtons.OK, MessageBoxIcon.Error);
                         _vibranceInfo.isInitialized = false; 
                         return;

@@ -111,9 +111,9 @@
             this.checkBoxAutostart.AutoSize = true;
             this.checkBoxAutostart.Location = new System.Drawing.Point(6, 19);
             this.checkBoxAutostart.Name = "checkBoxAutostart";
-            this.checkBoxAutostart.Size = new System.Drawing.Size(131, 17);
+            this.checkBoxAutostart.Size = new System.Drawing.Size(138, 17);
             this.checkBoxAutostart.TabIndex = 8;
-            this.checkBoxAutostart.Text = "Autostart vibranceGUI";
+            this.checkBoxAutostart.Text = "Autoiniciar vibranceGUI";
             this.checkBoxAutostart.UseVisualStyleBackColor = true;
             this.checkBoxAutostart.CheckedChanged += new System.EventHandler(this.checkBoxAutostart_CheckedChanged);
             // 
@@ -127,16 +127,16 @@
             this.groupBox1.Size = new System.Drawing.Size(397, 143);
             this.groupBox1.TabIndex = 15;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Settings";
+            this.groupBox1.Text = "Configurações";
             // 
             // checkBoxPrimaryMonitorOnly
             // 
             this.checkBoxPrimaryMonitorOnly.AutoSize = true;
             this.checkBoxPrimaryMonitorOnly.Location = new System.Drawing.Point(6, 42);
             this.checkBoxPrimaryMonitorOnly.Name = "checkBoxPrimaryMonitorOnly";
-            this.checkBoxPrimaryMonitorOnly.Size = new System.Drawing.Size(151, 17);
+            this.checkBoxPrimaryMonitorOnly.Size = new System.Drawing.Size(185, 17);
             this.checkBoxPrimaryMonitorOnly.TabIndex = 15;
-            this.checkBoxPrimaryMonitorOnly.Text = "Affect Primary Monitor only";
+            this.checkBoxPrimaryMonitorOnly.Text = "Afetar somente o monitor principal";
             this.toolTip.SetToolTip(this.checkBoxPrimaryMonitorOnly, "When checking this, VibranceGUI will only change vibrance values on your primary " +
         "monitor.");
             this.checkBoxPrimaryMonitorOnly.UseVisualStyleBackColor = true;
@@ -151,7 +151,7 @@
             this.groupBox3.Size = new System.Drawing.Size(182, 72);
             this.groupBox3.TabIndex = 12;
             this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Windows Vibrance Level";
+            this.groupBox3.Text = "Nivel no Windows";
             // 
             // labelWindowsLevel
             // 
@@ -173,34 +173,35 @@
             // statusLabel
             // 
             this.statusLabel.AutoSize = true;
-            this.statusLabel.Location = new System.Drawing.Point(106, 502);
+            this.statusLabel.Location = new System.Drawing.Point(61, 502);
             this.statusLabel.Name = "statusLabel";
-            this.statusLabel.Size = new System.Drawing.Size(61, 13);
+            this.statusLabel.Size = new System.Drawing.Size(73, 13);
             this.statusLabel.TabIndex = 14;
-            this.statusLabel.Text = "Initializing...";
+            this.statusLabel.Text = "inicializando...";
+            this.statusLabel.Click += new System.EventHandler(this.statusLabel_Click);
             // 
             // observerStatusLabel
             // 
             this.observerStatusLabel.AutoSize = true;
             this.observerStatusLabel.Location = new System.Drawing.Point(12, 502);
             this.observerStatusLabel.Name = "observerStatusLabel";
-            this.observerStatusLabel.Size = new System.Drawing.Size(87, 13);
+            this.observerStatusLabel.Size = new System.Drawing.Size(43, 13);
             this.observerStatusLabel.TabIndex = 13;
-            this.observerStatusLabel.Text = "Observer status: ";
+            this.observerStatusLabel.Text = "Status: ";
             // 
             // labelTwitter
             // 
             this.labelTwitter.AutoSize = true;
             this.labelTwitter.Location = new System.Drawing.Point(10, 11);
             this.labelTwitter.Name = "labelTwitter";
-            this.labelTwitter.Size = new System.Drawing.Size(192, 13);
+            this.labelTwitter.Size = new System.Drawing.Size(213, 13);
             this.labelTwitter.TabIndex = 11;
-            this.labelTwitter.Text = "Follow @juvlarN on twitter for updates: ";
+            this.labelTwitter.Text = "Siga @juvlarN no twitter para atualizações: ";
             // 
             // linkLabelTwitter
             // 
             this.linkLabelTwitter.AutoSize = true;
-            this.linkLabelTwitter.Location = new System.Drawing.Point(208, 11);
+            this.linkLabelTwitter.Location = new System.Drawing.Point(220, 12);
             this.linkLabelTwitter.Name = "linkLabelTwitter";
             this.linkLabelTwitter.Size = new System.Drawing.Size(132, 13);
             this.linkLabelTwitter.TabIndex = 10;
@@ -229,11 +230,12 @@
             // labelPaypal
             // 
             this.labelPaypal.AutoSize = true;
-            this.labelPaypal.Location = new System.Drawing.Point(10, 48);
+            this.labelPaypal.Location = new System.Drawing.Point(45, 48);
             this.labelPaypal.Name = "labelPaypal";
-            this.labelPaypal.Size = new System.Drawing.Size(183, 13);
+            this.labelPaypal.Size = new System.Drawing.Size(124, 13);
             this.labelPaypal.TabIndex = 17;
-            this.labelPaypal.Text = "Like the program? Consider donating:";
+            this.labelPaypal.Text = "Gostou? Considere doar.";
+            this.labelPaypal.Click += new System.EventHandler(this.labelPaypal_Click);
             // 
             // toolTip
             // 
@@ -267,7 +269,7 @@
             this.groupBox5.Size = new System.Drawing.Size(397, 227);
             this.groupBox5.TabIndex = 18;
             this.groupBox5.TabStop = false;
-            this.groupBox5.Text = "Program Settings";
+            this.groupBox5.Text = "Configurações do Programa";
             // 
             // buttonProcessExplorer
             // 
@@ -275,7 +277,7 @@
             this.buttonProcessExplorer.Name = "buttonProcessExplorer";
             this.buttonProcessExplorer.Size = new System.Drawing.Size(75, 23);
             this.buttonProcessExplorer.TabIndex = 3;
-            this.buttonProcessExplorer.Text = "Add";
+            this.buttonProcessExplorer.Text = "Adicionar";
             this.buttonProcessExplorer.UseVisualStyleBackColor = true;
             this.buttonProcessExplorer.Click += new System.EventHandler(this.buttonProcessExplorer_Click);
             // 
@@ -285,7 +287,7 @@
             this.buttonRemoveProgram.Name = "buttonRemoveProgram";
             this.buttonRemoveProgram.Size = new System.Drawing.Size(75, 23);
             this.buttonRemoveProgram.TabIndex = 2;
-            this.buttonRemoveProgram.Text = "Remove";
+            this.buttonRemoveProgram.Text = "Remover";
             this.buttonRemoveProgram.UseVisualStyleBackColor = true;
             this.buttonRemoveProgram.Click += new System.EventHandler(this.buttonRemoveProgram_Click);
             // 
@@ -304,7 +306,7 @@
             this.buttonAddProgram.Name = "buttonAddProgram";
             this.buttonAddProgram.Size = new System.Drawing.Size(92, 23);
             this.buttonAddProgram.TabIndex = 0;
-            this.buttonAddProgram.Text = "Add manually";
+            this.buttonAddProgram.Text = "Add Manual";
             this.buttonAddProgram.UseVisualStyleBackColor = true;
             this.buttonAddProgram.Click += new System.EventHandler(this.buttonAddProgram_Click);
             // 

@@ -16,8 +16,8 @@ namespace vibrance.GUI
 {
     static class Program
     {
-        private const string ErrorGraphicsAdapterUnknown = "Failed to determine your Graphic GraphicsAdapter type (NVIDIA/AMD). Please contact @juvlarN at twitter. Press Yes to open twitter in your browser now. Error: ";
-        private const string MessageBoxCaption = "vibranceGUI Error";
+        private const string ErrorGraphicsAdapterUnknown = "Falha em determinar o tipo de sua GPU (NVIDIA/AMD). Porvaor entrar em contato com @juvlarN no twitter. Pressione sim para abrir o twitter em seu navegador. Erro: ";
+        private const string MessageBoxCaption = "vibranceGUI Erro";
 
         [STAThread]
         static void Main(string[] args)
@@ -26,7 +26,7 @@ namespace vibrance.GUI
             Mutex mutex = new Mutex(true, "vibranceGUI~Mutex", out result);
             if (!result)
             {
-                MessageBox.Show("You can run vibranceGUI only once at a time!", MessageBoxCaption, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Você só pode executar uma instância de cada vez do vibranceGUI!", MessageBoxCaption, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 

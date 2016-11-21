@@ -87,7 +87,7 @@ namespace vibrance.GUI.common
                 }
                 else
                 {
-                    MessageBox.Show("Changing the resolution failed: " + Enum.GetName(typeof(DispChange), returnValue));
+                    MessageBox.Show("Falha na alteração da resolução: " + Enum.GetName(typeof(DispChange), returnValue));
                 }
             }
             return false;
@@ -114,7 +114,7 @@ namespace vibrance.GUI.common
                 }
                 else
                 {
-                    MessageBox.Show("Changing the resolution failed: " + Enum.GetName(typeof(DispChange), returnValue));
+                    MessageBox.Show("Falha na alteração da resolução: " + Enum.GetName(typeof(DispChange), returnValue));
                 }
             }
             return false;

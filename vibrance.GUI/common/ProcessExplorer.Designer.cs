@@ -57,7 +57,7 @@
             this.button.Name = "button";
             this.button.Size = new System.Drawing.Size(119, 23);
             this.button.TabIndex = 1;
-            this.button.Text = "Reload Processes";
+            this.button.Text = "Recarregar processos";
             this.button.UseVisualStyleBackColor = true;
             this.button.Click += new System.EventHandler(this.button_Click);
             // 

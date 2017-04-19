@@ -229,11 +229,6 @@ namespace vibrance.GUI.common
             {
                 this.settingsBackgroundWorker.RunWorkerAsync();
             }
-            if (this.checkBoxPrimaryMonitorOnly.Checked)
-            {
-                this.notifyIcon.BalloonTipText = "vibranceGUI will only affect your primary monitor now.";
-                this.notifyIcon.ShowBalloonTip(250);
-            }
         }
 
         private void checkBoxAutostart_CheckedChanged(object sender, EventArgs e)

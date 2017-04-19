@@ -6,7 +6,6 @@ namespace vibrance.GUI.common
     class RegistryController : IRegistryController
     {
         private const string RunKey = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
-        private const string VcKey = "SOFTWARE\\Microsoft\\DevDiv\\VC\\Servicing\\11.0\\RuntimeMinimum";
 
         private RegistryKey _startupKey;
 

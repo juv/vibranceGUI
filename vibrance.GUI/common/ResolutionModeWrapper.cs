@@ -40,7 +40,7 @@ namespace vibrance.GUI.common
             {
                 that = new ResolutionModeWrapper((Devmode)obj);
             }
-            if (obj is ResolutionModeWrapper)
+            if (obj is ResolutionModeWrapper || that != null)
             {
                 that = that == null ? obj as ResolutionModeWrapper : that;
                 if (this.DmPelsWidth == that.DmPelsWidth &&

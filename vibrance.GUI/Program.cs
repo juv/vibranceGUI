@@ -82,6 +82,7 @@ namespace vibrance.GUI
                 vibranceGui.WindowState = FormWindowState.Minimized;
                 ((VibranceGUI)vibranceGui).SetAllowVisible(false);
             }
+            vibranceGui.Text += String.Format(" ({0})", adapter.ToString().ToUpper());
             Application.Run(vibranceGui);
 
             GC.KeepAlive(mutex);

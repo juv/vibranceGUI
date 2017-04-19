@@ -52,7 +52,6 @@ namespace vibrance.GUI.common
                             ProcessExplorerEntry processEntry = new ProcessExplorerEntry(path, Icon.ExtractAssociatedIcon(path), process);
                             backgroundWorker.ReportProgress(++activeApplicationCount, processEntry);
                         }
-
                     }
                     catch (Exception ex)
                     {

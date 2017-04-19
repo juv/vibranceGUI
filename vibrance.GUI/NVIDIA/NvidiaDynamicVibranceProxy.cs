@@ -126,7 +126,7 @@ namespace vibrance.GUI.NVIDIA
             "NVIDIA Laptops are not supported because their NVIDIA drivers do not contain Digital Vibrance! " +
             "You are missing the Digital Vibrance option in your NVIDIA Control Panel. VibranceGUI can not run on your system.";
         public const string NvapiErrorSystypeUnknown = "VibranceProxy failed to initialize! Graphics card system type (Desktop / Laptop) is unknown!";
-        private const string GuideLink = "https://vibrancegui.com/vibrance/guide";
+        public const string GuideLink = "https://vibrancegui.com/vibrance/guide";
 
         private static VibranceInfo _vibranceInfo;
         private static List<ApplicationSetting> _applicationSettings;

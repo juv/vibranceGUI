@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -44,8 +45,12 @@ namespace vibrance.GUI.AMD
             catch (Exception ex)
             {
                 MessageBox.Show(ex.ToString());
-                MessageBox.Show(NvidiaDynamicVibranceProxy.NvapiErrorInitFailed, "vibranceGUI Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                DialogResult result = MessageBox.Show(NvidiaDynamicVibranceProxy.NvapiErrorInitFailed, "vibranceGUI Error",
+                    MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
+                if (result == DialogResult.OK)
+                {
+                    Process.Start(NvidiaDynamicVibranceProxy.GuideLink);
+                }
             }
         }
 

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Media;
 using System.Runtime.InteropServices;
@@ -205,12 +207,11 @@ namespace vibrance.GUI.NVIDIA
             {
                 ApplicationSetting applicationSetting = _applicationSettings.FirstOrDefault(x => x.Name.Equals(e.ProcessName));
                 if (applicationSetting != null)
-                {
+                {                    
                     //test if a resolution change is needed
                     Screen screen = Screen.FromHandle(e.Handle);
                     if (applicationSetting.IsResolutionChangeNeeded && IsResolutionChangeNeeded(screen, applicationSetting.ResolutionSettings))
                     {
-                        _gameScreen = screen;
                         PerformResolutionChange(screen, applicationSetting.ResolutionSettings);
                     }
 
@@ -218,6 +219,7 @@ namespace vibrance.GUI.NVIDIA
                     int displayHandle = GetApplicationDisplayHandle(e.Handle);
                     if (displayHandle != -1 && !equalsDVCLevel(displayHandle, applicationSetting.IngameLevel))
                     {
+                        _gameScreen = screen;
                         _vibranceInfo.defaultHandle = displayHandle;
                         setDVCLevel(_vibranceInfo.defaultHandle, applicationSetting.IngameLevel);
                     }
@@ -225,19 +227,26 @@ namespace vibrance.GUI.NVIDIA
                 else
                 {
                     IntPtr processHandle = e.Handle;
+
                     if (!isWindowActive(ref processHandle))
                         return;
-
+                    
                     //test if a resolution change is needed
-                    Screen screen = Screen.FromHandle(processHandle);
-                    if (_gameScreen != null && _gameScreen.Equals(screen) && IsResolutionChangeNeeded(screen, _windowsResolutionSettings))
-                    {
-                        PerformResolutionChange(screen, _windowsResolutionSettings);
-                    }
+                    Screen currentScreen = Screen.FromHandle(processHandle);
 
+                    if (_gameScreen != null && _gameScreen.Equals(currentScreen) && IsResolutionChangeNeeded(currentScreen, _windowsResolutionSettings))
+                    {
+                        PerformResolutionChange(currentScreen, _windowsResolutionSettings);
+                    }
+                    
                     //test if changing the vibrance value is needed
                     if (_vibranceInfo.affectPrimaryMonitorOnly && !equalsDVCLevel(_vibranceInfo.defaultHandle, _vibranceInfo.userVibranceSettingDefault))
                     {
+                        if(_gameScreen != null && !_gameScreen.DeviceName.Equals(currentScreen.DeviceName))
+                        {
+                            return;
+                        }
+
                         setDVCLevel(_vibranceInfo.defaultHandle, _vibranceInfo.userVibranceSettingDefault);
                     }
                     else if (!_vibranceInfo.affectPrimaryMonitorOnly && !_vibranceInfo.displayHandles.TrueForAll(handle => equalsDVCLevel(handle, _vibranceInfo.userVibranceSettingDefault)))

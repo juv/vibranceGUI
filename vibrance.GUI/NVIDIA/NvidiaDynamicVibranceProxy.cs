@@ -120,11 +120,13 @@ namespace vibrance.GUI.NVIDIA
         public const int NvapiMaxLevel = 63;
         public const int NvapiDefaultLevel = 0;
 
-        public const string NvapiErrorInitFailed = "VibranceProxy failed to initialize! Read readme.txt for fix!";
+        public const string NvapiErrorInitFailed = "VibranceProxy failed to initialize! Press Ok to open the vibranceGUI Steam Guide in your browser. " +
+            "Scroll down to section \"Troubleshooting, Errors, Q&A\".";
         public const string NvapiErrorSystypeUnsupported = "VibranceProxy detected that you are running a Laptop with integrated NVIDIA card. " +
             "NVIDIA Laptops are not supported because their NVIDIA drivers do not contain Digital Vibrance! " +
             "You are missing the Digital Vibrance option in your NVIDIA Control Panel. VibranceGUI can not run on your system.";
         public const string NvapiErrorSystypeUnknown = "VibranceProxy failed to initialize! Graphics card system type (Desktop / Laptop) is unknown!";
+        private const string GuideLink = "https://vibrancegui.com/vibrance/guide";
 
         private static VibranceInfo _vibranceInfo;
         private static List<ApplicationSetting> _applicationSettings;
@@ -149,13 +151,16 @@ namespace vibrance.GUI.NVIDIA
                     _hook = WinEventHook.GetInstance();
                     _hook.WinEventHookHandler += OnWinEventHook;
                 }
-
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.ToString());
-                MessageBox.Show(NvidiaDynamicVibranceProxy.NvapiErrorInitFailed, "vibranceGUI Error", 
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                DialogResult result = MessageBox.Show(NvidiaDynamicVibranceProxy.NvapiErrorInitFailed, "vibranceGUI Error", 
+                    MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
+                if (result == DialogResult.OK)
+                {
+                    Process.Start(GuideLink);
+                }                
             }
         }
 

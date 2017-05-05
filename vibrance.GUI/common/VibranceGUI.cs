@@ -25,7 +25,7 @@ namespace vibrance.GUI.common
         private const string AppName = "vibranceGUI";
         private const string TwitterLink = "https://twitter.com/juvlarN";
         private const string PaypalDonationLink = "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=JDQFNKNNEW356";
-        private const string SteamDonationLink = "https://steamcommunity.com/tradeoffer/new/?partner=92410529&token=Oas6jXrc";
+        private const string SteamDonationLink = "https://steamcommunity.com/tradeoffer/new/?partner=92410529&token=iGiRV4Nx";
 
         private bool _allowVisible;
         private List<ApplicationSetting> _applicationSettings;

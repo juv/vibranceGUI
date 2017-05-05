@@ -5,7 +5,7 @@ namespace vibrance.GUI.AMD.vendor.adl64
 {
     public static class AdlImport
     {
-        public const string AtiadlFileName = "atiadlxx.dll";
+        public const string AtiadlFileName = "atiadlxy.dll";
 
         public const string Kernel32FileName = "kernel32.dll";
 

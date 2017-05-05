@@ -103,7 +103,10 @@ namespace vibrance.GUI.common
         private void button_Click(object sender, EventArgs e)
         {
             listView.Items.Clear();
-            backgroundWorker.RunWorkerAsync();
+            if (!backgroundWorker.IsBusy)
+            {
+                backgroundWorker.RunWorkerAsync();
+            }
         }
 
         private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)

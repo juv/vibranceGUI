@@ -21,8 +21,8 @@ namespace vibrance.GUI.common
 
         private const string NvidiaDllName = "nvapi.dll";
         private static readonly string _amdDllName = Environment.Is64BitOperatingSystem 
-            ? AdlImport.AtiadlFileName 
-            : AMD.vendor.adl64.AdlImport.AtiadlFileName;
+            ? AMD.vendor.adl64.AdlImport.AtiadlFileName
+            : AMD.vendor.adl32.AdlImport.AtiadlFileName;
 
 
         public static GraphicsAdapter GetAdapter()

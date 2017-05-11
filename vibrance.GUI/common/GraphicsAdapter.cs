@@ -21,7 +21,7 @@ namespace vibrance.GUI.common
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern IntPtr LoadLibrary(string dllToLoad);
 
-        private const string NvidiaDllName = "nvapi.dll";
+        private const string _nvidiaDllName = "nvapi.dll";
         private static readonly string _amdDllName = Environment.Is64BitOperatingSystem 
             ? AMD.vendor.adl64.AdlImport.AtiadlFileName
             : AMD.vendor.adl32.AdlImport.AtiadlFileName;
@@ -29,8 +29,9 @@ namespace vibrance.GUI.common
 
         public static GraphicsAdapter GetAdapter()
         {
-            if(File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), _amdDllName)) && 
-                File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), NvidiaDllName)))
+            string windowsFolder = Environment.GetFolderPath(Environment.SpecialFolder.SystemX86);
+            if (File.Exists(Path.Combine(windowsFolder, _amdDllName)) && 
+                File.Exists(Path.Combine(windowsFolder, _nvidiaDllName)))
             {
                 return GraphicsAdapter.Ambiguous;
             }
@@ -42,7 +43,7 @@ namespace vibrance.GUI.common
                     return GraphicsAdapter.Amd;
                 }
             }
-            if (IsAdapterAvailable(NvidiaDllName))
+            if (IsAdapterAvailable(_nvidiaDllName))
             {
                 return GraphicsAdapter.Nvidia;
             }

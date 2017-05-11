@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using vibrance.GUI.AMD.vendor;
 using vibrance.GUI.AMD.vendor.adl32;
@@ -11,6 +12,7 @@ namespace vibrance.GUI.common
         Unknown = 0,
         Nvidia = 1,
         Amd = 2,
+        Ambiguous = 3
     }
 
     public class GraphicsAdapterHelper
@@ -27,6 +29,11 @@ namespace vibrance.GUI.common
 
         public static GraphicsAdapter GetAdapter()
         {
+            if(File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), _amdDllName)) && 
+                File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), NvidiaDllName)))
+            {
+                return GraphicsAdapter.Ambiguous;
+            }
             if (IsAdapterAvailable(_amdDllName))
             {
                 IAmdAdapter amdAdapter = Environment.Is64BitOperatingSystem ? (IAmdAdapter)new AmdAdapter64() :new AmdAdapter32();

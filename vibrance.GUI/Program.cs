@@ -17,6 +17,7 @@ namespace vibrance.GUI
     static class Program
     {
         private const string ErrorGraphicsAdapterUnknown = "Failed to determine your Graphic GraphicsAdapter type (NVIDIA/AMD). Please contact @juvlarN at twitter. Press Yes to open twitter in your browser now. Error: ";
+        private const string ErrorGraphicsAdapterAmbiguous = "Both NVIDIA and AMD graphic drivers have been found on your system. This can happen when you recently switch your graphic card and did not uninstall the old drivers. Make sure to uninstall unused graphic drivers to keep your system safe and stable. Restart vibranceGUI after you installed the old driver.";
         private const string MessageBoxCaption = "vibranceGUI Error";
 
         [STAThread]
@@ -75,6 +76,11 @@ namespace vibrance.GUI
                 {
                     System.Diagnostics.Process.Start("https://twitter.com/juvlarN");
                 }
+                return;
+            }
+            else if(adapter == GraphicsAdapter.Ambiguous)
+            {
+                MessageBox.Show(ErrorGraphicsAdapterAmbiguous, MessageBoxCaption, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             if (args.Contains("-minimized"))

@@ -296,6 +296,7 @@ namespace vibrance.GUI.common
                 this.Update();
                 if (_v != null && _v.GetVibranceInfo().isInitialized)
                 {
+                    _v.HandleDvcExit();
                     _v.SetShouldRun(false);
                     _v.UnloadLibraryEx();
                 }

@@ -239,15 +239,13 @@ namespace vibrance.GUI.common
                     GetInstance().DispatchWinEventHookEvent(e);
                 }
             }
-            catch (InvalidOperationException ex)
+            catch (InvalidOperationException)
             {
                 // The process property is not defined because the process has exited or it does not have an identifier.
-                VibranceGUI.Log(ex);
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
                 // The process specified by the processId parameter is not running.
-                VibranceGUI.Log(ex);
             }
         }
 

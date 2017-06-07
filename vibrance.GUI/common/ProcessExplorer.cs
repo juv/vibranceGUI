@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Management;
 using System.Text;
@@ -43,11 +44,10 @@ namespace vibrance.GUI.common
             {
                 if (process.MainWindowHandle != IntPtr.Zero && process.Id != Process.GetCurrentProcess().Id)
                 {
-                    string path = string.Empty;
                     try
                     {
-                        path = GetPathFromProcessId(process);
-                        if (path != string.Empty)
+                        string path = GetPathFromProcessId(process);
+                        if (path != string.Empty && File.Exists(path))
                         {
                             ProcessExplorerEntry processEntry = new ProcessExplorerEntry(path, Icon.ExtractAssociatedIcon(path), process);
                             backgroundWorker.ReportProgress(++activeApplicationCount, processEntry);

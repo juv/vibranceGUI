@@ -220,18 +220,33 @@ namespace vibrance.GUI.common
         {
             uint processId;
             GetWindowThreadProcessId(hwnd, out processId);
-            Process p = Process.GetProcessById((int)processId);
             int windowTextLength = GetWindowTextLength(hwnd);
             StringBuilder sb = new StringBuilder(windowTextLength + 1);
             GetWindowTextA(hwnd, sb, sb.Capacity);
 
-            WinEventHookEventArgs e = new WinEventHookEventArgs();
-            e.Handle = hwnd;
-            e.ProcessId = processId;
-            e.MainWindowTitle = p.MainWindowTitle;
-            e.ProcessName = p.ProcessName;
-            e.WindowText = sb.ToString();
-            WinEventHook.GetInstance().DispatchWinEventHookEvent(e);
+            try
+            {
+                using (Process p = Process.GetProcessById((int)processId))
+                {
+                    WinEventHookEventArgs e = new WinEventHookEventArgs
+                    {
+                        Handle = hwnd,
+                        ProcessId = processId,
+                        MainWindowTitle = p.MainWindowTitle,
+                        ProcessName = p.ProcessName,
+                        WindowText = sb.ToString()
+                    };
+                    GetInstance().DispatchWinEventHookEvent(e);
+                }
+            }
+            catch (InvalidOperationException)
+            {
+                // The process property is not defined because the process has exited or it does not have an identifier.
+            }
+            catch (ArgumentException)
+            {
+                // The process specified by the processId parameter is not running.
+            }
         }
 
         protected virtual void DispatchWinEventHookEvent(WinEventHookEventArgs e)

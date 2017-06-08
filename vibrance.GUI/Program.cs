@@ -83,7 +83,7 @@ namespace vibrance.GUI
                 if(MessageBox.Show(ErrorGraphicsAdapterAmbiguous, MessageBoxCaption, MessageBoxButtons.YesNo, 
                     MessageBoxIcon.Error) == DialogResult.Yes)
                 {
-                    System.Diagnostics.Process.Start("https://www.guru3d.com/files-details/display-driver-uninstaller-download.html");
+                    System.Diagnostics.Process.Start("http://www.guru3d.com/files-details/display-driver-uninstaller-download.html");
                 }
                 return;
             }

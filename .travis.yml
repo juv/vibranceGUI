@@ -1,5 +1,14 @@
+sudo: required
+dist: trusty
 language: csharp
 solution: vibrance.GUI.sln
-"script": [
-    "xbuild /p:Configuration=Release"
-    ]
+mono:
+  - beta
+dotnet: 1.0.3
+
+install:
+  - nuget restore vibrance.GUI.sln
+  - dotnet restore vibrance.GUI.sln
+
+script:
+  - msbuild /t:Rebuild vibrance.GUI.sln

@@ -1,2 +1,5 @@
 language: csharp
 solution: vibrance.GUI.sln
+"script": [
+    "xbuild /p:Configuration=Release"
+    ]

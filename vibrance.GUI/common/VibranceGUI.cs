@@ -354,7 +354,10 @@ namespace vibrance.GUI.common
                 foreach (ApplicationSetting application in _applicationSettings)
                 {
                     if (!File.Exists(application.FileName))
+                    {
+                        _applicationSettings.Remove(application);
                         continue;
+                    }                        
 
                     InitializeApplicationList();
 

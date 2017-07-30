@@ -212,18 +212,17 @@ namespace vibrance.GUI.NVIDIA
             {
                 ApplicationSetting applicationSetting = _applicationSettings.FirstOrDefault(x => x.Name.Equals(e.ProcessName));
                 if (applicationSetting != null)
-                {                    
-                    //test if a resolution change is needed
-                    Screen screen = Screen.FromHandle(e.Handle);
-                    if (applicationSetting.IsResolutionChangeNeeded && IsResolutionChangeNeeded(screen, applicationSetting.ResolutionSettings))
-                    {
-                        PerformResolutionChange(screen, applicationSetting.ResolutionSettings);
-                    }
-
-                    //test if changing the vibrance value is needed
+              {                  
                     int displayHandle = GetApplicationDisplayHandle(e.Handle);
+                    //test if changing the vibrance value is needed
                     if (displayHandle != -1 && !equalsDVCLevel(displayHandle, applicationSetting.IngameLevel))
                     {
+                        //test if a resolution change is needed
+                        Screen screen = Screen.FromHandle(e.Handle);
+                        if (applicationSetting.IsResolutionChangeNeeded && IsResolutionChangeNeeded(screen, applicationSetting.ResolutionSettings))
+                        {
+                            PerformResolutionChange(screen, applicationSetting.ResolutionSettings);
+                        }
                         _gameScreen = screen;
                         _vibranceInfo.defaultHandle = displayHandle;
                         setDVCLevel(_vibranceInfo.defaultHandle, applicationSetting.IngameLevel);

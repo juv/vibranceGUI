@@ -210,9 +210,9 @@ namespace vibrance.GUI.NVIDIA
         {
             if (_applicationSettings.Count > 0)
             {
-                ApplicationSetting applicationSetting = _applicationSettings.FirstOrDefault(x => x.Name.Equals(e.ProcessName));
+                ApplicationSetting applicationSetting = _applicationSettings.FirstOrDefault(x => string.Equals(x.Name, e.ProcessName, StringComparison.OrdinalIgnoreCase));
                 if (applicationSetting != null)
-              {                  
+                {                  
                     int displayHandle = GetApplicationDisplayHandle(e.Handle);
                     //test if changing the vibrance value is needed
                     if (displayHandle != -1 && !equalsDVCLevel(displayHandle, applicationSetting.IngameLevel))

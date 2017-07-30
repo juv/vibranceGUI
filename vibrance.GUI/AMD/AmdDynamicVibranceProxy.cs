@@ -104,7 +104,7 @@ namespace vibrance.GUI.AMD
         {
             if (_applicationSettings.Count > 0)
             {
-                ApplicationSetting applicationSetting = _applicationSettings.FirstOrDefault(x => x.Name.Equals(e.ProcessName));
+                ApplicationSetting applicationSetting = _applicationSettings.FirstOrDefault(x => string.Equals(x.Name, e.ProcessName, StringComparison.OrdinalIgnoreCase));
                 if (applicationSetting != null)
                 {
                     //test if a resolution change is needed

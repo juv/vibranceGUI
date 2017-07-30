@@ -351,7 +351,7 @@ namespace vibrance.GUI.common
 
                 trackBarWindowsLevel.Value = vibranceWindowsLevel;
                 checkBoxPrimaryMonitorOnly.Checked = affectPrimaryMonitorOnly;
-                foreach (ApplicationSetting application in _applicationSettings)
+                foreach (ApplicationSetting application in _applicationSettings.ToList())
                 {
                     if (!File.Exists(application.FileName))
                     {

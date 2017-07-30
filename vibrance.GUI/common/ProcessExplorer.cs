@@ -7,6 +7,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Management;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using vibrance.GUI.AMD;
@@ -61,6 +62,8 @@ namespace vibrance.GUI.common
             }
         }
 
+        [DllImport("psapi.dll")]
+        static extern uint GetModuleFileNameEx(IntPtr hProcess, IntPtr hModule, [Out] StringBuilder lpBaseName, [In] [MarshalAs(UnmanagedType.U4)] int nSize);
         /// <summary>
         /// Safely gets the executable path from the specified process.
         /// Process.MainModule.FileName crashes when called on a x64 process because vibranceGUI is running as x86 process.
@@ -69,19 +72,11 @@ namespace vibrance.GUI.common
         /// <returns>the fully qualified executable path</returns>
         private string GetPathFromProcessId(Process process)
         {
-            var query = "SELECT ProcessId, ExecutablePath, CommandLine FROM Win32_Process WHERE ProcessId = " + process.Id;
-
-            using (var searcher = new ManagementObjectSearcher(query))
-                foreach (ManagementObject item in searcher.Get())
-                {
-                    object id = item["ProcessID"];
-                    object path = item["ExecutablePath"];
-
-                    if (path != null && id.ToString() == process.Id.ToString())
-                    {
-                        return path.ToString();
-                    }
-                }
+            var sb = new StringBuilder(1024);
+            if (GetModuleFileNameEx(process.Handle, IntPtr.Zero, sb, sb.Capacity) > 0)
+            {
+                return sb.ToString();
+            }
             return string.Empty;
         }
 

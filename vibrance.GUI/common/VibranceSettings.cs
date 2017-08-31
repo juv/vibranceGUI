@@ -9,6 +9,7 @@ namespace vibrance.GUI.common
         private IVibranceProxy _v;
         private ListViewItem _sender;
         private readonly Func<int, string> _resolveLabelLevel;
+        private readonly int _defaultValue;
 
         public VibranceSettings(IVibranceProxy v, int minValue, int maxValue, int defaultValue, ListViewItem sender, ApplicationSetting setting, List<ResolutionModeWrapper> supportedResolutionList, Func<int, string> resolveLabelLevel)
         {
@@ -17,6 +18,7 @@ namespace vibrance.GUI.common
             this.trackBarIngameLevel.Maximum = maxValue;
             this.trackBarIngameLevel.Value = defaultValue;
             this._sender = sender;
+            this._defaultValue = defaultValue;
             _resolveLabelLevel = resolveLabelLevel;
             this._v = v;
             labelIngameLevel.Text = _resolveLabelLevel(trackBarIngameLevel.Value);
@@ -39,6 +41,16 @@ namespace vibrance.GUI.common
         {
             _v.SetVibranceIngameLevel(trackBarIngameLevel.Value);
             labelIngameLevel.Text = _resolveLabelLevel(trackBarIngameLevel.Value);
+        }
+
+        private void trackBarIngameLevel_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                trackBarIngameLevel.Value = _defaultValue;
+                _v.SetVibranceIngameLevel(_defaultValue);
+                labelIngameLevel.Text = _resolveLabelLevel(trackBarIngameLevel.Value);
+            }
         }
 
         private void buttonSave_Click(object sender, EventArgs e)

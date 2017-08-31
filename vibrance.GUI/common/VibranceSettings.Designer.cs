@@ -64,6 +64,7 @@
             this.trackBarIngameLevel.Size = new System.Drawing.Size(131, 45);
             this.trackBarIngameLevel.TabIndex = 9;
             this.trackBarIngameLevel.Scroll += new System.EventHandler(this.trackBarIngameLevel_Scroll);
+            this.trackBarIngameLevel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.trackBarIngameLevel_MouseDown);
             // 
             // labelIngameLevel
             // 

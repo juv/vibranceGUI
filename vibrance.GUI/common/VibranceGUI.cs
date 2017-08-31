@@ -170,6 +170,20 @@ namespace vibrance.GUI.common
             }
         }
 
+        private void trackBarWindowsLevel_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                trackBarWindowsLevel.Value = _defaultWindowsLevel;
+                _v.SetVibranceWindowsLevel(_defaultWindowsLevel);
+                labelWindowsLevel.Text = _resolveLabelLevel(trackBarWindowsLevel.Value);
+                if (!settingsBackgroundWorker.IsBusy)
+                {
+                    settingsBackgroundWorker.RunWorkerAsync();
+                }
+            }
+        }
+
         private void settingsBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             Thread.Sleep(5000);

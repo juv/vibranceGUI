@@ -169,6 +169,7 @@
             this.trackBarWindowsLevel.Size = new System.Drawing.Size(131, 45);
             this.trackBarWindowsLevel.TabIndex = 0;
             this.trackBarWindowsLevel.Scroll += new System.EventHandler(this.trackBarWindowsLevel_Scroll);
+            this.trackBarWindowsLevel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.trackBarWindowsLevel_MouseDown);
             // 
             // statusLabel
             // 

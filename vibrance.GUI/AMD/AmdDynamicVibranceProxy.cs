@@ -110,6 +110,7 @@ namespace vibrance.GUI.AMD
                     //test if a resolution change is needed
                     Screen screen = Screen.FromHandle(e.Handle);
                     if (applicationSetting.IsResolutionChangeNeeded && IsResolutionChangeNeeded(screen, applicationSetting.ResolutionSettings) &&
+                        _windowsResolutionSettings.ContainsKey(screen.DeviceName) &&
                         _windowsResolutionSettings[screen.DeviceName].Item2.Contains(applicationSetting.ResolutionSettings))
                     {
                         _gameScreen = screen;

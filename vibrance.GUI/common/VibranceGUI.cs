@@ -30,10 +30,10 @@ namespace vibrance.GUI.common
         private bool _allowVisible;
         private List<ApplicationSetting> _applicationSettings;
         private readonly List<ResolutionModeWrapper> _supportedResolutionList;
-        private readonly ResolutionModeWrapper _windowsResolutionSettings;
+        private readonly Dictionary<string, Tuple<ResolutionModeWrapper, List<ResolutionModeWrapper>>> _windowsResolutionSettings;
 
         public VibranceGUI(
-            Func<List<ApplicationSetting>, ResolutionModeWrapper, IVibranceProxy> getProxy, 
+            Func<List<ApplicationSetting>, Dictionary<string, Tuple<ResolutionModeWrapper, List<ResolutionModeWrapper>>>, IVibranceProxy> getProxy, 
             int defaultWindowsLevel, 
             int minTrackBarValue,
             int maxTrackBarValue,
@@ -52,18 +52,25 @@ namespace vibrance.GUI.common
             trackBarWindowsLevel.Minimum = minTrackBarValue;
             trackBarWindowsLevel.Maximum = maxTrackBarValue;
 
-            _supportedResolutionList = ResolutionHelper.EnumerateSupportedResolutionModes();
-
-            Devmode currentResolutionMode;
-            if (ResolutionHelper.GetCurrentResolutionSettings(out currentResolutionMode, null))
+            _windowsResolutionSettings = new Dictionary<string, Tuple<ResolutionModeWrapper, List<ResolutionModeWrapper>>>();
+            foreach(Screen screen in Screen.AllScreens)
             {
-                _windowsResolutionSettings = new ResolutionModeWrapper(currentResolutionMode);
+                Devmode currentResolutionMode;
+                if (ResolutionHelper.GetCurrentResolutionSettings(out currentResolutionMode, screen.DeviceName))
+                {
+                    List<ResolutionModeWrapper> availableResolutions = ResolutionHelper.EnumerateSupportedResolutionModes(screen.DeviceName);
+                    if(screen.Primary)
+                    {
+                        _supportedResolutionList = availableResolutions;
+                    }
+                    var tuple = new Tuple<ResolutionModeWrapper, List<ResolutionModeWrapper>>(new ResolutionModeWrapper(currentResolutionMode), availableResolutions);
+                    _windowsResolutionSettings.Add(screen.DeviceName, tuple);                    
+                }
+                else
+                {
+                    MessageBox.Show("Current resolution mode could not be determined. Switching back to your Windows resolution will not work.");
+                }
             }
-            else
-            {
-                MessageBox.Show("Current resolution mode could not be determined. Switching back to your Windows resolution will not work.");
-            }
-
             _applicationSettings = new List<ApplicationSetting>();
             _v = getProxy(_applicationSettings, _windowsResolutionSettings);
 

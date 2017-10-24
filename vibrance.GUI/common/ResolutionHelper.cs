@@ -56,12 +56,17 @@ namespace vibrance.GUI.common
 
         public static List<ResolutionModeWrapper> EnumerateSupportedResolutionModes()
         {
+            return EnumerateSupportedResolutionModes(null);
+        }
+
+        public static List<ResolutionModeWrapper> EnumerateSupportedResolutionModes(string deviceName)
+        {
             List<ResolutionModeWrapper> resolutionList = new List<ResolutionModeWrapper>();
             Devmode mode = new Devmode();
             mode.dmSize = (ushort)Marshal.SizeOf(mode);
 
             int index = 0;
-            while (EnumDisplaySettings(null, index++, ref mode) == true)
+            while (EnumDisplaySettings(deviceName, index++, ref mode) == true)
             {
                 resolutionList.Add(new ResolutionModeWrapper(mode));
             }

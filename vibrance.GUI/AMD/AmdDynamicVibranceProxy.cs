@@ -15,12 +15,12 @@ namespace vibrance.GUI.AMD
     {
         private readonly IAmdAdapter _amdAdapter;
         private List<ApplicationSetting> _applicationSettings;
-        private readonly ResolutionModeWrapper _windowsResolutionSettings;
+        private readonly Dictionary<string, Tuple<ResolutionModeWrapper, List<ResolutionModeWrapper>>> _windowsResolutionSettings;
         private VibranceInfo _vibranceInfo;
         private WinEventHook _hook;
         private static Screen _gameScreen;
 
-        public AmdDynamicVibranceProxy(IAmdAdapter amdAdapter, List<ApplicationSetting> applicationSettings, ResolutionModeWrapper windowsResolutionSettings)
+        public AmdDynamicVibranceProxy(IAmdAdapter amdAdapter, List<ApplicationSetting> applicationSettings, Dictionary<string, Tuple<ResolutionModeWrapper, List<ResolutionModeWrapper>>> windowsResolutionSettings)
         {
             _amdAdapter = amdAdapter;
             _applicationSettings = applicationSettings;
@@ -109,7 +109,8 @@ namespace vibrance.GUI.AMD
                 {
                     //test if a resolution change is needed
                     Screen screen = Screen.FromHandle(e.Handle);
-                    if (applicationSetting.IsResolutionChangeNeeded && IsResolutionChangeNeeded(screen, applicationSetting.ResolutionSettings))
+                    if (applicationSetting.IsResolutionChangeNeeded && IsResolutionChangeNeeded(screen, applicationSetting.ResolutionSettings) &&
+                        _windowsResolutionSettings[screen.DeviceName].Item2.Contains(applicationSetting.ResolutionSettings))
                     {
                         _gameScreen = screen;
                         PerformResolutionChange(screen, applicationSetting.ResolutionSettings);
@@ -133,9 +134,11 @@ namespace vibrance.GUI.AMD
 
                     //test if a resolution change is needed
                     Screen screen = Screen.FromHandle(processHandle);
-                    if (_gameScreen != null && _gameScreen.Equals(screen) && IsResolutionChangeNeeded(screen, _windowsResolutionSettings))
+                    if (_gameScreen != null && _gameScreen.Equals(screen) && 
+                        _windowsResolutionSettings.ContainsKey(screen.DeviceName) &&
+                        IsResolutionChangeNeeded(screen, _windowsResolutionSettings[screen.DeviceName].Item1))
                     {
-                        PerformResolutionChange(screen, _windowsResolutionSettings);
+                        PerformResolutionChange(screen, _windowsResolutionSettings[screen.DeviceName].Item1);
                     }
 
                     _amdAdapter.SetSaturationOnAllDisplays(_vibranceInfo.userVibranceSettingDefault);

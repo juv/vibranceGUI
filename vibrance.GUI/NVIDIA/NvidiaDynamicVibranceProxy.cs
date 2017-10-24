@@ -130,11 +130,11 @@ namespace vibrance.GUI.NVIDIA
 
         private static VibranceInfo _vibranceInfo;
         private static List<ApplicationSetting> _applicationSettings;
-        private static ResolutionModeWrapper _windowsResolutionSettings;
+        private static Dictionary<string, Tuple<ResolutionModeWrapper, List<ResolutionModeWrapper>>> _windowsResolutionSettings;
         private WinEventHook _hook;
         private static Screen _gameScreen;
 
-        public NvidiaDynamicVibranceProxy(List<ApplicationSetting> savedApplicationSettings, ResolutionModeWrapper currentWindowsResolutionSettings)
+        public NvidiaDynamicVibranceProxy(List<ApplicationSetting> savedApplicationSettings, Dictionary<string, Tuple<ResolutionModeWrapper, List<ResolutionModeWrapper>>> currentWindowsResolutionSettings)
         {
             try
             {
@@ -219,7 +219,8 @@ namespace vibrance.GUI.NVIDIA
                     {
                         //test if a resolution change is needed
                         Screen screen = Screen.FromHandle(e.Handle);
-                        if (applicationSetting.IsResolutionChangeNeeded && IsResolutionChangeNeeded(screen, applicationSetting.ResolutionSettings))
+                        if (applicationSetting.IsResolutionChangeNeeded && IsResolutionChangeNeeded(screen, applicationSetting.ResolutionSettings) &&
+                            _windowsResolutionSettings[screen.DeviceName].Item2.Contains(applicationSetting.ResolutionSettings))
                         {
                             PerformResolutionChange(screen, applicationSetting.ResolutionSettings);
                         }
@@ -237,12 +238,14 @@ namespace vibrance.GUI.NVIDIA
                     
                     //test if a resolution change is needed
                     Screen currentScreen = Screen.FromHandle(processHandle);
-
-                    if (_gameScreen != null && _gameScreen.Equals(currentScreen) && IsResolutionChangeNeeded(currentScreen, _windowsResolutionSettings))
+                    if (_gameScreen != null && 
+                        _gameScreen.Equals(currentScreen) && 
+                        _windowsResolutionSettings.ContainsKey(currentScreen.DeviceName) &&
+                        IsResolutionChangeNeeded(currentScreen, _windowsResolutionSettings[currentScreen.DeviceName].Item1))
                     {
-                        PerformResolutionChange(currentScreen, _windowsResolutionSettings);
+                        PerformResolutionChange(currentScreen, _windowsResolutionSettings[currentScreen.DeviceName].Item1);
                     }
-                    
+
                     //test if changing the vibrance value is needed
                     if (_vibranceInfo.affectPrimaryMonitorOnly && !equalsDVCLevel(_vibranceInfo.defaultHandle, _vibranceInfo.userVibranceSettingDefault))
                     {

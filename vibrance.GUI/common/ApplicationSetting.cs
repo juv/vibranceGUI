@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+﻿using System;
+using System.Xml.Serialization;
 
 namespace vibrance.GUI.common
 {
@@ -20,6 +21,21 @@ namespace vibrance.GUI.common
             this.IngameLevel = ingameLevel;
             this.ResolutionSettings = resolutionSettings;
             this.IsResolutionChangeNeeded = isResolutionChangeNeeded;
+        }
+
+        public override bool Equals(object obj)
+        {
+            // Check for null values and compare run-time types.
+            if (obj == null || GetType() != obj.GetType())
+                return false;
+
+            ApplicationSetting that = (ApplicationSetting)obj;
+            return this.FileName.Equals(that.FileName);
+        }
+
+        public override int GetHashCode()
+        {
+            return this.FileName.GetHashCode();
         }
     }
 }

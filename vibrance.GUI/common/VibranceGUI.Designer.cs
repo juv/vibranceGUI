@@ -37,6 +37,7 @@
             this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.checkBoxAutostart = new System.Windows.Forms.CheckBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.checkBoxNeverChangeResolutions = new System.Windows.Forms.CheckBox();
             this.checkBoxPrimaryMonitorOnly = new System.Windows.Forms.CheckBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.labelWindowsLevel = new System.Windows.Forms.Label();
@@ -49,7 +50,6 @@
             this.buttonPaypal = new System.Windows.Forms.Button();
             this.labelPaypal = new System.Windows.Forms.Label();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.buttonSteam = new System.Windows.Forms.Button();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.buttonProcessExplorer = new System.Windows.Forms.Button();
             this.buttonRemoveProgram = new System.Windows.Forms.Button();
@@ -119,6 +119,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.checkBoxNeverChangeResolutions);
             this.groupBox1.Controls.Add(this.checkBoxPrimaryMonitorOnly);
             this.groupBox1.Controls.Add(this.groupBox3);
             this.groupBox1.Controls.Add(this.checkBoxAutostart);
@@ -128,6 +129,19 @@
             this.groupBox1.TabIndex = 15;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Settings";
+            // 
+            // checkBoxNeverChangeResolutions
+            // 
+            this.checkBoxNeverChangeResolutions.AutoSize = true;
+            this.checkBoxNeverChangeResolutions.Location = new System.Drawing.Point(163, 42);
+            this.checkBoxNeverChangeResolutions.Name = "checkBoxNeverChangeResolutions";
+            this.checkBoxNeverChangeResolutions.Size = new System.Drawing.Size(147, 17);
+            this.checkBoxNeverChangeResolutions.TabIndex = 16;
+            this.checkBoxNeverChangeResolutions.Text = "Never change resolutions";
+            this.toolTip.SetToolTip(this.checkBoxNeverChangeResolutions, "When checking this, VibranceGUI will never change the resolution on any of your m" +
+        "onitors.");
+            this.checkBoxNeverChangeResolutions.UseVisualStyleBackColor = true;
+            this.checkBoxNeverChangeResolutions.CheckedChanged += new System.EventHandler(this.checkBoxNeverChangeResolutions_CheckedChanged);
             // 
             // checkBoxPrimaryMonitorOnly
             // 
@@ -242,20 +256,6 @@
             this.toolTip.IsBalloon = true;
             this.toolTip.ReshowDelay = 100;
             // 
-            // buttonSteam
-            // 
-            this.buttonSteam.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.buttonSteam.BackColor = System.Drawing.Color.Transparent;
-            this.buttonSteam.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.buttonSteam.Image = ((System.Drawing.Image)(resources.GetObject("buttonSteam.Image")));
-            this.buttonSteam.Location = new System.Drawing.Point(307, 27);
-            this.buttonSteam.Name = "buttonSteam";
-            this.buttonSteam.Size = new System.Drawing.Size(90, 55);
-            this.buttonSteam.TabIndex = 19;
-            this.toolTip.SetToolTip(this.buttonSteam, "Click here to donate to vibranceGUI through Steam");
-            this.buttonSteam.UseVisualStyleBackColor = false;
-            this.buttonSteam.Click += new System.EventHandler(this.buttonSteam_Click);
-            // 
             // groupBox5
             // 
             this.groupBox5.Controls.Add(this.buttonProcessExplorer);
@@ -313,7 +313,6 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(419, 524);
-            this.Controls.Add(this.buttonSteam);
             this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.labelPaypal);
             this.Controls.Add(this.buttonPaypal);
@@ -368,8 +367,8 @@
         private System.Windows.Forms.Button buttonRemoveProgram;
         private System.Windows.Forms.ListView listApplications;
         private System.Windows.Forms.Button buttonAddProgram;
-        private System.Windows.Forms.Button buttonSteam;
         private System.Windows.Forms.Button buttonProcessExplorer;
+        private System.Windows.Forms.CheckBox checkBoxNeverChangeResolutions;
     }
 }
 

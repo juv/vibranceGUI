@@ -25,7 +25,6 @@ namespace vibrance.GUI.common
         private const string AppName = "vibranceGUI";
         private const string TwitterLink = "https://twitter.com/juvlarN";
         private const string PaypalDonationLink = "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=JDQFNKNNEW356";
-        private const string SteamDonationLink = "https://steamcommunity.com/tradeoffer/new/?partner=92410529&token=iGiRV4Nx";
 
         private bool _allowVisible;
         private List<ApplicationSetting> _applicationSettings;
@@ -118,6 +117,7 @@ namespace vibrance.GUI.common
         {
             int vibranceWindowsLevel = _defaultWindowsLevel;
             bool affectPrimaryMonitorOnly = false;
+            bool neverSwitchResolution = false;
 
             while (!this.IsHandleCreated)
             {
@@ -128,12 +128,12 @@ namespace vibrance.GUI.common
             {
                 this.Invoke((MethodInvoker)delegate
                 {
-                    ReadVibranceSettings(out vibranceWindowsLevel, out affectPrimaryMonitorOnly);
+                    ReadVibranceSettings(out vibranceWindowsLevel, out affectPrimaryMonitorOnly, out neverSwitchResolution);
                 });
             }
             else
             {
-                ReadVibranceSettings(out vibranceWindowsLevel, out affectPrimaryMonitorOnly);
+                ReadVibranceSettings(out vibranceWindowsLevel, out affectPrimaryMonitorOnly, out neverSwitchResolution);
             }
 
             if (_v.GetVibranceInfo().isInitialized)
@@ -146,6 +146,7 @@ namespace vibrance.GUI.common
                 _v.SetShouldRun(true);
                 _v.SetVibranceWindowsLevel(vibranceWindowsLevel);
                 _v.SetAffectPrimaryMonitorOnly(affectPrimaryMonitorOnly);
+                _v.SetNeverSwitchResolution(neverSwitchResolution);
             }
         }
 
@@ -187,12 +188,14 @@ namespace vibrance.GUI.common
         {
             int windowsLevel = 0;
             bool affectPrimaryMonitorOnly = false;
+            bool neverSwitchResolution = false;
             this.Invoke((MethodInvoker)delegate
             {
                 windowsLevel = trackBarWindowsLevel.Value;
                 affectPrimaryMonitorOnly = checkBoxPrimaryMonitorOnly.Checked;
+                neverSwitchResolution = checkBoxNeverChangeResolutions.Checked;
             });
-            SaveVibranceSettings(windowsLevel, affectPrimaryMonitorOnly);
+            SaveVibranceSettings(windowsLevel, affectPrimaryMonitorOnly, neverSwitchResolution);
         }
 
         private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -232,6 +235,20 @@ namespace vibrance.GUI.common
             }
 
             this._v.SetAffectPrimaryMonitorOnly(this.checkBoxPrimaryMonitorOnly.Checked);
+            if (!this.settingsBackgroundWorker.IsBusy)
+            {
+                this.settingsBackgroundWorker.RunWorkerAsync();
+            }
+        }
+        
+        private void checkBoxNeverChangeResolutions_CheckedChanged(object sender, EventArgs e)
+        {
+            if (this._v == null)
+            {
+                return;
+            }
+
+            this._v.SetNeverSwitchResolution(this.checkBoxNeverChangeResolutions.Checked);
             if (!this.settingsBackgroundWorker.IsBusy)
             {
                 this.settingsBackgroundWorker.RunWorkerAsync();
@@ -343,13 +360,13 @@ namespace vibrance.GUI.common
             }
         }
 
-        private void ReadVibranceSettings(out int vibranceWindowsLevel, out bool affectPrimaryMonitorOnly)
+        private void ReadVibranceSettings(out int vibranceWindowsLevel, out bool affectPrimaryMonitorOnly, out bool neverSwitchResolution)
         {
             _registryController = new RegistryController();
             this.checkBoxAutostart.Checked = _registryController.IsProgramRegistered(AppName);
 
             SettingsController settingsController = new SettingsController();
-            settingsController.ReadVibranceSettings(_v.GraphicsAdapter, out vibranceWindowsLevel, out affectPrimaryMonitorOnly, out _applicationSettings);
+            settingsController.ReadVibranceSettings(_v.GraphicsAdapter, out vibranceWindowsLevel, out affectPrimaryMonitorOnly, out neverSwitchResolution, out _applicationSettings);
 
             if (this.IsHandleCreated)
             {
@@ -358,6 +375,7 @@ namespace vibrance.GUI.common
 
                 trackBarWindowsLevel.Value = vibranceWindowsLevel;
                 checkBoxPrimaryMonitorOnly.Checked = affectPrimaryMonitorOnly;
+                checkBoxNeverChangeResolutions.Checked = neverSwitchResolution;
                 foreach (ApplicationSetting application in _applicationSettings.ToList())
                 {
                     if (!File.Exists(application.FileName))
@@ -381,13 +399,14 @@ namespace vibrance.GUI.common
             }
         }
 
-        private void SaveVibranceSettings(int windowsLevel, bool affectPrimaryMonitorOnly)
+        private void SaveVibranceSettings(int windowsLevel, bool affectPrimaryMonitorOnly, bool neverSwitchResolution)
         {
             SettingsController settingsController = new SettingsController();
 
             settingsController.SetVibranceSettings(
                 windowsLevel.ToString(),
                 affectPrimaryMonitorOnly.ToString(),
+                neverSwitchResolution.ToString(),
                 _applicationSettings
             );
         }
@@ -395,11 +414,6 @@ namespace vibrance.GUI.common
         private void buttonPaypal_Click(object sender, EventArgs e)
         {
             Process.Start(PaypalDonationLink);
-        }
-
-        private void buttonSteam_Click(object sender, EventArgs e)
-        {
-            Process.Start(SteamDonationLink);
         }
 
         private void buttonAddProgram_Click(object sender, EventArgs e)

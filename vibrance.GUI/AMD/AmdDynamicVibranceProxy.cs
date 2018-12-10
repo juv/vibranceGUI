@@ -64,6 +64,11 @@ namespace vibrance.GUI.AMD
             _vibranceInfo.shouldRun = shouldRun;
         }
 
+        public void SetNeverSwitchResolution(bool neverChangeResolution)
+        {
+            _vibranceInfo.neverChangeResolution = neverChangeResolution;
+        }
+
         public void SetVibranceWindowsLevel(int vibranceWindowsLevel)
         {
             _vibranceInfo.userVibranceSettingDefault = vibranceWindowsLevel;
@@ -109,7 +114,9 @@ namespace vibrance.GUI.AMD
                 {
                     //test if a resolution change is needed
                     Screen screen = Screen.FromHandle(e.Handle);
-                    if (applicationSetting.IsResolutionChangeNeeded && IsResolutionChangeNeeded(screen, applicationSetting.ResolutionSettings) &&
+                    if (_vibranceInfo.neverChangeResolution == false && 
+                        applicationSetting.IsResolutionChangeNeeded && 
+                        IsResolutionChangeNeeded(screen, applicationSetting.ResolutionSettings) &&
                         _windowsResolutionSettings.ContainsKey(screen.DeviceName) &&
                         _windowsResolutionSettings[screen.DeviceName].Item2.Contains(applicationSetting.ResolutionSettings))
                     {
@@ -135,7 +142,8 @@ namespace vibrance.GUI.AMD
 
                     //test if a resolution change is needed
                     Screen screen = Screen.FromHandle(processHandle);
-                    if (_gameScreen != null && _gameScreen.Equals(screen) && 
+                    if (_vibranceInfo.neverChangeResolution == false && 
+                        _gameScreen != null && _gameScreen.Equals(screen) && 
                         _windowsResolutionSettings.ContainsKey(screen.DeviceName) &&
                         IsResolutionChangeNeeded(screen, _windowsResolutionSettings[screen.DeviceName].Item1))
                     {

@@ -14,5 +14,6 @@ namespace vibrance.GUI.common
         void SetAffectPrimaryMonitorOnly(bool affectPrimaryMonitorOnly);
         VibranceInfo GetVibranceInfo();
         GraphicsAdapter GraphicsAdapter { get; }
+        void SetNeverSwitchResolution(bool neverSwitchResolution);
     }
 }

@@ -17,5 +17,6 @@ namespace vibrance.GUI.common
         public int sleepInterval;
         public List<int> displayHandles;
         public bool affectPrimaryMonitorOnly;
+        public bool neverChangeResolution;
     }
 }

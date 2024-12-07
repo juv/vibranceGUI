@@ -75,11 +75,12 @@
             // 
             // contextMenuStrip
             // 
+            this.contextMenuStrip.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.contextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.twitterToolStripTextBox,
             this.exitToolStripMenuItem});
             this.contextMenuStrip.Name = "contextMenuStrip";
-            this.contextMenuStrip.Size = new System.Drawing.Size(217, 48);
+            this.contextMenuStrip.Size = new System.Drawing.Size(303, 68);
             this.contextMenuStrip.Text = "Vibrance Control";
             // 
             // twitterToolStripTextBox
@@ -88,7 +89,7 @@
             this.twitterToolStripTextBox.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(6)))), ((int)(((byte)(69)))), ((int)(((byte)(173)))));
             this.twitterToolStripTextBox.Image = ((System.Drawing.Image)(resources.GetObject("twitterToolStripTextBox.Image")));
             this.twitterToolStripTextBox.Name = "twitterToolStripTextBox";
-            this.twitterToolStripTextBox.Size = new System.Drawing.Size(216, 22);
+            this.twitterToolStripTextBox.Size = new System.Drawing.Size(302, 32);
             this.twitterToolStripTextBox.Text = "https://twitter.com/juvlarN";
             this.twitterToolStripTextBox.Click += new System.EventHandler(this.twitterToolStripTextBox_Click);
             // 
@@ -96,7 +97,7 @@
             // 
             this.exitToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("exitToolStripMenuItem.Image")));
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(302, 32);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -109,9 +110,10 @@
             // checkBoxAutostart
             // 
             this.checkBoxAutostart.AutoSize = true;
-            this.checkBoxAutostart.Location = new System.Drawing.Point(6, 19);
+            this.checkBoxAutostart.Location = new System.Drawing.Point(9, 29);
+            this.checkBoxAutostart.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.checkBoxAutostart.Name = "checkBoxAutostart";
-            this.checkBoxAutostart.Size = new System.Drawing.Size(131, 17);
+            this.checkBoxAutostart.Size = new System.Drawing.Size(194, 24);
             this.checkBoxAutostart.TabIndex = 8;
             this.checkBoxAutostart.Text = "Autostart vibranceGUI";
             this.checkBoxAutostart.UseVisualStyleBackColor = true;
@@ -123,9 +125,11 @@
             this.groupBox1.Controls.Add(this.checkBoxPrimaryMonitorOnly);
             this.groupBox1.Controls.Add(this.groupBox3);
             this.groupBox1.Controls.Add(this.checkBoxAutostart);
-            this.groupBox1.Location = new System.Drawing.Point(13, 82);
+            this.groupBox1.Location = new System.Drawing.Point(20, 126);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(397, 143);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox1.Size = new System.Drawing.Size(596, 220);
             this.groupBox1.TabIndex = 15;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Settings";
@@ -133,9 +137,10 @@
             // checkBoxNeverChangeResolutions
             // 
             this.checkBoxNeverChangeResolutions.AutoSize = true;
-            this.checkBoxNeverChangeResolutions.Location = new System.Drawing.Point(163, 42);
+            this.checkBoxNeverChangeResolutions.Location = new System.Drawing.Point(244, 65);
+            this.checkBoxNeverChangeResolutions.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.checkBoxNeverChangeResolutions.Name = "checkBoxNeverChangeResolutions";
-            this.checkBoxNeverChangeResolutions.Size = new System.Drawing.Size(147, 17);
+            this.checkBoxNeverChangeResolutions.Size = new System.Drawing.Size(214, 24);
             this.checkBoxNeverChangeResolutions.TabIndex = 16;
             this.checkBoxNeverChangeResolutions.Text = "Never change resolutions";
             this.toolTip.SetToolTip(this.checkBoxNeverChangeResolutions, "When checking this, VibranceGUI will never change the resolution on any of your m" +
@@ -146,9 +151,10 @@
             // checkBoxPrimaryMonitorOnly
             // 
             this.checkBoxPrimaryMonitorOnly.AutoSize = true;
-            this.checkBoxPrimaryMonitorOnly.Location = new System.Drawing.Point(6, 42);
+            this.checkBoxPrimaryMonitorOnly.Location = new System.Drawing.Point(9, 65);
+            this.checkBoxPrimaryMonitorOnly.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.checkBoxPrimaryMonitorOnly.Name = "checkBoxPrimaryMonitorOnly";
-            this.checkBoxPrimaryMonitorOnly.Size = new System.Drawing.Size(151, 17);
+            this.checkBoxPrimaryMonitorOnly.Size = new System.Drawing.Size(223, 24);
             this.checkBoxPrimaryMonitorOnly.TabIndex = 15;
             this.checkBoxPrimaryMonitorOnly.Text = "Affect Primary Monitor only";
             this.toolTip.SetToolTip(this.checkBoxPrimaryMonitorOnly, "When checking this, VibranceGUI will only change vibrance values on your primary " +
@@ -160,9 +166,11 @@
             // 
             this.groupBox3.Controls.Add(this.labelWindowsLevel);
             this.groupBox3.Controls.Add(this.trackBarWindowsLevel);
-            this.groupBox3.Location = new System.Drawing.Point(7, 65);
+            this.groupBox3.Location = new System.Drawing.Point(10, 100);
+            this.groupBox3.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(182, 72);
+            this.groupBox3.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox3.Size = new System.Drawing.Size(273, 111);
             this.groupBox3.TabIndex = 12;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Windows Vibrance Level";
@@ -170,53 +178,59 @@
             // labelWindowsLevel
             // 
             this.labelWindowsLevel.AutoSize = true;
-            this.labelWindowsLevel.Location = new System.Drawing.Point(148, 22);
+            this.labelWindowsLevel.Location = new System.Drawing.Point(222, 34);
+            this.labelWindowsLevel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelWindowsLevel.Name = "labelWindowsLevel";
-            this.labelWindowsLevel.Size = new System.Drawing.Size(0, 13);
+            this.labelWindowsLevel.Size = new System.Drawing.Size(0, 20);
             this.labelWindowsLevel.TabIndex = 1;
             // 
             // trackBarWindowsLevel
             // 
-            this.trackBarWindowsLevel.Location = new System.Drawing.Point(15, 22);
+            this.trackBarWindowsLevel.Location = new System.Drawing.Point(22, 34);
+            this.trackBarWindowsLevel.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.trackBarWindowsLevel.Maximum = 63;
             this.trackBarWindowsLevel.Name = "trackBarWindowsLevel";
-            this.trackBarWindowsLevel.Size = new System.Drawing.Size(131, 45);
+            this.trackBarWindowsLevel.Size = new System.Drawing.Size(196, 69);
             this.trackBarWindowsLevel.TabIndex = 0;
             this.trackBarWindowsLevel.Scroll += new System.EventHandler(this.trackBarWindowsLevel_Scroll);
             // 
             // statusLabel
             // 
             this.statusLabel.AutoSize = true;
-            this.statusLabel.Location = new System.Drawing.Point(106, 502);
+            this.statusLabel.Location = new System.Drawing.Point(159, 772);
+            this.statusLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.statusLabel.Name = "statusLabel";
-            this.statusLabel.Size = new System.Drawing.Size(61, 13);
+            this.statusLabel.Size = new System.Drawing.Size(90, 20);
             this.statusLabel.TabIndex = 14;
             this.statusLabel.Text = "Initializing...";
             // 
             // observerStatusLabel
             // 
             this.observerStatusLabel.AutoSize = true;
-            this.observerStatusLabel.Location = new System.Drawing.Point(12, 502);
+            this.observerStatusLabel.Location = new System.Drawing.Point(18, 772);
+            this.observerStatusLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.observerStatusLabel.Name = "observerStatusLabel";
-            this.observerStatusLabel.Size = new System.Drawing.Size(87, 13);
+            this.observerStatusLabel.Size = new System.Drawing.Size(129, 20);
             this.observerStatusLabel.TabIndex = 13;
             this.observerStatusLabel.Text = "Observer status: ";
             // 
             // labelTwitter
             // 
             this.labelTwitter.AutoSize = true;
-            this.labelTwitter.Location = new System.Drawing.Point(10, 11);
+            this.labelTwitter.Location = new System.Drawing.Point(15, 17);
+            this.labelTwitter.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelTwitter.Name = "labelTwitter";
-            this.labelTwitter.Size = new System.Drawing.Size(192, 13);
+            this.labelTwitter.Size = new System.Drawing.Size(283, 20);
             this.labelTwitter.TabIndex = 11;
             this.labelTwitter.Text = "Follow @juvlarN on twitter for updates: ";
             // 
             // linkLabelTwitter
             // 
             this.linkLabelTwitter.AutoSize = true;
-            this.linkLabelTwitter.Location = new System.Drawing.Point(208, 11);
+            this.linkLabelTwitter.Location = new System.Drawing.Point(312, 17);
+            this.linkLabelTwitter.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.linkLabelTwitter.Name = "linkLabelTwitter";
-            this.linkLabelTwitter.Size = new System.Drawing.Size(132, 13);
+            this.linkLabelTwitter.Size = new System.Drawing.Size(185, 20);
             this.linkLabelTwitter.TabIndex = 10;
             this.linkLabelTwitter.TabStop = true;
             this.linkLabelTwitter.Text = "https://twitter.com/juvlarN";
@@ -232,9 +246,10 @@
             this.buttonPaypal.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.buttonPaypal.BackColor = System.Drawing.Color.Transparent;
             this.buttonPaypal.Image = ((System.Drawing.Image)(resources.GetObject("buttonPaypal.Image")));
-            this.buttonPaypal.Location = new System.Drawing.Point(211, 28);
+            this.buttonPaypal.Location = new System.Drawing.Point(316, 43);
+            this.buttonPaypal.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.buttonPaypal.Name = "buttonPaypal";
-            this.buttonPaypal.Size = new System.Drawing.Size(90, 55);
+            this.buttonPaypal.Size = new System.Drawing.Size(135, 85);
             this.buttonPaypal.TabIndex = 16;
             this.toolTip.SetToolTip(this.buttonPaypal, "Click here to donate to vibranceGUI through Paypal");
             this.buttonPaypal.UseVisualStyleBackColor = false;
@@ -243,9 +258,10 @@
             // labelPaypal
             // 
             this.labelPaypal.AutoSize = true;
-            this.labelPaypal.Location = new System.Drawing.Point(10, 48);
+            this.labelPaypal.Location = new System.Drawing.Point(15, 74);
+            this.labelPaypal.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelPaypal.Name = "labelPaypal";
-            this.labelPaypal.Size = new System.Drawing.Size(183, 13);
+            this.labelPaypal.Size = new System.Drawing.Size(274, 20);
             this.labelPaypal.TabIndex = 17;
             this.labelPaypal.Text = "Like the program? Consider donating:";
             // 
@@ -262,18 +278,21 @@
             this.groupBox5.Controls.Add(this.buttonRemoveProgram);
             this.groupBox5.Controls.Add(this.listApplications);
             this.groupBox5.Controls.Add(this.buttonAddProgram);
-            this.groupBox5.Location = new System.Drawing.Point(13, 231);
+            this.groupBox5.Location = new System.Drawing.Point(20, 355);
+            this.groupBox5.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(397, 227);
+            this.groupBox5.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox5.Size = new System.Drawing.Size(596, 349);
             this.groupBox5.TabIndex = 18;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Program Settings";
             // 
             // buttonProcessExplorer
             // 
-            this.buttonProcessExplorer.Location = new System.Drawing.Point(7, 20);
+            this.buttonProcessExplorer.Location = new System.Drawing.Point(10, 31);
+            this.buttonProcessExplorer.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.buttonProcessExplorer.Name = "buttonProcessExplorer";
-            this.buttonProcessExplorer.Size = new System.Drawing.Size(75, 23);
+            this.buttonProcessExplorer.Size = new System.Drawing.Size(112, 35);
             this.buttonProcessExplorer.TabIndex = 3;
             this.buttonProcessExplorer.Text = "Add";
             this.buttonProcessExplorer.UseVisualStyleBackColor = true;
@@ -281,9 +300,10 @@
             // 
             // buttonRemoveProgram
             // 
-            this.buttonRemoveProgram.Location = new System.Drawing.Point(186, 20);
+            this.buttonRemoveProgram.Location = new System.Drawing.Point(279, 31);
+            this.buttonRemoveProgram.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.buttonRemoveProgram.Name = "buttonRemoveProgram";
-            this.buttonRemoveProgram.Size = new System.Drawing.Size(75, 23);
+            this.buttonRemoveProgram.Size = new System.Drawing.Size(112, 35);
             this.buttonRemoveProgram.TabIndex = 2;
             this.buttonRemoveProgram.Text = "Remove";
             this.buttonRemoveProgram.UseVisualStyleBackColor = true;
@@ -291,18 +311,21 @@
             // 
             // listApplications
             // 
-            this.listApplications.Location = new System.Drawing.Point(7, 49);
+            this.listApplications.HideSelection = false;
+            this.listApplications.Location = new System.Drawing.Point(10, 75);
+            this.listApplications.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.listApplications.Name = "listApplications";
-            this.listApplications.Size = new System.Drawing.Size(384, 172);
+            this.listApplications.Size = new System.Drawing.Size(574, 262);
             this.listApplications.TabIndex = 1;
             this.listApplications.UseCompatibleStateImageBehavior = false;
             this.listApplications.DoubleClick += new System.EventHandler(this.listApplications_DoubleClick);
             // 
             // buttonAddProgram
             // 
-            this.buttonAddProgram.Location = new System.Drawing.Point(88, 20);
+            this.buttonAddProgram.Location = new System.Drawing.Point(132, 31);
+            this.buttonAddProgram.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.buttonAddProgram.Name = "buttonAddProgram";
-            this.buttonAddProgram.Size = new System.Drawing.Size(92, 23);
+            this.buttonAddProgram.Size = new System.Drawing.Size(138, 35);
             this.buttonAddProgram.TabIndex = 0;
             this.buttonAddProgram.Text = "Add manually";
             this.buttonAddProgram.UseVisualStyleBackColor = true;
@@ -310,9 +333,9 @@
             // 
             // VibranceGUI
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(419, 524);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(144F, 144F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+            this.ClientSize = new System.Drawing.Size(628, 806);
             this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.labelPaypal);
             this.Controls.Add(this.buttonPaypal);
@@ -323,6 +346,7 @@
             this.Controls.Add(this.linkLabelTwitter);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.MaximizeBox = false;
             this.Name = "VibranceGUI";
             this.Text = "vibranceGUI";

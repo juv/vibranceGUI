@@ -50,36 +50,41 @@
             // 
             this.groupBox2.Controls.Add(this.trackBarIngameLevel);
             this.groupBox2.Controls.Add(this.labelIngameLevel);
-            this.groupBox2.Location = new System.Drawing.Point(12, 63);
+            this.groupBox2.Location = new System.Drawing.Point(18, 97);
+            this.groupBox2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(246, 72);
+            this.groupBox2.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox2.Size = new System.Drawing.Size(369, 111);
             this.groupBox2.TabIndex = 13;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Ingame Vibrance Level";
             // 
             // trackBarIngameLevel
             // 
-            this.trackBarIngameLevel.Location = new System.Drawing.Point(16, 23);
+            this.trackBarIngameLevel.Location = new System.Drawing.Point(24, 35);
+            this.trackBarIngameLevel.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.trackBarIngameLevel.Maximum = 63;
             this.trackBarIngameLevel.Name = "trackBarIngameLevel";
-            this.trackBarIngameLevel.Size = new System.Drawing.Size(131, 45);
+            this.trackBarIngameLevel.Size = new System.Drawing.Size(196, 69);
             this.trackBarIngameLevel.TabIndex = 9;
             this.trackBarIngameLevel.Scroll += new System.EventHandler(this.trackBarIngameLevel_Scroll);
             // 
             // labelIngameLevel
             // 
             this.labelIngameLevel.AutoSize = true;
-            this.labelIngameLevel.Location = new System.Drawing.Point(149, 26);
+            this.labelIngameLevel.Location = new System.Drawing.Point(224, 40);
+            this.labelIngameLevel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelIngameLevel.Name = "labelIngameLevel";
-            this.labelIngameLevel.Size = new System.Drawing.Size(27, 13);
+            this.labelIngameLevel.Size = new System.Drawing.Size(41, 20);
             this.labelIngameLevel.TabIndex = 10;
             this.labelIngameLevel.Text = "50%";
             // 
             // buttonSave
             // 
-            this.buttonSave.Location = new System.Drawing.Point(100, 231);
+            this.buttonSave.Location = new System.Drawing.Point(150, 355);
+            this.buttonSave.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.buttonSave.Name = "buttonSave";
-            this.buttonSave.Size = new System.Drawing.Size(75, 23);
+            this.buttonSave.Size = new System.Drawing.Size(112, 35);
             this.buttonSave.TabIndex = 14;
             this.buttonSave.Text = "Save";
             this.buttonSave.UseVisualStyleBackColor = true;
@@ -88,18 +93,20 @@
             // labelTitle
             // 
             this.labelTitle.AutoSize = true;
-            this.labelTitle.Location = new System.Drawing.Point(66, 9);
-            this.labelTitle.MaximumSize = new System.Drawing.Size(150, 0);
+            this.labelTitle.Location = new System.Drawing.Point(99, 14);
+            this.labelTitle.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelTitle.MaximumSize = new System.Drawing.Size(225, 0);
             this.labelTitle.Name = "labelTitle";
-            this.labelTitle.Size = new System.Drawing.Size(63, 13);
+            this.labelTitle.Size = new System.Drawing.Size(95, 20);
             this.labelTitle.TabIndex = 15;
             this.labelTitle.Text = "Settings for ";
             // 
             // pictureBox
             // 
-            this.pictureBox.Location = new System.Drawing.Point(12, 9);
+            this.pictureBox.Location = new System.Drawing.Point(18, 14);
+            this.pictureBox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.pictureBox.Name = "pictureBox";
-            this.pictureBox.Size = new System.Drawing.Size(48, 48);
+            this.pictureBox.Size = new System.Drawing.Size(72, 74);
             this.pictureBox.TabIndex = 16;
             this.pictureBox.TabStop = false;
             // 
@@ -107,9 +114,10 @@
             // 
             this.cBoxResolution.Enabled = false;
             this.cBoxResolution.FormattingEnabled = true;
-            this.cBoxResolution.Location = new System.Drawing.Point(6, 57);
+            this.cBoxResolution.Location = new System.Drawing.Point(9, 88);
+            this.cBoxResolution.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.cBoxResolution.Name = "cBoxResolution";
-            this.cBoxResolution.Size = new System.Drawing.Size(234, 21);
+            this.cBoxResolution.Size = new System.Drawing.Size(349, 28);
             this.cBoxResolution.TabIndex = 17;
             // 
             // groupBox1
@@ -117,9 +125,11 @@
             this.groupBox1.Controls.Add(this.labelResolution);
             this.groupBox1.Controls.Add(this.checkBoxResolution);
             this.groupBox1.Controls.Add(this.cBoxResolution);
-            this.groupBox1.Location = new System.Drawing.Point(12, 141);
+            this.groupBox1.Location = new System.Drawing.Point(18, 217);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(246, 84);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox1.Size = new System.Drawing.Size(369, 129);
             this.groupBox1.TabIndex = 19;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Ingame Resolution";
@@ -128,18 +138,20 @@
             // 
             this.labelResolution.AutoSize = true;
             this.labelResolution.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelResolution.Location = new System.Drawing.Point(4, 18);
+            this.labelResolution.Location = new System.Drawing.Point(6, 28);
+            this.labelResolution.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelResolution.Name = "labelResolution";
-            this.labelResolution.Size = new System.Drawing.Size(225, 13);
+            this.labelResolution.Size = new System.Drawing.Size(360, 20);
             this.labelResolution.TabIndex = 19;
             this.labelResolution.Text = "For (Borderless) Windowed Mode players only!";
             // 
             // checkBoxResolution
             // 
             this.checkBoxResolution.AutoSize = true;
-            this.checkBoxResolution.Location = new System.Drawing.Point(6, 34);
+            this.checkBoxResolution.Location = new System.Drawing.Point(9, 52);
+            this.checkBoxResolution.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.checkBoxResolution.Name = "checkBoxResolution";
-            this.checkBoxResolution.Size = new System.Drawing.Size(183, 17);
+            this.checkBoxResolution.Size = new System.Drawing.Size(271, 24);
             this.checkBoxResolution.TabIndex = 18;
             this.checkBoxResolution.Text = "Change Resolution when Ingame";
             this.checkBoxResolution.UseVisualStyleBackColor = true;
@@ -147,9 +159,10 @@
             // 
             // buttonReadColorSettings
             // 
-            this.buttonReadColorSettings.Location = new System.Drawing.Point(166, 24);
+            this.buttonReadColorSettings.Location = new System.Drawing.Point(249, 37);
+            this.buttonReadColorSettings.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.buttonReadColorSettings.Name = "buttonReadColorSettings";
-            this.buttonReadColorSettings.Size = new System.Drawing.Size(75, 23);
+            this.buttonReadColorSettings.Size = new System.Drawing.Size(112, 35);
             this.buttonReadColorSettings.TabIndex = 20;
             this.buttonReadColorSettings.Text = "Read Brightness/Contrast/Gamma";
             this.buttonReadColorSettings.UseVisualStyleBackColor = true;
@@ -157,9 +170,9 @@
             // 
             // VibranceSettings
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(270, 266);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(144F, 144F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+            this.ClientSize = new System.Drawing.Size(405, 409);
             this.Controls.Add(this.buttonReadColorSettings);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.pictureBox);
@@ -168,6 +181,7 @@
             this.Controls.Add(this.groupBox2);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.MaximizeBox = false;
             this.Name = "VibranceSettings";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;

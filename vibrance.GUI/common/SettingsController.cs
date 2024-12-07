@@ -114,7 +114,7 @@ namespace vibrance.GUI.common
                 vibranceWindowsLevel = defaultLevel;
                 affectPrimaryMonitorOnly = false;
                 applicationSettings = new List<ApplicationSetting>();
-                neverSwitchResolution = false;
+                neverSwitchResolution = true;
                 return;
             }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Media;
@@ -113,6 +114,26 @@ namespace vibrance.GUI.NVIDIA
             CallingConvention = CallingConvention.StdCall,
             CharSet = CharSet.Ansi)]
         static extern int getAssociatedNvidiaDisplayHandle(string deviceName, [In] int length);
+
+        [DllImport("gdi32.dll")]
+        public static extern bool GetDeviceGammaRamp(IntPtr hDC, ref RAMP lpRamp);
+
+        [DllImport("gdi32.dll")]
+        public static extern bool SetDeviceGammaRamp(IntPtr hDC, ref RAMP lpRamp);
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+        public struct RAMP
+        {
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
+            public UInt16[] Red;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
+            public UInt16[] Green;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
+            public UInt16[] Blue;
+        }
+
+        [DllImport("gdi32.dll")]
+        static extern IntPtr CreateDC(string lpszDriver, string lpszDevice, string lpszOutput, IntPtr lpInitData);
         #endregion
 
 
@@ -204,6 +225,49 @@ namespace vibrance.GUI.NVIDIA
             }
 
             _vibranceInfo.isInitialized = true;
+        }
+
+        private static ushort[] CalculateLUT(double brightness = 0.5, double contrast = 0.5, double gamma = 1)
+        {
+            const int dataPoints = 256;
+
+            // Limit gamma in range [0.4-2.8]
+            gamma = Math.Min(Math.Max(gamma, 0.4), 2.8);
+
+            // Normalize contrast in range [-1,1]
+            contrast = (Math.Min(Math.Max(contrast, 0), 1) - 0.5) * 2;
+
+            // Normalize brightness in range [-1,1]
+            brightness = (Math.Min(Math.Max(brightness, 0), 1) - 0.5) * 2;
+
+            // Calculate curve offset resulted from contrast
+            var offset = contrast > 0 ? contrast * -25.4 : contrast * -32;
+
+            // Calculate the total range of curve
+            var range = (dataPoints - 1) + offset * 2;
+
+            // Add brightness to the curve offset
+            offset += brightness * (range / 5);
+
+            // Fill the gamma curve
+            var result = new ushort[dataPoints];
+            for (var i = 0; i < result.Length; i++)
+            {
+                var factor = (i + offset) / range;
+
+                factor = Math.Pow(factor, 1 / gamma);
+
+                factor = Math.Min(Math.Max(factor, 0), 1);
+
+                result[i] = (ushort)Math.Round(factor * ushort.MaxValue);
+            }
+
+            return result;
+        }
+
+        private void changeGamma()
+        {
+            CalculateLUT(1.0, 1.0, 1.0);
         }
 
         private static void OnWinEventHook(object sender, WinEventHookEventArgs e)
@@ -373,6 +437,32 @@ namespace vibrance.GUI.NVIDIA
             }
             else if (!_vibranceInfo.displayHandles.TrueForAll(handle => equalsDVCLevel(handle, _vibranceInfo.userVibranceSettingDefault)))
                 _vibranceInfo.displayHandles.ForEach(handle => setDVCLevel(handle, _vibranceInfo.userVibranceSettingDefault));
+        }
+        int i = 0; 
+        public void ReadColorSettings()
+        {
+            if(i%2 == 0)
+            {
+                SetDeviceGammaRampHelper.ApplyGammaRamp(555, 50, 1.0, 1.0, 0.5);
+            }
+            else
+            {
+                SetDeviceGammaRampHelper.ApplyGammaRamp(555, 50, 1.0, 0.5, 0.5);
+            }
+            i = i + 1;
+
+            /*RAMP ramp = new RAMP();
+            bool ret = GetDeviceGammaRamp(CreateDC("DISPLAY", _gameScreen.DeviceName, null, IntPtr.Zero), ref ramp);
+            Console.WriteLine("GetDeviceGammaRamp: " + ret);
+            string content = "";
+            if(ret)
+            {
+                content += string.Join(",\n", ramp.Red);
+                content += string.Join(",\n", ramp.Green);
+                content += string.Join(",\n", ramp.Blue);
+                File.WriteAllText("data" + i +".txt", content);
+                i = i+1;
+            }*/
         }
     }
 }

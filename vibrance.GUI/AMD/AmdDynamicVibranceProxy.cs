@@ -13,6 +13,25 @@ namespace vibrance.GUI.AMD
 {
     public class AmdDynamicVibranceProxy : IVibranceProxy
     {
+        #region DllImports
+        [DllImport("gdi32.dll")]
+        public static extern bool GetDeviceGammaRamp(IntPtr hDC, ref RAMP lpRamp);
+
+        [DllImport("gdi32.dll")]
+        public static extern bool SetDeviceGammaRamp(IntPtr hDC, ref RAMP lpRamp);
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+        public struct RAMP
+        {
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
+            public UInt16[] Red;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
+            public UInt16[] Green;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
+            public UInt16[] Blue;
+        }
+        #endregion
+
         private readonly IAmdAdapter _amdAdapter;
         private List<ApplicationSetting> _applicationSettings;
         private readonly Dictionary<string, Tuple<ResolutionModeWrapper, List<ResolutionModeWrapper>>> _windowsResolutionSettings;
@@ -168,6 +187,18 @@ namespace vibrance.GUI.AMD
         private static void PerformResolutionChange(Screen screen, ResolutionModeWrapper resolutionSettings)
         {
             ResolutionHelper.ChangeResolutionEx(resolutionSettings, screen.DeviceName);
+        }
+
+        public void ReadColorSettings()
+        {
+            RAMP ramp = new RAMP();
+            //new WindowInteropHelper(_gameScreen).Handle
+            //bool ret = GetDeviceGammaRamp(new IntPtr(_gameScreen), ref ramp);
+            //Console.WriteLine("GetDeviceGammaRamp: " + ret);
+            //if (ret)
+            //{
+            //    Console.WriteLine(ramp.ToString());
+            //}
         }
     }
 }

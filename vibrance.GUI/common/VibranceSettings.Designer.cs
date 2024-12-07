@@ -39,6 +39,7 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.labelResolution = new System.Windows.Forms.Label();
             this.checkBoxResolution = new System.Windows.Forms.CheckBox();
+            this.buttonReadColorSettings = new System.Windows.Forms.Button();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarIngameLevel)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
@@ -144,11 +145,22 @@
             this.checkBoxResolution.UseVisualStyleBackColor = true;
             this.checkBoxResolution.CheckedChanged += new System.EventHandler(this.checkBoxResolution_CheckedChanged);
             // 
+            // buttonReadColorSettings
+            // 
+            this.buttonReadColorSettings.Location = new System.Drawing.Point(166, 24);
+            this.buttonReadColorSettings.Name = "buttonReadColorSettings";
+            this.buttonReadColorSettings.Size = new System.Drawing.Size(75, 23);
+            this.buttonReadColorSettings.TabIndex = 20;
+            this.buttonReadColorSettings.Text = "Read Brightness/Contrast/Gamma";
+            this.buttonReadColorSettings.UseVisualStyleBackColor = true;
+            this.buttonReadColorSettings.Click += new System.EventHandler(this.buttonReadColorSettings_Click);
+            // 
             // VibranceSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(270, 266);
+            this.Controls.Add(this.buttonReadColorSettings);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.pictureBox);
             this.Controls.Add(this.labelTitle);
@@ -183,5 +195,6 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.CheckBox checkBoxResolution;
         private System.Windows.Forms.Label labelResolution;
+        private System.Windows.Forms.Button buttonReadColorSettings;
     }
 }

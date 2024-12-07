@@ -15,5 +15,6 @@ namespace vibrance.GUI.common
         VibranceInfo GetVibranceInfo();
         GraphicsAdapter GraphicsAdapter { get; }
         void SetNeverSwitchResolution(bool neverSwitchResolution);
+        void ReadColorSettings();
     }
 }

@@ -57,5 +57,10 @@ namespace vibrance.GUI.common
         {
             this.cBoxResolution.Enabled = this.checkBoxResolution.Checked;
         }
+
+        private void buttonReadColorSettings_Click(object sender, EventArgs e)
+        {
+            _v.ReadColorSettings();
+        }
     }
 }

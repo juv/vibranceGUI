@@ -46,7 +46,10 @@ namespace vibrance.GUI
             GraphicsAdapter adapter = GraphicsAdapterHelper.GetAdapter();
             Form vibranceGui = null;
 
-            if (adapter == GraphicsAdapter.Amd || args.Contains("--force-amd"))
+            bool isForcedAmdAdapterExecution = args.Contains("--force-amd");
+            bool isForcedNvidiaAdapterExecution = args.Contains("--force-nvidia");
+
+            if (adapter == GraphicsAdapter.Amd || isForcedAmdAdapterExecution)
             {
                 Func<List<ApplicationSetting>, Dictionary<string, Tuple<ResolutionModeWrapper, List<ResolutionModeWrapper>>>, IVibranceProxy> getProxy = (x, y) => new AmdDynamicVibranceProxy(Environment.Is64BitOperatingSystem
                     ? new AmdAdapter64()
@@ -56,9 +59,10 @@ namespace vibrance.GUI
                     AmdDynamicVibranceProxy.AmdDefaultLevel,
                     AmdDynamicVibranceProxy.AmdMinLevel,
                     AmdDynamicVibranceProxy.AmdMaxLevel,
-                    AmdDynamicVibranceProxy.AmdDefaultLevel);
+                    AmdDynamicVibranceProxy.AmdDefaultLevel,
+                    isForcedAmdAdapterExecution);
             }
-            else if (adapter == GraphicsAdapter.Nvidia || args.Contains("--force-nvidia"))
+            else if (adapter == GraphicsAdapter.Nvidia || isForcedNvidiaAdapterExecution)
             {
                 const string nvidiaAdapterName = "vibranceDLL.dll";
                 string resourceName = $"{typeof(Program).Namespace}.NVIDIA.{nvidiaAdapterName}";
@@ -74,7 +78,8 @@ namespace vibrance.GUI
                     NvidiaDynamicVibranceProxy.NvapiDefaultLevel,
                     NvidiaDynamicVibranceProxy.NvapiDefaultLevel,
                     NvidiaDynamicVibranceProxy.NvapiMaxLevel,
-                    NvidiaDynamicVibranceProxy.NvapiDefaultLevel);
+                    NvidiaDynamicVibranceProxy.NvapiDefaultLevel,
+                    isForcedNvidiaAdapterExecution);
             }
             else if (adapter == GraphicsAdapter.Unknown)
             {
@@ -86,9 +91,9 @@ namespace vibrance.GUI
                 }
                 return;
             }
-            else if(adapter == GraphicsAdapter.Ambiguous)
+            else if (adapter == GraphicsAdapter.Ambiguous)
             {
-                if(MessageBox.Show(ErrorGraphicsAdapterAmbiguous, MessageBoxCaption, MessageBoxButtons.YesNo, 
+                if (MessageBox.Show(ErrorGraphicsAdapterAmbiguous, MessageBoxCaption, MessageBoxButtons.YesNo,
                     MessageBoxIcon.Error) == DialogResult.Yes)
                 {
                     System.Diagnostics.Process.Start("http://www.guru3d.com/files-details/display-driver-uninstaller-download.html");
@@ -100,10 +105,24 @@ namespace vibrance.GUI
                 vibranceGui.WindowState = FormWindowState.Minimized;
                 ((VibranceGUI)vibranceGui).SetAllowVisible(false);
             }
-            vibranceGui.Text += String.Format(" ({0}, {1})", adapter.ToString().ToUpper(), Application.ProductVersion);
+            vibranceGui.Text += buildFormTitleText(adapter, isForcedAmdAdapterExecution, isForcedNvidiaAdapterExecution);
             Application.Run(vibranceGui);
 
             GC.KeepAlive(mutex);
+        }
+
+        static string buildFormTitleText(GraphicsAdapter adapter, bool isForcedAmdAdapterExecution, bool isForcedNvidiaAdapterExecution)
+        {
+            string forcedExecution = "";
+            if (isForcedAmdAdapterExecution)
+            {
+                forcedExecution = "*AMD forced*";
+            }
+            else if (isForcedNvidiaAdapterExecution)
+            {
+                forcedExecution = "*NVIDIA forced*";
+            }
+            return String.Format(" ({0}, {1}) {2}", adapter.ToString().ToUpper(), Application.ProductVersion, forcedExecution);
         }
     }
 }

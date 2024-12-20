@@ -31,13 +31,16 @@ namespace vibrance.GUI.common
         private readonly List<ResolutionModeWrapper> _supportedResolutionList;
         private readonly Dictionary<string, Tuple<ResolutionModeWrapper, List<ResolutionModeWrapper>>> _windowsResolutionSettings;
 
+        private readonly bool _isForcedExecution;
+
         public VibranceGUI(
             Func<List<ApplicationSetting>, Dictionary<string, Tuple<ResolutionModeWrapper, List<ResolutionModeWrapper>>>, IVibranceProxy> getProxy,
             GraphicsAdapter graphicsAdapter,
             int defaultWindowsLevel,
             int minTrackBarValue,
             int maxTrackBarValue,
-            int defaultIngameValue)
+            int defaultIngameValue,
+            bool isForcedExecution)
         {
             _graphicsAdapter = graphicsAdapter;
             _defaultWindowsLevel = defaultWindowsLevel;
@@ -45,6 +48,7 @@ namespace vibrance.GUI.common
             _maxTrackBarValue = maxTrackBarValue;
             _defaultIngameValue = defaultIngameValue;
             _allowVisible = true;
+            _isForcedExecution = isForcedExecution;
 
             InitializeComponent();
 
@@ -52,18 +56,18 @@ namespace vibrance.GUI.common
             trackBarWindowsLevel.Maximum = maxTrackBarValue;
 
             _windowsResolutionSettings = new Dictionary<string, Tuple<ResolutionModeWrapper, List<ResolutionModeWrapper>>>();
-            foreach(Screen screen in Screen.AllScreens)
+            foreach (Screen screen in Screen.AllScreens)
             {
                 Devmode currentResolutionMode;
                 if (ResolutionHelper.GetCurrentResolutionSettings(out currentResolutionMode, screen.DeviceName))
                 {
                     List<ResolutionModeWrapper> availableResolutions = ResolutionHelper.EnumerateSupportedResolutionModes(screen.DeviceName);
-                    if(screen.Primary)
+                    if (screen.Primary)
                     {
                         _supportedResolutionList = availableResolutions;
                     }
                     var tuple = new Tuple<ResolutionModeWrapper, List<ResolutionModeWrapper>>(new ResolutionModeWrapper(currentResolutionMode), availableResolutions);
-                    _windowsResolutionSettings.Add(screen.DeviceName, tuple);                    
+                    _windowsResolutionSettings.Add(screen.DeviceName, tuple);
                 }
                 else
                 {
@@ -284,7 +288,7 @@ namespace vibrance.GUI.common
                 this.settingsBackgroundWorker.RunWorkerAsync();
             }
         }
-        
+
         private void checkBoxNeverChangeResolutions_CheckedChanged(object sender, EventArgs e)
         {
             if (this._v == null)
@@ -305,10 +309,15 @@ namespace vibrance.GUI.common
             if (this.checkBoxAutostart.Checked)
             {
                 string pathToExe = "\"" + Application.ExecutablePath + "\" -minimized";
+                if (_isForcedExecution)
+                {
+                    pathToExe += string.Format(" --force-{0}", _graphicsAdapter.ToString().ToLower());
+                }
+
                 if (!autostartController.IsProgramRegistered(AppName))
                 {
-                    this.notifyIcon.BalloonTipText = autostartController.RegisterProgram(AppName, pathToExe) 
-                        ? "Registered to Autostart!" 
+                    this.notifyIcon.BalloonTipText = autostartController.RegisterProgram(AppName, pathToExe)
+                        ? "Registered to Autostart!"
                         : "Registering to Autostart failed!";
                 }
                 else if (!autostartController.IsStartupPathUnchanged(AppName, pathToExe))
@@ -324,8 +333,8 @@ namespace vibrance.GUI.common
             }
             else
             {
-                this.notifyIcon.BalloonTipText = autostartController.UnregisterProgram(AppName) 
-                    ? "Unregistered from Autostart!" 
+                this.notifyIcon.BalloonTipText = autostartController.UnregisterProgram(AppName)
+                    ? "Unregistered from Autostart!"
                     : "Unregistering from Autostart failed!";
             }
 
@@ -426,14 +435,14 @@ namespace vibrance.GUI.common
             }
         }
 
-        private void ReadVibranceSettings(out int vibranceWindowsLevel, out bool affectPrimaryMonitorOnly, out bool neverSwitchResolution, 
+        private void ReadVibranceSettings(out int vibranceWindowsLevel, out bool affectPrimaryMonitorOnly, out bool neverSwitchResolution,
             out bool neverChangeColorSettings, out int brightnessWindowsLevel, out int contrastWindowsLevel, out int gammaWindowsLevel)
         {
             _registryController = new RegistryController();
             this.checkBoxAutostart.Checked = _registryController.IsProgramRegistered(AppName);
 
             SettingsController settingsController = new SettingsController();
-            settingsController.ReadVibranceSettings(_v.GraphicsAdapter, out vibranceWindowsLevel, out affectPrimaryMonitorOnly, out neverSwitchResolution, 
+            settingsController.ReadVibranceSettings(_v.GraphicsAdapter, out vibranceWindowsLevel, out affectPrimaryMonitorOnly, out neverSwitchResolution,
                 out neverChangeColorSettings, out _applicationSettings, out brightnessWindowsLevel, out contrastWindowsLevel, out gammaWindowsLevel);
 
             if (this.IsHandleCreated)
@@ -451,7 +460,7 @@ namespace vibrance.GUI.common
                     {
                         _applicationSettings.Remove(application);
                         continue;
-                    }                        
+                    }
 
                     InitializeApplicationList();
 
@@ -479,7 +488,7 @@ namespace vibrance.GUI.common
                 neverChangeColorSettings.ToString(),
                 _applicationSettings,
                 brightnessWindowsLevel.ToString(),
-                contrastWindowsLevel.ToString(), 
+                contrastWindowsLevel.ToString(),
                 gammaWindowsLevel.ToString()
             );
         }
@@ -495,7 +504,7 @@ namespace vibrance.GUI.common
 
             OpenFileDialog fileDialog = new OpenFileDialog();
             DialogResult result = fileDialog.ShowDialog();
-            if (result == DialogResult.OK && fileDialog.CheckFileExists && fileDialog.SafeFileName != null 
+            if (result == DialogResult.OK && fileDialog.CheckFileExists && fileDialog.SafeFileName != null
                 && _applicationSettings.FirstOrDefault(x => x.FileName.ToLower() == fileDialog.FileName.ToLower()) == null)
             {
                 Icon icon = Icon.ExtractAssociatedIcon(fileDialog.FileName);
@@ -509,7 +518,7 @@ namespace vibrance.GUI.common
 
         public void AddProgramExtern(ProcessExplorerEntry processExplorerEntry)
         {
-            if(this.InvokeRequired)
+            if (this.InvokeRequired)
             {
                 this.Invoke((MethodInvoker)delegate
                 {
@@ -525,11 +534,11 @@ namespace vibrance.GUI.common
         private void AddProgramIntern(ProcessExplorerEntry processExplorerEntry)
         {
             InitializeApplicationList();
-            
-            if(!File.Exists(processExplorerEntry.Path) || _applicationSettings.FirstOrDefault(x => x.FileName.ToLower() == processExplorerEntry.Path.ToLower()) != null)
+
+            if (!File.Exists(processExplorerEntry.Path) || _applicationSettings.FirstOrDefault(x => x.FileName.ToLower() == processExplorerEntry.Path.ToLower()) != null)
             {
                 this.listApplications.SelectedIndices.Clear();
-                return; 
+                return;
             }
 
             Icon icon = processExplorerEntry.Icon;
@@ -592,7 +601,7 @@ namespace vibrance.GUI.common
                     _applicationSettings.Add(newSetting);
                     ForceSaveVibranceSettings();
                 }
-                else if(actualSetting == null)
+                else if (actualSetting == null)
                 {
                     removeApplicationListItem(selectedItem);
                 }

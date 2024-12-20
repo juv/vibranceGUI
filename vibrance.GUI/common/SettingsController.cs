@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
+using vibrance.GUI.AMD;
 using vibrance.GUI.NVIDIA;
 
 namespace vibrance.GUI.common
@@ -32,12 +33,18 @@ namespace vibrance.GUI.common
         const string SzKeyNameRefreshRate = "refreshRate";
         const string SzKeyNameAffectPrimaryMonitorOnly = "affectPrimaryMonitorOnly";
         const string SzKeyNameNeverSwitchResolution = "neverSwitchResolution";
+        const string SzKeyNameNeverChangeColorSettings = "neverChangeColorSettings";
+        const string SzKeyNameBrightnessWindowsLevel = "brightnessWindowsLevel";
+        const string SzKeyNameContrastWindowsLevel = "contrastWindowsLevel";
+        const string SzKeyNameGammaWindowsLevel = "gammaWindowsLevel";
+        
 
         private string _fileName = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToString() + "\\vibranceGUI\\vibranceGUI.ini";
         private string _fileNameApplicationSettings = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToString() + "\\vibranceGUI\\applicationData.xml";
 
 
-        public bool SetVibranceSettings(string windowsLevel, string affectPrimaryMonitorOnly, string neverSwitchResolution, List<ApplicationSetting> applicationSettings)
+        public bool SetVibranceSettings(string windowsLevel, string affectPrimaryMonitorOnly, string neverSwitchResolution, string neverChangeColorSettings, List<ApplicationSetting> applicationSettings, 
+            string brightnessWindowsLevel, string contrastWindowsLevel, string gammaWindowsLevel)
         {
             if (!PrepareFile())
             {
@@ -47,6 +54,10 @@ namespace vibrance.GUI.common
             WritePrivateProfileString(SzSectionName, SzKeyNameInactive, windowsLevel, _fileName);
             WritePrivateProfileString(SzSectionName, SzKeyNameAffectPrimaryMonitorOnly, affectPrimaryMonitorOnly, _fileName);
             WritePrivateProfileString(SzSectionName, SzKeyNameNeverSwitchResolution, neverSwitchResolution, _fileName);
+            WritePrivateProfileString(SzSectionName, SzKeyNameNeverChangeColorSettings, neverChangeColorSettings, _fileName);
+            WritePrivateProfileString(SzSectionName, SzKeyNameBrightnessWindowsLevel, brightnessWindowsLevel, _fileName);
+            WritePrivateProfileString(SzSectionName, SzKeyNameContrastWindowsLevel, contrastWindowsLevel, _fileName);
+            WritePrivateProfileString(SzSectionName, SzKeyNameGammaWindowsLevel, gammaWindowsLevel, _fileName);
 
             try
             {
@@ -93,7 +104,8 @@ namespace vibrance.GUI.common
             return true;
         }
 
-        public void ReadVibranceSettings(GraphicsAdapter graphicsAdapter, out int vibranceWindowsLevel, out bool affectPrimaryMonitorOnly, out bool neverSwitchResolution, out List<ApplicationSetting> applicationSettings)
+        public void ReadVibranceSettings(GraphicsAdapter graphicsAdapter, out int vibranceWindowsLevel, out bool affectPrimaryMonitorOnly, out bool neverSwitchResolution, 
+            out bool neverChangeColorSettings, out List<ApplicationSetting> applicationSettings, out int brightnessWindowsLevel, out int contrastWindowsLevel, out int gammaWindowsLevel)
         {
             int defaultLevel = 0; 
             int maxLevel = 0;
@@ -104,17 +116,20 @@ namespace vibrance.GUI.common
             }
             if (graphicsAdapter == GraphicsAdapter.Amd)
             {
-                // todo
-                defaultLevel = 100;
-                maxLevel = 300;
+                defaultLevel = AmdDynamicVibranceProxy.AmdDefaultLevel;
+                maxLevel = AmdDynamicVibranceProxy.AmdMaxLevel;
             }
 
             if (!IsFileExisting(_fileName) || !IsFileExisting(_fileNameApplicationSettings))
             {
                 vibranceWindowsLevel = defaultLevel;
-                affectPrimaryMonitorOnly = false;
+                affectPrimaryMonitorOnly = true;
                 applicationSettings = new List<ApplicationSetting>();
                 neverSwitchResolution = true;
+                neverChangeColorSettings = true;
+                brightnessWindowsLevel = 50;
+                contrastWindowsLevel = 50;
+                gammaWindowsLevel = 100;
                 return;
             }
 
@@ -139,7 +154,7 @@ namespace vibrance.GUI.common
             StringBuilder szValueAffectPrimaryMonitorOnly = new StringBuilder(1024);
             GetPrivateProfileString(SzSectionName,
                 SzKeyNameAffectPrimaryMonitorOnly,
-                "false",
+                "true",
                 szValueAffectPrimaryMonitorOnly,
                 Convert.ToUInt32(szValueAffectPrimaryMonitorOnly.Capacity),
                 _fileName);
@@ -147,9 +162,41 @@ namespace vibrance.GUI.common
             StringBuilder szValueNeverSwitchResolution = new StringBuilder(1024);
             GetPrivateProfileString(SzSectionName,
                 SzKeyNameNeverSwitchResolution,
-                "false",
+                "true",
                 szValueNeverSwitchResolution,
                 Convert.ToUInt32(szValueNeverSwitchResolution.Capacity),
+                _fileName);
+
+            StringBuilder szValueNeverChangeColorSettings = new StringBuilder(1024);
+            GetPrivateProfileString(SzSectionName,
+                SzKeyNameNeverChangeColorSettings,
+                "true",
+                szValueNeverChangeColorSettings,
+                Convert.ToUInt32(szValueNeverChangeColorSettings.Capacity),
+                _fileName);
+
+            StringBuilder szValueBrightnessWindowsLevel = new StringBuilder(1024);
+            GetPrivateProfileString(SzSectionName,
+                SzKeyNameBrightnessWindowsLevel,
+                "50",
+                szValueBrightnessWindowsLevel,
+                Convert.ToUInt32(szValueBrightnessWindowsLevel.Capacity),
+                _fileName);
+
+            StringBuilder szValueContrastWindowsLevel = new StringBuilder(1024);
+            GetPrivateProfileString(SzSectionName,
+                SzKeyNameContrastWindowsLevel,
+                "50",
+                szValueContrastWindowsLevel,
+                Convert.ToUInt32(szValueContrastWindowsLevel.Capacity),
+                _fileName);
+
+            StringBuilder szValueGammaWindowsLevel = new StringBuilder(1024);
+            GetPrivateProfileString(SzSectionName,
+                SzKeyNameGammaWindowsLevel,
+                "100",
+                szValueGammaWindowsLevel,
+                Convert.ToUInt32(szValueGammaWindowsLevel.Capacity),
                 _fileName);
 
             try
@@ -157,13 +204,21 @@ namespace vibrance.GUI.common
                 vibranceWindowsLevel = int.Parse(szValueInactive.ToString());
                 affectPrimaryMonitorOnly = bool.Parse(szValueAffectPrimaryMonitorOnly.ToString());
                 neverSwitchResolution = bool.Parse(szValueNeverSwitchResolution.ToString());
+                neverChangeColorSettings = bool.Parse(szValueNeverChangeColorSettings.ToString());
+                brightnessWindowsLevel = int.Parse(szValueBrightnessWindowsLevel.ToString());
+                contrastWindowsLevel = int.Parse(szValueContrastWindowsLevel.ToString());
+                gammaWindowsLevel = int.Parse(szValueGammaWindowsLevel.ToString());
             }
             catch (Exception)
             {
                 vibranceWindowsLevel = defaultLevel;
                 affectPrimaryMonitorOnly = false;
                 applicationSettings = new List<ApplicationSetting>();
-                neverSwitchResolution = false;
+                neverSwitchResolution = true;
+                neverChangeColorSettings = true;
+                brightnessWindowsLevel = 50;
+                contrastWindowsLevel = 50;
+                gammaWindowsLevel = 100;
                 return;
             }
 

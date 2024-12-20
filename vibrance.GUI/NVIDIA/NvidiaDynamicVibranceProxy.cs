@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
-using System.IO;
 using System.Linq;
-using System.Media;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading;
 using System.Windows.Forms;
-using System.Windows.Forms.VisualStyles;
 using vibrance.GUI.common;
 
 namespace vibrance.GUI.NVIDIA
@@ -83,13 +78,6 @@ namespace vibrance.GUI.NVIDIA
 
         [DllImport(
             "vibranceDLL.dll",
-            EntryPoint = "?isCsgoStarted@vibrance@vibranceDLL@@QAE_NPAPAUHWND__@@@Z",
-            CallingConvention = CallingConvention.StdCall,
-            CharSet = CharSet.Ansi)]
-        static extern bool isCsgoStarted(ref IntPtr hwnd);
-
-        [DllImport(
-            "vibranceDLL.dll",
             EntryPoint = "?equalsDVCLevel@vibrance@vibranceDLL@@QAE_NHH@Z",
             CallingConvention = CallingConvention.StdCall,
             CharSet = CharSet.Auto)]
@@ -102,38 +90,12 @@ namespace vibrance.GUI.NVIDIA
             CharSet = CharSet.Auto)]
         static extern NvSystemType getGpuSystemType(int gpuHandle);
 
-        [DllImport("user32.dll", CharSet = CharSet.Ansi)]
-        static extern int GetWindowTextLength([In] IntPtr hWnd);
-
-        [DllImport("user32.dll", CharSet = CharSet.Ansi)]
-        static extern int GetWindowTextA([In] IntPtr hWnd, [In, Out] StringBuilder lpString, [In] int nMaxCount);
-
         [DllImport(
             "vibranceDLL.dll",
             EntryPoint = "?getAssociatedNvidiaDisplayHandle@vibrance@vibranceDLL@@QAEHPBDH@Z",
             CallingConvention = CallingConvention.StdCall,
             CharSet = CharSet.Ansi)]
         static extern int getAssociatedNvidiaDisplayHandle(string deviceName, [In] int length);
-
-        [DllImport("gdi32.dll")]
-        public static extern bool GetDeviceGammaRamp(IntPtr hDC, ref RAMP lpRamp);
-
-        [DllImport("gdi32.dll")]
-        public static extern bool SetDeviceGammaRamp(IntPtr hDC, ref RAMP lpRamp);
-
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-        public struct RAMP
-        {
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
-            public UInt16[] Red;
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
-            public UInt16[] Green;
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
-            public UInt16[] Blue;
-        }
-
-        [DllImport("gdi32.dll")]
-        static extern IntPtr CreateDC(string lpszDriver, string lpszDevice, string lpszOutput, IntPtr lpInitData);
         #endregion
 
 
@@ -227,49 +189,6 @@ namespace vibrance.GUI.NVIDIA
             _vibranceInfo.isInitialized = true;
         }
 
-        private static ushort[] CalculateLUT(double brightness = 0.5, double contrast = 0.5, double gamma = 1)
-        {
-            const int dataPoints = 256;
-
-            // Limit gamma in range [0.4-2.8]
-            gamma = Math.Min(Math.Max(gamma, 0.4), 2.8);
-
-            // Normalize contrast in range [-1,1]
-            contrast = (Math.Min(Math.Max(contrast, 0), 1) - 0.5) * 2;
-
-            // Normalize brightness in range [-1,1]
-            brightness = (Math.Min(Math.Max(brightness, 0), 1) - 0.5) * 2;
-
-            // Calculate curve offset resulted from contrast
-            var offset = contrast > 0 ? contrast * -25.4 : contrast * -32;
-
-            // Calculate the total range of curve
-            var range = (dataPoints - 1) + offset * 2;
-
-            // Add brightness to the curve offset
-            offset += brightness * (range / 5);
-
-            // Fill the gamma curve
-            var result = new ushort[dataPoints];
-            for (var i = 0; i < result.Length; i++)
-            {
-                var factor = (i + offset) / range;
-
-                factor = Math.Pow(factor, 1 / gamma);
-
-                factor = Math.Min(Math.Max(factor, 0), 1);
-
-                result[i] = (ushort)Math.Round(factor * ushort.MaxValue);
-            }
-
-            return result;
-        }
-
-        private void changeGamma()
-        {
-            CalculateLUT(1.0, 1.0, 1.0);
-        }
-
         private static void OnWinEventHook(object sender, WinEventHookEventArgs e)
         {
             if (_applicationSettings.Count > 0)
@@ -278,22 +197,37 @@ namespace vibrance.GUI.NVIDIA
                 if (applicationSetting != null)
                 {                  
                     int displayHandle = GetApplicationDisplayHandle(e.Handle);
-                    //test if changing the vibrance value is needed
-                    if (displayHandle != -1 && !equalsDVCLevel(displayHandle, applicationSetting.IngameLevel))
+                    if (displayHandle == -1) 
                     {
-                        //test if a resolution change is needed
-                        Screen screen = Screen.FromHandle(e.Handle);
-                        if (_vibranceInfo.neverChangeResolution == false && 
-                            applicationSetting.IsResolutionChangeNeeded && 
-                            IsResolutionChangeNeeded(screen, applicationSetting.ResolutionSettings) &&
-                            _windowsResolutionSettings.ContainsKey(screen.DeviceName) &&
-                            _windowsResolutionSettings[screen.DeviceName].Item2.Contains(applicationSetting.ResolutionSettings))
-                        {
-                            PerformResolutionChange(screen, applicationSetting.ResolutionSettings);
-                        }
-                        _gameScreen = screen;
+                        return;
+                    }
+
+                    Screen screen = Screen.FromHandle(e.Handle);
+                    _gameScreen = screen;
+
+                    //test if digital vibrance change is needed
+                    if (!equalsDVCLevel(displayHandle, applicationSetting.IngameLevel))
+                    {
                         _vibranceInfo.defaultHandle = displayHandle;
                         setDVCLevel(_vibranceInfo.defaultHandle, applicationSetting.IngameLevel);
+                    }
+
+                    //test if a resolution change is needed
+                    if (_vibranceInfo.neverChangeResolution == false && applicationSetting.IsResolutionChangeNeeded &&
+                        IsResolutionChangeNeeded(screen, applicationSetting.ResolutionSettings) &&
+                        _windowsResolutionSettings.ContainsKey(screen.DeviceName) &&
+                        _windowsResolutionSettings[screen.DeviceName].Item2.Contains(applicationSetting.ResolutionSettings))
+                    {
+                        PerformResolutionChange(screen, applicationSetting.ResolutionSettings);
+                        _vibranceInfo.isResolutionChangeApplied = true;
+                    }
+
+                    //test if color settings change is needed
+                    if (_vibranceInfo.neverChangeColorSettings == false && _vibranceInfo.isColorSettingApplied == false &&
+                        DeviceGammaRampHelper.IsGammaRampEqualToWindowsValues(_vibranceInfo, applicationSetting) == false)
+                    {
+                        DeviceGammaRampHelper.SetGammaRamp(screen, applicationSetting.Gamma, applicationSetting.Brightness, applicationSetting.Contrast);
+                        _vibranceInfo.isColorSettingApplied = true;
                     }
                 }
                 else
@@ -305,28 +239,42 @@ namespace vibrance.GUI.NVIDIA
                     
                     //test if a resolution change is needed
                     Screen currentScreen = Screen.FromHandle(processHandle);
-                    if (_vibranceInfo.neverChangeResolution == false && 
-                        _gameScreen != null && 
-                        _gameScreen.Equals(currentScreen) && 
-                        _windowsResolutionSettings.ContainsKey(currentScreen.DeviceName) &&
-                        IsResolutionChangeNeeded(currentScreen, _windowsResolutionSettings[currentScreen.DeviceName].Item1))
-                    {
-                        PerformResolutionChange(currentScreen, _windowsResolutionSettings[currentScreen.DeviceName].Item1);
-                    }
 
                     //test if changing the vibrance value is needed
                     if (_vibranceInfo.affectPrimaryMonitorOnly && !equalsDVCLevel(_vibranceInfo.defaultHandle, _vibranceInfo.userVibranceSettingDefault))
                     {
-                        if(_gameScreen != null && !_gameScreen.DeviceName.Equals(currentScreen.DeviceName))
+                        if (_gameScreen != null && !_gameScreen.DeviceName.Equals(currentScreen.DeviceName))
                         {
                             return;
                         }
-
                         setDVCLevel(_vibranceInfo.defaultHandle, _vibranceInfo.userVibranceSettingDefault);
                     }
                     else if (!_vibranceInfo.affectPrimaryMonitorOnly && !_vibranceInfo.displayHandles.TrueForAll(handle => equalsDVCLevel(handle, _vibranceInfo.userVibranceSettingDefault)))
                     {
                         _vibranceInfo.displayHandles.ForEach(handle => setDVCLevel(handle, _vibranceInfo.userVibranceSettingDefault));
+                    }
+
+                    if (_vibranceInfo.neverChangeResolution == false && _vibranceInfo.isResolutionChangeApplied == true &&
+                        _gameScreen != null && _gameScreen.Equals(currentScreen) && 
+                        _windowsResolutionSettings.ContainsKey(currentScreen.DeviceName) &&
+                        IsResolutionChangeNeeded(currentScreen, _windowsResolutionSettings[currentScreen.DeviceName].Item1))
+                    {
+                        PerformResolutionChange(currentScreen, _windowsResolutionSettings[currentScreen.DeviceName].Item1);
+                        _vibranceInfo.isResolutionChangeApplied = false;
+                    }
+
+                    //apply windows color settings if color settings were previously changed
+                    if (_vibranceInfo.neverChangeColorSettings == false && _vibranceInfo.isColorSettingApplied == true)
+                    {
+                        if (_vibranceInfo.affectPrimaryMonitorOnly && _gameScreen != null && _gameScreen.DeviceName.Equals(currentScreen.DeviceName))
+                        {
+                            DeviceGammaRampHelper.SetGammaRamp(_gameScreen, _vibranceInfo.userColorSettings.brightness, _vibranceInfo.userColorSettings.contrast, _vibranceInfo.userColorSettings.gamma);
+                        }
+                        else
+                        {
+                            Screen.AllScreens.ToList().ForEach(screen => DeviceGammaRampHelper.SetGammaRamp(screen, _vibranceInfo.userColorSettings.brightness, _vibranceInfo.userColorSettings.contrast, _vibranceInfo.userColorSettings.gamma));
+                        }
+                        _vibranceInfo.isColorSettingApplied = false;
                     }
                 }
             }
@@ -392,6 +340,33 @@ namespace vibrance.GUI.NVIDIA
             _vibranceInfo.neverChangeResolution = neverChangeResolution;
         }
 
+        public void SetNeverChangeColorSettings(bool neverChangeColorSettings)
+        {
+            _vibranceInfo.neverChangeColorSettings = neverChangeColorSettings;
+        }
+
+        public void SetWindowsColorSettings(int brightness, int contrast, int gamma)
+        {
+            _vibranceInfo.userColorSettings.brightness = brightness;
+            _vibranceInfo.userColorSettings.contrast = contrast;
+            _vibranceInfo.userColorSettings.gamma = gamma;
+        }
+
+        public void SetWindowsColorBrightness(int brightness)
+        {
+            _vibranceInfo.userColorSettings.brightness = brightness;
+        }
+
+        public void SetWindowsColorContrast(int contrast)
+        {
+            _vibranceInfo.userColorSettings.contrast = contrast;
+        }
+
+        public void SetWindowsColorGamma(int gamma)
+        {
+            _vibranceInfo.userColorSettings.gamma = gamma;
+        }
+
         public void SetVibranceWindowsLevel(int vibranceWindowsLevel)
         {
             _vibranceInfo.userVibranceSettingDefault = vibranceWindowsLevel;
@@ -437,32 +412,6 @@ namespace vibrance.GUI.NVIDIA
             }
             else if (!_vibranceInfo.displayHandles.TrueForAll(handle => equalsDVCLevel(handle, _vibranceInfo.userVibranceSettingDefault)))
                 _vibranceInfo.displayHandles.ForEach(handle => setDVCLevel(handle, _vibranceInfo.userVibranceSettingDefault));
-        }
-        int i = 0; 
-        public void ReadColorSettings()
-        {
-            if(i%2 == 0)
-            {
-                SetDeviceGammaRampHelper.ApplyGammaRamp(555, 50, 1.0, 1.0, 0.5);
-            }
-            else
-            {
-                SetDeviceGammaRampHelper.ApplyGammaRamp(555, 50, 1.0, 0.5, 0.5);
-            }
-            i = i + 1;
-
-            /*RAMP ramp = new RAMP();
-            bool ret = GetDeviceGammaRamp(CreateDC("DISPLAY", _gameScreen.DeviceName, null, IntPtr.Zero), ref ramp);
-            Console.WriteLine("GetDeviceGammaRamp: " + ret);
-            string content = "";
-            if(ret)
-            {
-                content += string.Join(",\n", ramp.Red);
-                content += string.Join(",\n", ramp.Green);
-                content += string.Join(",\n", ramp.Blue);
-                File.WriteAllText("data" + i +".txt", content);
-                i = i+1;
-            }*/
         }
     }
 }

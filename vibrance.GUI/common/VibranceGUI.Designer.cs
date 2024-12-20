@@ -36,7 +36,7 @@
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.checkBoxAutostart = new System.Windows.Forms.CheckBox();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.groupBoxSettings = new System.Windows.Forms.GroupBox();
             this.checkBoxNeverChangeResolutions = new System.Windows.Forms.CheckBox();
             this.checkBoxPrimaryMonitorOnly = new System.Windows.Forms.CheckBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
@@ -50,16 +50,34 @@
             this.buttonPaypal = new System.Windows.Forms.Button();
             this.labelPaypal = new System.Windows.Forms.Label();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.checkBoxNeverChangeColorSettings = new System.Windows.Forms.CheckBox();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.buttonProcessExplorer = new System.Windows.Forms.Button();
             this.buttonRemoveProgram = new System.Windows.Forms.Button();
             this.listApplications = new System.Windows.Forms.ListView();
             this.buttonAddProgram = new System.Windows.Forms.Button();
+            this.groupBoxColorSettings = new System.Windows.Forms.GroupBox();
+            this.groupBox8 = new System.Windows.Forms.GroupBox();
+            this.labelGamma = new System.Windows.Forms.Label();
+            this.trackBarGamma = new System.Windows.Forms.TrackBar();
+            this.groupBox9 = new System.Windows.Forms.GroupBox();
+            this.labelContrast = new System.Windows.Forms.Label();
+            this.trackBarContrast = new System.Windows.Forms.TrackBar();
+            this.groupBox10 = new System.Windows.Forms.GroupBox();
+            this.labelBrightness = new System.Windows.Forms.Label();
+            this.trackBarBrightness = new System.Windows.Forms.TrackBar();
             this.contextMenuStrip.SuspendLayout();
-            this.groupBox1.SuspendLayout();
+            this.groupBoxSettings.SuspendLayout();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarWindowsLevel)).BeginInit();
             this.groupBox5.SuspendLayout();
+            this.groupBoxColorSettings.SuspendLayout();
+            this.groupBox8.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarGamma)).BeginInit();
+            this.groupBox9.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarContrast)).BeginInit();
+            this.groupBox10.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarBrightness)).BeginInit();
             this.SuspendLayout();
             // 
             // notifyIcon
@@ -119,32 +137,33 @@
             this.checkBoxAutostart.UseVisualStyleBackColor = true;
             this.checkBoxAutostart.CheckedChanged += new System.EventHandler(this.checkBoxAutostart_CheckedChanged);
             // 
-            // groupBox1
+            // groupBoxSettings
             // 
-            this.groupBox1.Controls.Add(this.checkBoxNeverChangeResolutions);
-            this.groupBox1.Controls.Add(this.checkBoxPrimaryMonitorOnly);
-            this.groupBox1.Controls.Add(this.groupBox3);
-            this.groupBox1.Controls.Add(this.checkBoxAutostart);
-            this.groupBox1.Location = new System.Drawing.Point(20, 126);
-            this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBox1.Size = new System.Drawing.Size(596, 220);
-            this.groupBox1.TabIndex = 15;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Settings";
+            this.groupBoxSettings.Controls.Add(this.checkBoxNeverChangeResolutions);
+            this.groupBoxSettings.Controls.Add(this.checkBoxPrimaryMonitorOnly);
+            this.groupBoxSettings.Controls.Add(this.groupBox3);
+            this.groupBoxSettings.Controls.Add(this.checkBoxAutostart);
+            this.groupBoxSettings.Location = new System.Drawing.Point(15, 137);
+            this.groupBoxSettings.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBoxSettings.Name = "groupBoxSettings";
+            this.groupBoxSettings.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBoxSettings.Size = new System.Drawing.Size(600, 250);
+            this.groupBoxSettings.TabIndex = 15;
+            this.groupBoxSettings.TabStop = false;
+            this.groupBoxSettings.Text = "Settings";
             // 
             // checkBoxNeverChangeResolutions
             // 
             this.checkBoxNeverChangeResolutions.AutoSize = true;
-            this.checkBoxNeverChangeResolutions.Location = new System.Drawing.Point(244, 65);
+            this.checkBoxNeverChangeResolutions.Checked = true;
+            this.checkBoxNeverChangeResolutions.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBoxNeverChangeResolutions.Location = new System.Drawing.Point(9, 99);
             this.checkBoxNeverChangeResolutions.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.checkBoxNeverChangeResolutions.Name = "checkBoxNeverChangeResolutions";
-            this.checkBoxNeverChangeResolutions.Size = new System.Drawing.Size(214, 24);
+            this.checkBoxNeverChangeResolutions.Size = new System.Drawing.Size(282, 24);
             this.checkBoxNeverChangeResolutions.TabIndex = 16;
-            this.checkBoxNeverChangeResolutions.Text = "Never change resolutions";
-            this.toolTip.SetToolTip(this.checkBoxNeverChangeResolutions, "When checking this, VibranceGUI will never change the resolution on any of your m" +
-        "onitors.");
+            this.checkBoxNeverChangeResolutions.Text = "Never change Windows resolutions";
+            this.toolTip.SetToolTip(this.checkBoxNeverChangeResolutions, resources.GetString("checkBoxNeverChangeResolutions.ToolTip"));
             this.checkBoxNeverChangeResolutions.UseVisualStyleBackColor = true;
             this.checkBoxNeverChangeResolutions.CheckedChanged += new System.EventHandler(this.checkBoxNeverChangeResolutions_CheckedChanged);
             // 
@@ -166,7 +185,7 @@
             // 
             this.groupBox3.Controls.Add(this.labelWindowsLevel);
             this.groupBox3.Controls.Add(this.trackBarWindowsLevel);
-            this.groupBox3.Location = new System.Drawing.Point(10, 100);
+            this.groupBox3.Location = new System.Drawing.Point(8, 129);
             this.groupBox3.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
@@ -181,8 +200,9 @@
             this.labelWindowsLevel.Location = new System.Drawing.Point(222, 34);
             this.labelWindowsLevel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelWindowsLevel.Name = "labelWindowsLevel";
-            this.labelWindowsLevel.Size = new System.Drawing.Size(0, 20);
+            this.labelWindowsLevel.Size = new System.Drawing.Size(41, 20);
             this.labelWindowsLevel.TabIndex = 1;
+            this.labelWindowsLevel.Text = "50%";
             // 
             // trackBarWindowsLevel
             // 
@@ -197,7 +217,7 @@
             // statusLabel
             // 
             this.statusLabel.AutoSize = true;
-            this.statusLabel.Location = new System.Drawing.Point(159, 772);
+            this.statusLabel.Location = new System.Drawing.Point(152, 1136);
             this.statusLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.statusLabel.Name = "statusLabel";
             this.statusLabel.Size = new System.Drawing.Size(90, 20);
@@ -207,7 +227,7 @@
             // observerStatusLabel
             // 
             this.observerStatusLabel.AutoSize = true;
-            this.observerStatusLabel.Location = new System.Drawing.Point(18, 772);
+            this.observerStatusLabel.Location = new System.Drawing.Point(11, 1136);
             this.observerStatusLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.observerStatusLabel.Name = "observerStatusLabel";
             this.observerStatusLabel.Size = new System.Drawing.Size(129, 20);
@@ -246,7 +266,7 @@
             this.buttonPaypal.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.buttonPaypal.BackColor = System.Drawing.Color.Transparent;
             this.buttonPaypal.Image = ((System.Drawing.Image)(resources.GetObject("buttonPaypal.Image")));
-            this.buttonPaypal.Location = new System.Drawing.Point(316, 43);
+            this.buttonPaypal.Location = new System.Drawing.Point(316, 42);
             this.buttonPaypal.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.buttonPaypal.Name = "buttonPaypal";
             this.buttonPaypal.Size = new System.Drawing.Size(135, 85);
@@ -272,17 +292,33 @@
             this.toolTip.IsBalloon = true;
             this.toolTip.ReshowDelay = 100;
             // 
+            // checkBoxNeverChangeColorSettings
+            // 
+            this.checkBoxNeverChangeColorSettings.AutoSize = true;
+            this.checkBoxNeverChangeColorSettings.Checked = true;
+            this.checkBoxNeverChangeColorSettings.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBoxNeverChangeColorSettings.Location = new System.Drawing.Point(11, 38);
+            this.checkBoxNeverChangeColorSettings.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.checkBoxNeverChangeColorSettings.Name = "checkBoxNeverChangeColorSettings";
+            this.checkBoxNeverChangeColorSettings.Size = new System.Drawing.Size(231, 24);
+            this.checkBoxNeverChangeColorSettings.TabIndex = 17;
+            this.checkBoxNeverChangeColorSettings.Text = "Never change color settings";
+            this.toolTip.SetToolTip(this.checkBoxNeverChangeColorSettings, "When checking this, VibranceGUI will never change the color settings (brightness," +
+        " contrast, gamma) on any of your monitors.");
+            this.checkBoxNeverChangeColorSettings.UseVisualStyleBackColor = true;
+            this.checkBoxNeverChangeColorSettings.CheckedChanged += new System.EventHandler(this.checkBoxNeverChangeColorSettings_CheckedChanged);
+            // 
             // groupBox5
             // 
             this.groupBox5.Controls.Add(this.buttonProcessExplorer);
             this.groupBox5.Controls.Add(this.buttonRemoveProgram);
             this.groupBox5.Controls.Add(this.listApplications);
             this.groupBox5.Controls.Add(this.buttonAddProgram);
-            this.groupBox5.Location = new System.Drawing.Point(20, 355);
+            this.groupBox5.Location = new System.Drawing.Point(15, 757);
             this.groupBox5.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBox5.Size = new System.Drawing.Size(596, 349);
+            this.groupBox5.Size = new System.Drawing.Size(600, 349);
             this.groupBox5.TabIndex = 18;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Program Settings";
@@ -331,15 +367,137 @@
             this.buttonAddProgram.UseVisualStyleBackColor = true;
             this.buttonAddProgram.Click += new System.EventHandler(this.buttonAddProgram_Click);
             // 
+            // groupBoxColorSettings
+            // 
+            this.groupBoxColorSettings.Controls.Add(this.groupBox8);
+            this.groupBoxColorSettings.Controls.Add(this.groupBox9);
+            this.groupBoxColorSettings.Controls.Add(this.groupBox10);
+            this.groupBoxColorSettings.Controls.Add(this.checkBoxNeverChangeColorSettings);
+            this.groupBoxColorSettings.Location = new System.Drawing.Point(15, 397);
+            this.groupBoxColorSettings.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBoxColorSettings.Name = "groupBoxColorSettings";
+            this.groupBoxColorSettings.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBoxColorSettings.Size = new System.Drawing.Size(600, 350);
+            this.groupBoxColorSettings.TabIndex = 19;
+            this.groupBoxColorSettings.TabStop = false;
+            this.groupBoxColorSettings.Text = "Color Settings (EXPERIMENTAL)";
+            // 
+            // groupBox8
+            // 
+            this.groupBox8.Controls.Add(this.labelGamma);
+            this.groupBox8.Controls.Add(this.trackBarGamma);
+            this.groupBox8.Location = new System.Drawing.Point(11, 210);
+            this.groupBox8.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox8.Name = "groupBox8";
+            this.groupBox8.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox8.Size = new System.Drawing.Size(273, 111);
+            this.groupBox8.TabIndex = 14;
+            this.groupBox8.TabStop = false;
+            this.groupBox8.Text = "Windows Gamma";
+            // 
+            // labelGamma
+            // 
+            this.labelGamma.AutoSize = true;
+            this.labelGamma.Location = new System.Drawing.Point(222, 34);
+            this.labelGamma.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelGamma.Name = "labelGamma";
+            this.labelGamma.Size = new System.Drawing.Size(18, 20);
+            this.labelGamma.TabIndex = 1;
+            this.labelGamma.Text = "1";
+            // 
+            // trackBarGamma
+            // 
+            this.trackBarGamma.Enabled = false;
+            this.trackBarGamma.Location = new System.Drawing.Point(22, 34);
+            this.trackBarGamma.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.trackBarGamma.Maximum = 240;
+            this.trackBarGamma.Minimum = 30;
+            this.trackBarGamma.Name = "trackBarGamma";
+            this.trackBarGamma.Size = new System.Drawing.Size(196, 69);
+            this.trackBarGamma.TabIndex = 0;
+            this.trackBarGamma.Value = 100;
+            this.trackBarGamma.Scroll += new System.EventHandler(this.trackBarGamma_Scroll);
+            // 
+            // groupBox9
+            // 
+            this.groupBox9.Controls.Add(this.labelContrast);
+            this.groupBox9.Controls.Add(this.trackBarContrast);
+            this.groupBox9.Location = new System.Drawing.Point(315, 89);
+            this.groupBox9.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox9.Name = "groupBox9";
+            this.groupBox9.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox9.Size = new System.Drawing.Size(273, 111);
+            this.groupBox9.TabIndex = 18;
+            this.groupBox9.TabStop = false;
+            this.groupBox9.Text = "Windows Contrast";
+            // 
+            // labelContrast
+            // 
+            this.labelContrast.AutoSize = true;
+            this.labelContrast.Location = new System.Drawing.Point(222, 34);
+            this.labelContrast.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelContrast.Name = "labelContrast";
+            this.labelContrast.Size = new System.Drawing.Size(41, 20);
+            this.labelContrast.TabIndex = 1;
+            this.labelContrast.Text = "50%";
+            // 
+            // trackBarContrast
+            // 
+            this.trackBarContrast.Enabled = false;
+            this.trackBarContrast.Location = new System.Drawing.Point(22, 34);
+            this.trackBarContrast.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.trackBarContrast.Maximum = 100;
+            this.trackBarContrast.Name = "trackBarContrast";
+            this.trackBarContrast.Size = new System.Drawing.Size(196, 69);
+            this.trackBarContrast.TabIndex = 0;
+            this.trackBarContrast.Value = 50;
+            this.trackBarContrast.Scroll += new System.EventHandler(this.trackBarContrast_Scroll);
+            // 
+            // groupBox10
+            // 
+            this.groupBox10.Controls.Add(this.labelBrightness);
+            this.groupBox10.Controls.Add(this.trackBarBrightness);
+            this.groupBox10.Location = new System.Drawing.Point(11, 89);
+            this.groupBox10.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox10.Name = "groupBox10";
+            this.groupBox10.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox10.Size = new System.Drawing.Size(273, 111);
+            this.groupBox10.TabIndex = 13;
+            this.groupBox10.TabStop = false;
+            this.groupBox10.Text = "Windows Brightness";
+            // 
+            // labelBrightness
+            // 
+            this.labelBrightness.AutoSize = true;
+            this.labelBrightness.Location = new System.Drawing.Point(222, 34);
+            this.labelBrightness.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelBrightness.Name = "labelBrightness";
+            this.labelBrightness.Size = new System.Drawing.Size(41, 20);
+            this.labelBrightness.TabIndex = 1;
+            this.labelBrightness.Text = "50%";
+            // 
+            // trackBarBrightness
+            // 
+            this.trackBarBrightness.Enabled = false;
+            this.trackBarBrightness.Location = new System.Drawing.Point(22, 34);
+            this.trackBarBrightness.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.trackBarBrightness.Maximum = 100;
+            this.trackBarBrightness.Name = "trackBarBrightness";
+            this.trackBarBrightness.Size = new System.Drawing.Size(196, 69);
+            this.trackBarBrightness.TabIndex = 0;
+            this.trackBarBrightness.Value = 50;
+            this.trackBarBrightness.Scroll += new System.EventHandler(this.trackBarBrightness_Scroll);
+            // 
             // VibranceGUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(144F, 144F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(628, 806);
+            this.ClientSize = new System.Drawing.Size(628, 1161);
+            this.Controls.Add(this.groupBoxColorSettings);
             this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.labelPaypal);
             this.Controls.Add(this.buttonPaypal);
-            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.groupBoxSettings);
             this.Controls.Add(this.statusLabel);
             this.Controls.Add(this.observerStatusLabel);
             this.Controls.Add(this.labelTwitter);
@@ -355,12 +513,23 @@
             this.Shown += new System.EventHandler(this.Form1_Shown);
             this.Resize += new System.EventHandler(this.Form1_Resize);
             this.contextMenuStrip.ResumeLayout(false);
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
+            this.groupBoxSettings.ResumeLayout(false);
+            this.groupBoxSettings.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarWindowsLevel)).EndInit();
             this.groupBox5.ResumeLayout(false);
+            this.groupBoxColorSettings.ResumeLayout(false);
+            this.groupBoxColorSettings.PerformLayout();
+            this.groupBox8.ResumeLayout(false);
+            this.groupBox8.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarGamma)).EndInit();
+            this.groupBox9.ResumeLayout(false);
+            this.groupBox9.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarContrast)).EndInit();
+            this.groupBox10.ResumeLayout(false);
+            this.groupBox10.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarBrightness)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -374,7 +543,7 @@
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.ComponentModel.BackgroundWorker backgroundWorker;
         private System.Windows.Forms.CheckBox checkBoxAutostart;
-        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.GroupBox groupBoxSettings;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.Label labelWindowsLevel;
         private System.Windows.Forms.TrackBar trackBarWindowsLevel;
@@ -393,6 +562,17 @@
         private System.Windows.Forms.Button buttonAddProgram;
         private System.Windows.Forms.Button buttonProcessExplorer;
         private System.Windows.Forms.CheckBox checkBoxNeverChangeResolutions;
+        private System.Windows.Forms.CheckBox checkBoxNeverChangeColorSettings;
+        private System.Windows.Forms.GroupBox groupBoxColorSettings;
+        private System.Windows.Forms.GroupBox groupBox8;
+        private System.Windows.Forms.Label labelGamma;
+        private System.Windows.Forms.TrackBar trackBarGamma;
+        private System.Windows.Forms.GroupBox groupBox9;
+        private System.Windows.Forms.Label labelContrast;
+        private System.Windows.Forms.TrackBar trackBarContrast;
+        private System.Windows.Forms.GroupBox groupBox10;
+        private System.Windows.Forms.Label labelBrightness;
+        private System.Windows.Forms.TrackBar trackBarBrightness;
     }
 }
 

@@ -186,7 +186,7 @@ namespace vibrance.GUI.common
 
         private WinEventHook()
         {
-            _winEventHookHandle = SetWinEventHook(WinEvent.EventSystemForeground, WinEvent.EventSystemForeground, IntPtr.Zero, _procDelegate, 0, 0, WinEvent.WineventOutofcontext);
+            _winEventHookHandle = SetWinEventHook(WinEvent.EventSystemForeground, WinEvent.EventSystemMinimizeend, IntPtr.Zero, _procDelegate, 0, 0, WinEvent.WineventOutofcontext);
         }
 
         public void RemoveWinEventHook()
@@ -201,11 +201,7 @@ namespace vibrance.GUI.common
             }
             catch (Exception ex)
             {
-                VibranceGUI.Log(new Exception("UnhookWinEvent(winEventHookHandle) failed."));
-            }
-            finally
-            {
-
+                VibranceGUI.Log(new Exception("UnhookWinEvent(winEventHookHandle) failed.", ex));
             }
         }
 

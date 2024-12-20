@@ -20,7 +20,7 @@ namespace vibrance.GUI
         private static extern bool SetProcessDPIAware();
 
         private const string ErrorGraphicsAdapterUnknown = "Failed to determine your Graphic GraphicsAdapter type (NVIDIA/AMD). Make sure you have installed a proper GPU driver. Intel laptops are not supported as stated on the website. When installing your GPU driver did not work, please contact @juvlarN at twitter. Press Yes to open twitter in your browser now. Error: ";
-        private const string ErrorGraphicsAdapterAmbiguous = "Both NVIDIA and AMD graphic drivers have been found on your system. This can happen when you recently switched your graphic card and did not uninstall the old drivers. Make sure to uninstall unused graphic drivers to keep your system safe and stable. Use the program \"Display Driver Uninstaller\" to uninstall your old drivers!\n\nPress Yes to open \"Display Driver Uninstaller\" download website now.\nPress No to quit vibranceGUI.";
+        private const string ErrorGraphicsAdapterAmbiguous = "Both NVIDIA and AMD graphic drivers have been found on your system. This can happen when you recently switched your graphic card and did not uninstall the old drivers. Make sure to uninstall unused graphic drivers to keep your system safe and stable. Use the program \"Display Driver Uninstaller\" to uninstall your old drivers!\n\nIn case you want to do it manually: The related files are located in your Windows folder and are called \"nvapi.dll\" (NVIDIA) and \"atiadlxx.dll\" (AMD) and \"atiadlxy.dll\" (AMD). You are free to rename/delete the files that you no longer need but proceed with caution!\n\nPress Yes to open \"Display Driver Uninstaller\" download website in your Browser now.\nPress No to quit vibranceGUI.";
         private const string MessageBoxCaption = "vibranceGUI Error";
 
         [STAThread]
@@ -46,19 +46,19 @@ namespace vibrance.GUI
             GraphicsAdapter adapter = GraphicsAdapterHelper.GetAdapter();
             Form vibranceGui = null;
 
-            if (adapter == GraphicsAdapter.Amd)
+            if (adapter == GraphicsAdapter.Amd || args.Contains("--force-amd"))
             {
                 Func<List<ApplicationSetting>, Dictionary<string, Tuple<ResolutionModeWrapper, List<ResolutionModeWrapper>>>, IVibranceProxy> getProxy = (x, y) => new AmdDynamicVibranceProxy(Environment.Is64BitOperatingSystem
                     ? new AmdAdapter64()
                     : (IAmdAdapter)new AmdAdapter32(), x, y);
-                vibranceGui = new VibranceGUI(getProxy, 
-                    100, 
-                    0,
-                    300,
-                    100,
-                    x => x.ToString());
+                vibranceGui = new VibranceGUI(getProxy,
+                    GraphicsAdapter.Amd,
+                    AmdDynamicVibranceProxy.AmdDefaultLevel,
+                    AmdDynamicVibranceProxy.AmdMinLevel,
+                    AmdDynamicVibranceProxy.AmdMaxLevel,
+                    AmdDynamicVibranceProxy.AmdDefaultLevel);
             }
-            else if (adapter == GraphicsAdapter.Nvidia)
+            else if (adapter == GraphicsAdapter.Nvidia || args.Contains("--force-nvidia"))
             {
                 const string nvidiaAdapterName = "vibranceDLL.dll";
                 string resourceName = $"{typeof(Program).Namespace}.NVIDIA.{nvidiaAdapterName}";
@@ -70,11 +70,11 @@ namespace vibrance.GUI
 
                 vibranceGui = new VibranceGUI(
                     (x, y) => new NvidiaDynamicVibranceProxy(x, y),
+                    GraphicsAdapter.Nvidia,
                     NvidiaDynamicVibranceProxy.NvapiDefaultLevel,
                     NvidiaDynamicVibranceProxy.NvapiDefaultLevel,
                     NvidiaDynamicVibranceProxy.NvapiMaxLevel,
-                    NvidiaDynamicVibranceProxy.NvapiDefaultLevel,
-                    x => NvidiaVibranceValueWrapper.Find(x).Percentage);
+                    NvidiaDynamicVibranceProxy.NvapiDefaultLevel);
             }
             else if (adapter == GraphicsAdapter.Unknown)
             {

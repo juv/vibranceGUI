@@ -15,6 +15,11 @@ namespace vibrance.GUI.common
         VibranceInfo GetVibranceInfo();
         GraphicsAdapter GraphicsAdapter { get; }
         void SetNeverSwitchResolution(bool neverSwitchResolution);
-        void ReadColorSettings();
+        void SetNeverChangeColorSettings(bool neverChangeColorSettings);
+        void SetWindowsColorSettings(int brightness, int contrast, int gamma);
+
+        void SetWindowsColorBrightness(int brightness);
+        void SetWindowsColorContrast(int contrast);
+        void SetWindowsColorGamma(int gamma);
     }
 }

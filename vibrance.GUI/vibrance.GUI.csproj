@@ -128,7 +128,8 @@
     <Compile Include="common\ProcessExplorerEntry.cs" />
     <Compile Include="common\ResolutionHelper.cs" />
     <Compile Include="common\ResolutionModeWrapper.cs" />
-    <Compile Include="common\SetDeviceGammaRampHelper.cs" />
+    <Compile Include="common\DeviceGammaRampHelper.cs" />
+    <Compile Include="common\TrackbarLabelHelper.cs" />
     <Compile Include="common\WinEventHook.cs" />
     <Compile Include="common\WinEventHookEventArgs.cs" />
     <Compile Include="common\Definitions.cs" />

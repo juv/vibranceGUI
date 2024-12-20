@@ -54,5 +54,16 @@ namespace vibrance.GUI.common
             }
             return false;
         }
+
+        public override int GetHashCode()
+        {
+            int hashCode = -281771422;
+            hashCode = hashCode * -1521134295 + DmPelsWidth.GetHashCode();
+            hashCode = hashCode * -1521134295 + DmPelsHeight.GetHashCode();
+            hashCode = hashCode * -1521134295 + DmBitsPerPel.GetHashCode();
+            hashCode = hashCode * -1521134295 + DmDisplayFrequency.GetHashCode();
+            hashCode = hashCode * -1521134295 + DmDisplayFixedOutput.GetHashCode();
+            return hashCode;
+        }
     }
 }

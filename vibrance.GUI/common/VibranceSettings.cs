@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.Xml.Linq;
+using System.Drawing;
 
 namespace vibrance.GUI.common
 {
@@ -58,21 +62,25 @@ namespace vibrance.GUI.common
         {
             _v.SetVibranceIngameLevel(trackBarIngameLevel.Value);
             labelIngameLevel.Text = TrackbarLabelHelper.ResolveVibranceLabelLevel(_graphicsAdapter, trackBarIngameLevel.Value);
+            validateIngameValues();
         }
 
         private void trackBarBrightness_Scroll(object sender, EventArgs e)
         {
             labelBrightness.Text = TrackbarLabelHelper.ResolveBrightnessLabelLevel(trackBarBrightness.Value);
+            validateIngameValues();
         }
 
         private void trackBarContrast_Scroll(object sender, EventArgs e)
         {
             labelContrast.Text = TrackbarLabelHelper.ResolveContrastLabelLevel(trackBarContrast.Value);
+            validateIngameValues();
         }
 
         private void trackBarGamma_Scroll(object sender, EventArgs e)
         {
             labelGamma.Text = TrackbarLabelHelper.ResolveGammaLabelLevel(trackBarGamma.Value);
+            validateIngameValues();
         }
 
         private void buttonSave_Click(object sender, EventArgs e)
@@ -112,6 +120,29 @@ namespace vibrance.GUI.common
             trackBarBrightness_Scroll(null, null);
             trackBarContrast_Scroll(null, null);
             trackBarGamma_Scroll(null, null);
+        }
+
+        private void validateIngameValues()
+        {
+            if(matchesWindowsValues())
+            {
+                labelValidation.ForeColor = Color.Red;
+                labelValidation.Text = "⚠️ Ingame settings match your Windows settings!" + Environment.NewLine + "No color change will happen.";
+            }
+            else
+            {
+                labelValidation.ForeColor = Color.Green;
+                labelValidation.Text = "Validation of ingame settings was successful";
+            }
+        }
+
+        private bool matchesWindowsValues()
+        {
+            VibranceInfo vibranceInfo = _v.GetVibranceInfo();
+            return vibranceInfo.userVibranceSettingDefault == trackBarIngameLevel.Value &&
+                vibranceInfo.userColorSettings.brightness == trackBarBrightness.Value &&
+                vibranceInfo.userColorSettings.contrast == trackBarContrast.Value &&
+                vibranceInfo.userColorSettings.gamma == trackBarGamma.Value;
         }
     }
 }

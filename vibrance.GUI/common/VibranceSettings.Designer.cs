@@ -49,6 +49,7 @@
             this.trackBarGamma = new System.Windows.Forms.TrackBar();
             this.labelGamma = new System.Windows.Forms.Label();
             this.buttonReset = new System.Windows.Forms.Button();
+            this.labelValidation = new System.Windows.Forms.Label();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarIngameLevel)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
@@ -96,7 +97,7 @@
             // 
             // buttonSave
             // 
-            this.buttonSave.Location = new System.Drawing.Point(247, 718);
+            this.buttonSave.Location = new System.Drawing.Point(247, 760);
             this.buttonSave.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.buttonSave.Name = "buttonSave";
             this.buttonSave.Size = new System.Drawing.Size(140, 37);
@@ -277,7 +278,7 @@
             // 
             // buttonReset
             // 
-            this.buttonReset.Location = new System.Drawing.Point(18, 718);
+            this.buttonReset.Location = new System.Drawing.Point(18, 760);
             this.buttonReset.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.buttonReset.Name = "buttonReset";
             this.buttonReset.Size = new System.Drawing.Size(140, 37);
@@ -286,11 +287,23 @@
             this.buttonReset.UseVisualStyleBackColor = true;
             this.buttonReset.Click += new System.EventHandler(this.buttonReset_Click);
             // 
+            // labelValidation
+            // 
+            this.labelValidation.AutoSize = true;
+            this.labelValidation.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelValidation.ForeColor = System.Drawing.Color.Red;
+            this.labelValidation.Location = new System.Drawing.Point(14, 717);
+            this.labelValidation.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelValidation.Name = "labelValidation";
+            this.labelValidation.Size = new System.Drawing.Size(0, 20);
+            this.labelValidation.TabIndex = 20;
+            // 
             // VibranceSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(144F, 144F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(405, 769);
+            this.ClientSize = new System.Drawing.Size(405, 811);
+            this.Controls.Add(this.labelValidation);
             this.Controls.Add(this.buttonReset);
             this.Controls.Add(this.groupBoxGamma);
             this.Controls.Add(this.groupBoxContrast);
@@ -349,5 +362,6 @@
         private System.Windows.Forms.TrackBar trackBarGamma;
         private System.Windows.Forms.Label labelGamma;
         private System.Windows.Forms.Button buttonReset;
+        private System.Windows.Forms.Label labelValidation;
     }
 }

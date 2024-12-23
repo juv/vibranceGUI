@@ -15,11 +15,11 @@ namespace vibrance.GUI.common
 {
     public partial class VibranceGUI : Form
     {
+        private GraphicsAdapter _graphicsAdapter;
         private readonly int _defaultWindowsLevel;
         private readonly int _minTrackBarValue;
         private readonly int _maxTrackBarValue;
         private readonly int _defaultIngameValue;
-        private readonly Func<int, string> _resolveLabelLevel;
         private readonly IVibranceProxy _v;
         private IRegistryController _registryController;
         private const string AppName = "vibranceGUI";
@@ -31,20 +31,24 @@ namespace vibrance.GUI.common
         private readonly List<ResolutionModeWrapper> _supportedResolutionList;
         private readonly Dictionary<string, Tuple<ResolutionModeWrapper, List<ResolutionModeWrapper>>> _windowsResolutionSettings;
 
+        private readonly bool _isForcedExecution;
+
         public VibranceGUI(
-            Func<List<ApplicationSetting>, Dictionary<string, Tuple<ResolutionModeWrapper, List<ResolutionModeWrapper>>>, IVibranceProxy> getProxy, 
-            int defaultWindowsLevel, 
+            Func<List<ApplicationSetting>, Dictionary<string, Tuple<ResolutionModeWrapper, List<ResolutionModeWrapper>>>, IVibranceProxy> getProxy,
+            GraphicsAdapter graphicsAdapter,
+            int defaultWindowsLevel,
             int minTrackBarValue,
             int maxTrackBarValue,
             int defaultIngameValue,
-            Func<int, string> resolveLabelLevel)
+            bool isForcedExecution)
         {
+            _graphicsAdapter = graphicsAdapter;
             _defaultWindowsLevel = defaultWindowsLevel;
             _minTrackBarValue = minTrackBarValue;
             _maxTrackBarValue = maxTrackBarValue;
             _defaultIngameValue = defaultIngameValue;
-            _resolveLabelLevel = resolveLabelLevel;
             _allowVisible = true;
+            _isForcedExecution = isForcedExecution;
 
             InitializeComponent();
 
@@ -52,18 +56,18 @@ namespace vibrance.GUI.common
             trackBarWindowsLevel.Maximum = maxTrackBarValue;
 
             _windowsResolutionSettings = new Dictionary<string, Tuple<ResolutionModeWrapper, List<ResolutionModeWrapper>>>();
-            foreach(Screen screen in Screen.AllScreens)
+            foreach (Screen screen in Screen.AllScreens)
             {
                 Devmode currentResolutionMode;
                 if (ResolutionHelper.GetCurrentResolutionSettings(out currentResolutionMode, screen.DeviceName))
                 {
                     List<ResolutionModeWrapper> availableResolutions = ResolutionHelper.EnumerateSupportedResolutionModes(screen.DeviceName);
-                    if(screen.Primary)
+                    if (screen.Primary)
                     {
                         _supportedResolutionList = availableResolutions;
                     }
                     var tuple = new Tuple<ResolutionModeWrapper, List<ResolutionModeWrapper>>(new ResolutionModeWrapper(currentResolutionMode), availableResolutions);
-                    _windowsResolutionSettings.Add(screen.DeviceName, tuple);                    
+                    _windowsResolutionSettings.Add(screen.DeviceName, tuple);
                 }
                 else
                 {
@@ -118,6 +122,10 @@ namespace vibrance.GUI.common
             int vibranceWindowsLevel = _defaultWindowsLevel;
             bool affectPrimaryMonitorOnly = false;
             bool neverSwitchResolution = false;
+            bool neverChangeColorSettings = false;
+            int brightnessWindowsLevel = 50;
+            int contrastWindowsLevel = 50;
+            int gammaWindowsLevel = 100;
 
             while (!this.IsHandleCreated)
             {
@@ -128,12 +136,12 @@ namespace vibrance.GUI.common
             {
                 this.Invoke((MethodInvoker)delegate
                 {
-                    ReadVibranceSettings(out vibranceWindowsLevel, out affectPrimaryMonitorOnly, out neverSwitchResolution);
+                    ReadVibranceSettings(out vibranceWindowsLevel, out affectPrimaryMonitorOnly, out neverSwitchResolution, out neverChangeColorSettings, out brightnessWindowsLevel, out contrastWindowsLevel, out gammaWindowsLevel);
                 });
             }
             else
             {
-                ReadVibranceSettings(out vibranceWindowsLevel, out affectPrimaryMonitorOnly, out neverSwitchResolution);
+                ReadVibranceSettings(out vibranceWindowsLevel, out affectPrimaryMonitorOnly, out neverSwitchResolution, out neverChangeColorSettings, out brightnessWindowsLevel, out contrastWindowsLevel, out gammaWindowsLevel);
             }
 
             if (_v.GetVibranceInfo().isInitialized)
@@ -147,6 +155,8 @@ namespace vibrance.GUI.common
                 _v.SetVibranceWindowsLevel(vibranceWindowsLevel);
                 _v.SetAffectPrimaryMonitorOnly(affectPrimaryMonitorOnly);
                 _v.SetNeverSwitchResolution(neverSwitchResolution);
+                _v.SetNeverChangeColorSettings(neverChangeColorSettings);
+                _v.SetWindowsColorSettings(brightnessWindowsLevel, contrastWindowsLevel, gammaWindowsLevel);
             }
         }
 
@@ -171,7 +181,37 @@ namespace vibrance.GUI.common
         private void trackBarWindowsLevel_Scroll(object sender, EventArgs e)
         {
             _v.SetVibranceWindowsLevel(trackBarWindowsLevel.Value);
-            labelWindowsLevel.Text = _resolveLabelLevel(trackBarWindowsLevel.Value);
+            labelWindowsLevel.Text = TrackbarLabelHelper.ResolveVibranceLabelLevel(_graphicsAdapter, trackBarWindowsLevel.Value);
+            if (!settingsBackgroundWorker.IsBusy)
+            {
+                settingsBackgroundWorker.RunWorkerAsync();
+            }
+        }
+
+        private void trackBarBrightness_Scroll(object sender, EventArgs e)
+        {
+            _v.SetWindowsColorBrightness(trackBarBrightness.Value);
+            labelBrightness.Text = TrackbarLabelHelper.ResolveBrightnessLabelLevel(trackBarBrightness.Value);
+            if (!settingsBackgroundWorker.IsBusy)
+            {
+                settingsBackgroundWorker.RunWorkerAsync();
+            }
+        }
+
+
+        private void trackBarContrast_Scroll(object sender, EventArgs e)
+        {
+            _v.SetWindowsColorContrast(trackBarContrast.Value);
+            labelContrast.Text = TrackbarLabelHelper.ResolveContrastLabelLevel(trackBarContrast.Value);
+            if (!settingsBackgroundWorker.IsBusy)
+            {
+                settingsBackgroundWorker.RunWorkerAsync();
+            }
+        }
+        private void trackBarGamma_Scroll(object sender, EventArgs e)
+        {
+            _v.SetWindowsColorGamma(trackBarGamma.Value);
+            labelGamma.Text = TrackbarLabelHelper.ResolveGammaLabelLevel(trackBarGamma.Value);
             if (!settingsBackgroundWorker.IsBusy)
             {
                 settingsBackgroundWorker.RunWorkerAsync();
@@ -187,15 +227,23 @@ namespace vibrance.GUI.common
         private void ForceSaveVibranceSettings()
         {
             int windowsLevel = 0;
-            bool affectPrimaryMonitorOnly = false;
-            bool neverSwitchResolution = false;
+            bool affectPrimaryMonitorOnly = true;
+            bool neverSwitchResolution = true;
+            bool neverChangeColorSettings = true;
+            int brightnessWindowsLevel = 50;
+            int contrastWindowsLevel = 50;
+            int gammaWindowsLevel = 100;
             this.Invoke((MethodInvoker)delegate
             {
                 windowsLevel = trackBarWindowsLevel.Value;
                 affectPrimaryMonitorOnly = checkBoxPrimaryMonitorOnly.Checked;
                 neverSwitchResolution = checkBoxNeverChangeResolutions.Checked;
+                neverChangeColorSettings = checkBoxNeverChangeColorSettings.Checked;
+                brightnessWindowsLevel = trackBarBrightness.Value;
+                contrastWindowsLevel = trackBarContrast.Value;
+                gammaWindowsLevel = trackBarGamma.Value;
             });
-            SaveVibranceSettings(windowsLevel, affectPrimaryMonitorOnly, neverSwitchResolution);
+            SaveVibranceSettings(windowsLevel, affectPrimaryMonitorOnly, neverSwitchResolution, neverChangeColorSettings, brightnessWindowsLevel, contrastWindowsLevel, gammaWindowsLevel);
         }
 
         private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -240,7 +288,7 @@ namespace vibrance.GUI.common
                 this.settingsBackgroundWorker.RunWorkerAsync();
             }
         }
-        
+
         private void checkBoxNeverChangeResolutions_CheckedChanged(object sender, EventArgs e)
         {
             if (this._v == null)
@@ -261,10 +309,15 @@ namespace vibrance.GUI.common
             if (this.checkBoxAutostart.Checked)
             {
                 string pathToExe = "\"" + Application.ExecutablePath + "\" -minimized";
+                if (_isForcedExecution)
+                {
+                    pathToExe += string.Format(" --force-{0}", _graphicsAdapter.ToString().ToLower());
+                }
+
                 if (!autostartController.IsProgramRegistered(AppName))
                 {
-                    this.notifyIcon.BalloonTipText = autostartController.RegisterProgram(AppName, pathToExe) 
-                        ? "Registered to Autostart!" 
+                    this.notifyIcon.BalloonTipText = autostartController.RegisterProgram(AppName, pathToExe)
+                        ? "Registered to Autostart!"
                         : "Registering to Autostart failed!";
                 }
                 else if (!autostartController.IsStartupPathUnchanged(AppName, pathToExe))
@@ -280,12 +333,32 @@ namespace vibrance.GUI.common
             }
             else
             {
-                this.notifyIcon.BalloonTipText = autostartController.UnregisterProgram(AppName) 
-                    ? "Unregistered from Autostart!" 
+                this.notifyIcon.BalloonTipText = autostartController.UnregisterProgram(AppName)
+                    ? "Unregistered from Autostart!"
                     : "Unregistering from Autostart failed!";
             }
 
             notifyIcon.ShowBalloonTip(250);
+        }
+
+
+        private void checkBoxNeverChangeColorSettings_CheckedChanged(object sender, EventArgs e)
+        {
+            if (this._v == null)
+            {
+                return;
+            }
+
+            this._v.SetNeverChangeColorSettings(this.checkBoxNeverChangeColorSettings.Checked);
+
+            trackBarBrightness.Enabled = !this.checkBoxNeverChangeColorSettings.Checked;
+            trackBarContrast.Enabled = !this.checkBoxNeverChangeColorSettings.Checked;
+            trackBarGamma.Enabled = !this.checkBoxNeverChangeColorSettings.Checked;
+
+            if (!this.settingsBackgroundWorker.IsBusy)
+            {
+                this.settingsBackgroundWorker.RunWorkerAsync();
+            }
         }
 
         private void twitterToolStripTextBox_Click(object sender, EventArgs e)
@@ -308,6 +381,8 @@ namespace vibrance.GUI.common
                 this.buttonAddProgram.Enabled = flag;
                 this.buttonProcessExplorer.Enabled = flag;
                 this.buttonRemoveProgram.Enabled = flag;
+                this.checkBoxNeverChangeResolutions.Enabled = flag;
+                this.checkBoxNeverChangeColorSettings.Enabled = flag;
             });
         }
 
@@ -333,7 +408,7 @@ namespace vibrance.GUI.common
 
         public static void Log(Exception ex)
         {
-            using (StreamWriter w = File.AppendText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "vibranceGUI.log")))
+            using (StreamWriter w = File.AppendText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "vibranceGUI\\vibranceGUI.log")))
             {
                 w.Write("\r\nLog Entry : ");
                 w.WriteLine("{0} {1}", DateTime.Now.ToLongTimeString(),
@@ -350,7 +425,7 @@ namespace vibrance.GUI.common
 
         public static void Log(string msg)
         {
-            using (StreamWriter w = File.AppendText("vibranceGUI_log.txt"))
+            using (StreamWriter w = File.AppendText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "vibranceGUI\\vibranceGUI.log")))
             {
                 w.Write("\r\nLog Entry : ");
                 w.WriteLine("{0} {1}", DateTime.Now.ToLongTimeString(),
@@ -360,29 +435,32 @@ namespace vibrance.GUI.common
             }
         }
 
-        private void ReadVibranceSettings(out int vibranceWindowsLevel, out bool affectPrimaryMonitorOnly, out bool neverSwitchResolution)
+        private void ReadVibranceSettings(out int vibranceWindowsLevel, out bool affectPrimaryMonitorOnly, out bool neverSwitchResolution,
+            out bool neverChangeColorSettings, out int brightnessWindowsLevel, out int contrastWindowsLevel, out int gammaWindowsLevel)
         {
             _registryController = new RegistryController();
             this.checkBoxAutostart.Checked = _registryController.IsProgramRegistered(AppName);
 
             SettingsController settingsController = new SettingsController();
-            settingsController.ReadVibranceSettings(_v.GraphicsAdapter, out vibranceWindowsLevel, out affectPrimaryMonitorOnly, out neverSwitchResolution, out _applicationSettings);
+            settingsController.ReadVibranceSettings(_v.GraphicsAdapter, out vibranceWindowsLevel, out affectPrimaryMonitorOnly, out neverSwitchResolution,
+                out neverChangeColorSettings, out _applicationSettings, out brightnessWindowsLevel, out contrastWindowsLevel, out gammaWindowsLevel);
 
             if (this.IsHandleCreated)
             {
                 //no null check needed, SettingsController will always return matching values.
-                labelWindowsLevel.Text = _resolveLabelLevel(vibranceWindowsLevel);
+                labelWindowsLevel.Text = TrackbarLabelHelper.ResolveVibranceLabelLevel(_graphicsAdapter, vibranceWindowsLevel);
 
                 trackBarWindowsLevel.Value = vibranceWindowsLevel;
                 checkBoxPrimaryMonitorOnly.Checked = affectPrimaryMonitorOnly;
                 checkBoxNeverChangeResolutions.Checked = neverSwitchResolution;
+                checkBoxNeverChangeColorSettings.Checked = neverChangeColorSettings;
                 foreach (ApplicationSetting application in _applicationSettings.ToList())
                 {
                     if (!File.Exists(application.FileName))
                     {
                         _applicationSettings.Remove(application);
                         continue;
-                    }                        
+                    }
 
                     InitializeApplicationList();
 
@@ -399,7 +477,7 @@ namespace vibrance.GUI.common
             }
         }
 
-        private void SaveVibranceSettings(int windowsLevel, bool affectPrimaryMonitorOnly, bool neverSwitchResolution)
+        private void SaveVibranceSettings(int windowsLevel, bool affectPrimaryMonitorOnly, bool neverSwitchResolution, bool neverChangeColorSettings, int brightnessWindowsLevel, int contrastWindowsLevel, int gammaWindowsLevel)
         {
             SettingsController settingsController = new SettingsController();
 
@@ -407,7 +485,11 @@ namespace vibrance.GUI.common
                 windowsLevel.ToString(),
                 affectPrimaryMonitorOnly.ToString(),
                 neverSwitchResolution.ToString(),
-                _applicationSettings
+                neverChangeColorSettings.ToString(),
+                _applicationSettings,
+                brightnessWindowsLevel.ToString(),
+                contrastWindowsLevel.ToString(),
+                gammaWindowsLevel.ToString()
             );
         }
 
@@ -422,7 +504,7 @@ namespace vibrance.GUI.common
 
             OpenFileDialog fileDialog = new OpenFileDialog();
             DialogResult result = fileDialog.ShowDialog();
-            if (result == DialogResult.OK && fileDialog.CheckFileExists && fileDialog.SafeFileName != null 
+            if (result == DialogResult.OK && fileDialog.CheckFileExists && fileDialog.SafeFileName != null
                 && _applicationSettings.FirstOrDefault(x => x.FileName.ToLower() == fileDialog.FileName.ToLower()) == null)
             {
                 Icon icon = Icon.ExtractAssociatedIcon(fileDialog.FileName);
@@ -436,7 +518,7 @@ namespace vibrance.GUI.common
 
         public void AddProgramExtern(ProcessExplorerEntry processExplorerEntry)
         {
-            if(this.InvokeRequired)
+            if (this.InvokeRequired)
             {
                 this.Invoke((MethodInvoker)delegate
                 {
@@ -452,11 +534,11 @@ namespace vibrance.GUI.common
         private void AddProgramIntern(ProcessExplorerEntry processExplorerEntry)
         {
             InitializeApplicationList();
-            
-            if(!File.Exists(processExplorerEntry.Path) || _applicationSettings.FirstOrDefault(x => x.FileName.ToLower() == processExplorerEntry.Path.ToLower()) != null)
+
+            if (!File.Exists(processExplorerEntry.Path) || _applicationSettings.FirstOrDefault(x => x.FileName.ToLower() == processExplorerEntry.Path.ToLower()) != null)
             {
                 this.listApplications.SelectedIndices.Clear();
-                return; 
+                return;
             }
 
             Icon icon = processExplorerEntry.Icon;
@@ -507,7 +589,7 @@ namespace vibrance.GUI.common
             if (selectedItem != null)
             {
                 ApplicationSetting actualSetting = _applicationSettings.FirstOrDefault(x => x.FileName == selectedItem.Tag.ToString());
-                VibranceSettings settingsWindow = new VibranceSettings(_v, _minTrackBarValue, _maxTrackBarValue, _defaultIngameValue, selectedItem, actualSetting, _supportedResolutionList, _resolveLabelLevel);
+                VibranceSettings settingsWindow = new VibranceSettings(_v, _minTrackBarValue, _maxTrackBarValue, _defaultIngameValue, selectedItem, actualSetting, _supportedResolutionList, _graphicsAdapter);
                 DialogResult result = settingsWindow.ShowDialog();
                 if (result == DialogResult.OK)
                 {
@@ -519,7 +601,7 @@ namespace vibrance.GUI.common
                     _applicationSettings.Add(newSetting);
                     ForceSaveVibranceSettings();
                 }
-                else if(actualSetting == null)
+                else if (actualSetting == null)
                 {
                     removeApplicationListItem(selectedItem);
                 }

@@ -18,5 +18,15 @@ namespace vibrance.GUI.common
         public List<int> displayHandles;
         public bool affectPrimaryMonitorOnly;
         public bool neverChangeResolution;
+        public bool neverChangeColorSettings;
+        public bool isColorSettingApplied;
+        public bool isResolutionChangeApplied;
+        public ColorSettings userColorSettings;
+        public struct ColorSettings
+        {
+            public int brightness;
+            public int contrast;
+            public int gamma;
+        }
     }
 }

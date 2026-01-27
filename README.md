@@ -9,6 +9,10 @@ Intel did not publish an API for their integrated GPUs and are not supported.
 
 More information and binary download available at: http://vibrancegui.com/
 
+## Troubleshooting (v2.5.0+)
+
+If you see the "Both NVIDIA and AMD graphic drivers have been found on your system" error (for example on systems with an AMD iGPU and a dedicated NVIDIA GPU), you can force the GPU type via a shortcut: create a shortcut to `vibranceGUI.exe`, open its Properties, and append a space plus `--force-nvidia` or `--force-amd` to the Target path (e.g. `C:\WHATEVER\vibranceGUI\vibranceGUI.exe --force-nvidia`).
+
 ## Compiling
 
 When compiling, make sure to compile for x86 target platform.  

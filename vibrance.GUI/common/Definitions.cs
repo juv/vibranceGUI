@@ -19,6 +19,8 @@ namespace vibrance.GUI.common
         public bool affectPrimaryMonitorOnly;
         public bool neverChangeResolution;
         public bool neverChangeColorSettings;
+        public bool isProfileToggleEnabled;
+        public bool isProfileToggleOn;
         public bool isColorSettingApplied;
         public bool isResolutionChangeApplied;
         public ColorSettings userColorSettings;

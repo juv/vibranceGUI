@@ -96,6 +96,88 @@ namespace vibrance.GUI.AMD
             _vibranceInfo.neverChangeColorSettings = neverChangeColorSettings;
         }
 
+        public void SetProfileToggleEnabled(bool profileToggleEnabled)
+        {
+            _vibranceInfo.isProfileToggleEnabled = profileToggleEnabled;
+            _vibranceInfo.isProfileToggleOn = true;
+        }
+
+        public void SetProfileToggleState(bool isProfileToggleOn)
+        {
+            _vibranceInfo.isProfileToggleOn = isProfileToggleOn;
+        }
+
+        public bool IsProfileToggleEnabled()
+        {
+            return _vibranceInfo.isProfileToggleEnabled;
+        }
+
+        public bool IsProfileToggleOn()
+        {
+            return _vibranceInfo.isProfileToggleOn;
+        }
+
+        public void ApplyProfileToggle(IntPtr windowHandle, string processName, bool isProfileToggleOn)
+        {
+            if (_applicationSettings.Count == 0)
+            {
+                return;
+            }
+
+            ApplicationSetting applicationSetting = _applicationSettings.FirstOrDefault(x => string.Equals(x.Name, processName, StringComparison.OrdinalIgnoreCase));
+            if (applicationSetting == null)
+            {
+                return;
+            }
+
+            Screen screen = Screen.FromHandle(windowHandle);
+            if (screen == null)
+            {
+                return;
+            }
+
+            _gameScreen = screen;
+
+            if (isProfileToggleOn)
+            {
+                if (_vibranceInfo.userVibranceSettingDefault != applicationSetting.IngameLevel)
+                {
+                    if (_vibranceInfo.affectPrimaryMonitorOnly)
+                    {
+                        _amdAdapter.SetSaturationOnDisplay(applicationSetting.IngameLevel, screen.DeviceName);
+                    }
+                    else
+                    {
+                        _amdAdapter.SetSaturationOnAllDisplays(applicationSetting.IngameLevel);
+                    }
+                }
+
+                if (_vibranceInfo.neverChangeColorSettings == false && _vibranceInfo.isColorSettingApplied == false &&
+                    DeviceGammaRampHelper.IsGammaRampEqualToWindowsValues(_vibranceInfo, applicationSetting) == false)
+                {
+                    DeviceGammaRampHelper.SetGammaRamp(screen, applicationSetting.Gamma, applicationSetting.Brightness, applicationSetting.Contrast);
+                    _vibranceInfo.isColorSettingApplied = true;
+                }
+            }
+            else
+            {
+                _amdAdapter.SetSaturationOnAllDisplays(_vibranceInfo.userVibranceSettingDefault);
+
+                if (_vibranceInfo.neverChangeColorSettings == false && _vibranceInfo.isColorSettingApplied == true)
+                {
+                    if (_vibranceInfo.affectPrimaryMonitorOnly && _gameScreen != null && _gameScreen.DeviceName.Equals(screen.DeviceName))
+                    {
+                        DeviceGammaRampHelper.SetGammaRamp(_gameScreen, _vibranceInfo.userColorSettings.brightness, _vibranceInfo.userColorSettings.contrast, _vibranceInfo.userColorSettings.gamma);
+                    }
+                    else
+                    {
+                        Screen.AllScreens.ToList().ForEach(currentScreen => DeviceGammaRampHelper.SetGammaRamp(currentScreen, _vibranceInfo.userColorSettings.brightness, _vibranceInfo.userColorSettings.contrast, _vibranceInfo.userColorSettings.gamma));
+                    }
+                    _vibranceInfo.isColorSettingApplied = false;
+                }
+            }
+        }
+
         public void SetWindowsColorSettings(int brightness, int contrast, int gamma)
         {
             _vibranceInfo.userColorSettings.brightness = brightness;
@@ -158,6 +240,7 @@ namespace vibrance.GUI.AMD
         {
             if (_applicationSettings.Count > 0)
             {
+                bool shouldApplyProfileSettings = !_vibranceInfo.isProfileToggleEnabled || _vibranceInfo.isProfileToggleOn;
                 ApplicationSetting applicationSetting = _applicationSettings.FirstOrDefault(x => string.Equals(x.Name, e.ProcessName, StringComparison.OrdinalIgnoreCase));
                 if (applicationSetting != null)
                 {
@@ -165,7 +248,7 @@ namespace vibrance.GUI.AMD
                     _gameScreen = screen;
 
                     //apply application specific saturation
-                    if (_vibranceInfo.userVibranceSettingDefault != applicationSetting.IngameLevel)
+                    if (shouldApplyProfileSettings && _vibranceInfo.userVibranceSettingDefault != applicationSetting.IngameLevel)
                     {
                         if (_vibranceInfo.affectPrimaryMonitorOnly)
                         {
@@ -188,7 +271,7 @@ namespace vibrance.GUI.AMD
                     }
 
                     //test if color settings change is needed
-                    if (_vibranceInfo.neverChangeColorSettings == false && _vibranceInfo.isColorSettingApplied == false &&
+                    if (shouldApplyProfileSettings && _vibranceInfo.neverChangeColorSettings == false && _vibranceInfo.isColorSettingApplied == false &&
                         DeviceGammaRampHelper.IsGammaRampEqualToWindowsValues(_vibranceInfo, applicationSetting) == false)
                     {
                         DeviceGammaRampHelper.SetGammaRamp(screen, applicationSetting.Gamma, applicationSetting.Brightness, applicationSetting.Contrast);

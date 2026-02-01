@@ -36,6 +36,9 @@
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.checkBoxAutostart = new System.Windows.Forms.CheckBox();
+            this.checkBoxProfileToggleEnabled = new System.Windows.Forms.CheckBox();
+            this.labelProfileToggleHotkey = new System.Windows.Forms.Label();
+            this.textBoxProfileToggleHotkey = new System.Windows.Forms.TextBox();
             this.groupBoxSettings = new System.Windows.Forms.GroupBox();
             this.checkBoxNeverChangeResolutions = new System.Windows.Forms.CheckBox();
             this.checkBoxPrimaryMonitorOnly = new System.Windows.Forms.CheckBox();
@@ -137,8 +140,46 @@
             this.checkBoxAutostart.UseVisualStyleBackColor = true;
             this.checkBoxAutostart.CheckedChanged += new System.EventHandler(this.checkBoxAutostart_CheckedChanged);
             // 
+            // checkBoxProfileToggleEnabled
+            // 
+            this.checkBoxProfileToggleEnabled.AutoSize = true;
+            this.checkBoxProfileToggleEnabled.Location = new System.Drawing.Point(315, 29);
+            this.checkBoxProfileToggleEnabled.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.checkBoxProfileToggleEnabled.Name = "checkBoxProfileToggleEnabled";
+            this.checkBoxProfileToggleEnabled.Size = new System.Drawing.Size(256, 24);
+            this.checkBoxProfileToggleEnabled.TabIndex = 17;
+            this.checkBoxProfileToggleEnabled.Text = "Enable profile toggle hotkey";
+            this.toolTip.SetToolTip(this.checkBoxProfileToggleEnabled, "Enable a global hotkey that toggles profile settings on the active application.");
+            this.checkBoxProfileToggleEnabled.UseVisualStyleBackColor = true;
+            this.checkBoxProfileToggleEnabled.CheckedChanged += new System.EventHandler(this.checkBoxProfileToggleEnabled_CheckedChanged);
+            // 
+            // labelProfileToggleHotkey
+            // 
+            this.labelProfileToggleHotkey.AutoSize = true;
+            this.labelProfileToggleHotkey.Location = new System.Drawing.Point(311, 65);
+            this.labelProfileToggleHotkey.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelProfileToggleHotkey.Name = "labelProfileToggleHotkey";
+            this.labelProfileToggleHotkey.Size = new System.Drawing.Size(237, 20);
+            this.labelProfileToggleHotkey.TabIndex = 18;
+            this.labelProfileToggleHotkey.Text = "Profile toggle hotkey (press keys)";
+            this.labelProfileToggleHotkey.Visible = false;
+            // 
+            // textBoxProfileToggleHotkey
+            // 
+            this.textBoxProfileToggleHotkey.Location = new System.Drawing.Point(315, 89);
+            this.textBoxProfileToggleHotkey.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.textBoxProfileToggleHotkey.Name = "textBoxProfileToggleHotkey";
+            this.textBoxProfileToggleHotkey.ReadOnly = true;
+            this.textBoxProfileToggleHotkey.Size = new System.Drawing.Size(269, 26);
+            this.textBoxProfileToggleHotkey.TabIndex = 19;
+            this.textBoxProfileToggleHotkey.Visible = false;
+            this.textBoxProfileToggleHotkey.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBoxProfileToggleHotkey_KeyDown);
+            // 
             // groupBoxSettings
             // 
+            this.groupBoxSettings.Controls.Add(this.textBoxProfileToggleHotkey);
+            this.groupBoxSettings.Controls.Add(this.labelProfileToggleHotkey);
+            this.groupBoxSettings.Controls.Add(this.checkBoxProfileToggleEnabled);
             this.groupBoxSettings.Controls.Add(this.checkBoxNeverChangeResolutions);
             this.groupBoxSettings.Controls.Add(this.checkBoxPrimaryMonitorOnly);
             this.groupBoxSettings.Controls.Add(this.groupBox3);
@@ -543,6 +584,9 @@
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.ComponentModel.BackgroundWorker backgroundWorker;
         private System.Windows.Forms.CheckBox checkBoxAutostart;
+        private System.Windows.Forms.CheckBox checkBoxProfileToggleEnabled;
+        private System.Windows.Forms.Label labelProfileToggleHotkey;
+        private System.Windows.Forms.TextBox textBoxProfileToggleHotkey;
         private System.Windows.Forms.GroupBox groupBoxSettings;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.Label labelWindowsLevel;
@@ -575,4 +619,3 @@
         private System.Windows.Forms.TrackBar trackBarBrightness;
     }
 }
-

@@ -38,9 +38,11 @@
             // 
             // listView
             // 
-            this.listView.Location = new System.Drawing.Point(12, 41);
+            this.listView.HideSelection = false;
+            this.listView.Location = new System.Drawing.Point(18, 63);
+            this.listView.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.listView.Name = "listView";
-            this.listView.Size = new System.Drawing.Size(615, 236);
+            this.listView.Size = new System.Drawing.Size(920, 361);
             this.listView.TabIndex = 0;
             this.listView.UseCompatibleStateImageBehavior = false;
             this.listView.DoubleClick += new System.EventHandler(this.listView_DoubleClick);
@@ -53,9 +55,10 @@
             // 
             // button
             // 
-            this.button.Location = new System.Drawing.Point(13, 12);
+            this.button.Location = new System.Drawing.Point(20, 18);
+            this.button.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.button.Name = "button";
-            this.button.Size = new System.Drawing.Size(119, 23);
+            this.button.Size = new System.Drawing.Size(178, 35);
             this.button.TabIndex = 1;
             this.button.Text = "Reload Processes";
             this.button.UseVisualStyleBackColor = true;
@@ -68,13 +71,14 @@
             // 
             // ProcessExplorer
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(639, 289);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(144F, 144F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+            this.ClientSize = new System.Drawing.Size(958, 445);
             this.Controls.Add(this.button);
             this.Controls.Add(this.listView);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "ProcessExplorer";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "vibranceGUI Process Explorer";

@@ -503,6 +503,11 @@ namespace vibrance.GUI.common
 
         private void listApplications_DoubleClick(object sender, EventArgs e)
         {
+            //ListView raises DoubleClick for the whole control, empty space included, where
+            //SelectedItems is empty and the indexer below would throw ArgumentOutOfRangeException.
+            if (this.listApplications.SelectedItems.Count == 0)
+                return;
+
             ListViewItem selectedItem = this.listApplications.SelectedItems[0];
             if (selectedItem != null)
             {

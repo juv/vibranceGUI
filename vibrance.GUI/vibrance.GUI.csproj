@@ -131,6 +131,7 @@
     <Compile Include="common\ISettingsController.cs" />
     <Compile Include="common\IVibranceProxy.cs" />
     <Compile Include="common\ApplicationSetting.cs" />
+    <Compile Include="common\StabilityFixture.cs" />
     <Compile Include="NVIDIA\NvidiaDynamicVibranceProxy.cs" />
     <Compile Include="NVIDIA\NvidiaTypes.cs" />
     <Compile Include="common\RegistryController.cs" />

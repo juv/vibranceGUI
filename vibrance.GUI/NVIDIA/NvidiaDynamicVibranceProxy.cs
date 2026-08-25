@@ -117,6 +117,27 @@ namespace vibrance.GUI.NVIDIA
 
 
         public const int NvapiMaxPhysicalGpus = 64;
+
+        // Each physical GPU can drive more than one display, so the bound below (issue #138) scales
+        // by a display-per-GPU headroom - not a quoted nvapi.h constant: no copy of nvapi.h is
+        // vendored in this repo, so the exact ceiling NvAPI itself uses cannot be confirmed here.
+        // A bound that must never truncate a real display should over-approximate rather than try
+        // to match that ceiling exactly.
+        public const int NvapiAdvancedDisplayHeads = 4;
+
+        // The ceiling EnumerateDisplayHandles() (below) loops up to. NvapiMaxPhysicalGpus is
+        // already trusted to size the GPU handle arrays in InitializeProxy(), so deriving this
+        // bound from it is internally consistent with the rest of the class.
+        //
+        // Pre-fix (issue #138): with no NVIDIA GPU present the prebuilt vibranceDLL.dll never
+        // returned -1, so the loop spun forever. InitializeProxy() never returned in that state, so
+        // isInitialized was never set and the constructor never reached the OnWinEventHook
+        // subscription below - nothing ever "walked" the growing list. In this x86 process it
+        // instead ran the unbounded List<int> out of address space, throwing OutOfMemoryException,
+        // which the constructor's catch (Exception) block turns into the "failed to initialize"
+        // dialog.
+        public const int NvapiMaxDisplays = NvapiMaxPhysicalGpus * NvapiAdvancedDisplayHeads;
+
         public const int NvapiMaxLevel = 63;
         public const int NvapiDefaultLevel = 0;
 
@@ -208,62 +229,65 @@ namespace vibrance.GUI.NVIDIA
 
         private static void OnWinEventHook(object sender, WinEventHookEventArgs e)
         {
-            if (_applicationSettings.Count > 0)
+            //an empty list still has to reach the restore branch below. Gating the whole handler on
+            //Count > 0 stranded vibrance and the resolution change whenever the last entry was
+            //removed while its game held the foreground, with no way back short of restarting.
+            ApplicationSetting applicationSetting = _applicationSettings.Count > 0
+                ? _applicationSettings.FirstOrDefault(x => string.Equals(x.Name, e.ProcessName, StringComparison.OrdinalIgnoreCase))
+                : null;
+
+            if (applicationSetting != null)
             {
-                ApplicationSetting applicationSetting = _applicationSettings.FirstOrDefault(x => string.Equals(x.Name, e.ProcessName, StringComparison.OrdinalIgnoreCase));
-                if (applicationSetting != null)
-                {                  
-                    int displayHandle = GetApplicationDisplayHandle(e.Handle);
-                    //test if changing the vibrance value is needed
-                    if (displayHandle != -1 && !equalsDVCLevel(displayHandle, applicationSetting.IngameLevel))
-                    {
-                        //test if a resolution change is needed
-                        Screen screen = Screen.FromHandle(e.Handle);
-                        if (_vibranceInfo.neverChangeResolution == false && 
-                            applicationSetting.IsResolutionChangeNeeded && 
-                            IsResolutionChangeNeeded(screen, applicationSetting.ResolutionSettings) &&
-                            _windowsResolutionSettings.ContainsKey(screen.DeviceName) &&
-                            _windowsResolutionSettings[screen.DeviceName].Item2.Contains(applicationSetting.ResolutionSettings))
-                        {
-                            PerformResolutionChange(screen, applicationSetting.ResolutionSettings);
-                        }
-                        _gameScreen = screen;
-                        _vibranceInfo.defaultHandle = displayHandle;
-                        setDVCLevel(_vibranceInfo.defaultHandle, applicationSetting.IngameLevel);
-                    }
-                }
-                else
+                int displayHandle = GetApplicationDisplayHandle(e.Handle);
+                //test if changing the vibrance value is needed
+                if (displayHandle != -1 && !equalsDVCLevel(displayHandle, applicationSetting.IngameLevel))
                 {
-                    IntPtr processHandle = e.Handle;
-
-                    if (!isWindowActive(ref processHandle))
-                        return;
-                    
                     //test if a resolution change is needed
-                    Screen currentScreen = Screen.FromHandle(processHandle);
-                    if (_vibranceInfo.neverChangeResolution == false && 
-                        _gameScreen != null && 
-                        _gameScreen.Equals(currentScreen) && 
-                        _windowsResolutionSettings.ContainsKey(currentScreen.DeviceName) &&
-                        IsResolutionChangeNeeded(currentScreen, _windowsResolutionSettings[currentScreen.DeviceName].Item1))
+                    Screen screen = Screen.FromHandle(e.Handle);
+                    if (_vibranceInfo.neverChangeResolution == false &&
+                        applicationSetting.IsResolutionChangeNeeded &&
+                        IsResolutionChangeNeeded(screen, applicationSetting.ResolutionSettings) &&
+                        _windowsResolutionSettings.ContainsKey(screen.DeviceName) &&
+                        _windowsResolutionSettings[screen.DeviceName].Item2.Contains(applicationSetting.ResolutionSettings))
                     {
-                        PerformResolutionChange(currentScreen, _windowsResolutionSettings[currentScreen.DeviceName].Item1);
+                        PerformResolutionChange(screen, applicationSetting.ResolutionSettings);
+                    }
+                    _gameScreen = screen;
+                    _vibranceInfo.defaultHandle = displayHandle;
+                    setDVCLevel(_vibranceInfo.defaultHandle, applicationSetting.IngameLevel);
+                }
+            }
+            else
+            {
+                IntPtr processHandle = e.Handle;
+
+                if (!isWindowActive(ref processHandle))
+                    return;
+
+                //test if a resolution change is needed
+                Screen currentScreen = Screen.FromHandle(processHandle);
+                if (_vibranceInfo.neverChangeResolution == false &&
+                    _gameScreen != null &&
+                    _gameScreen.Equals(currentScreen) &&
+                    _windowsResolutionSettings.ContainsKey(currentScreen.DeviceName) &&
+                    IsResolutionChangeNeeded(currentScreen, _windowsResolutionSettings[currentScreen.DeviceName].Item1))
+                {
+                    PerformResolutionChange(currentScreen, _windowsResolutionSettings[currentScreen.DeviceName].Item1);
+                }
+
+                //test if changing the vibrance value is needed
+                if (_vibranceInfo.affectPrimaryMonitorOnly && !equalsDVCLevel(_vibranceInfo.defaultHandle, _vibranceInfo.userVibranceSettingDefault))
+                {
+                    if(_gameScreen != null && !_gameScreen.DeviceName.Equals(currentScreen.DeviceName))
+                    {
+                        return;
                     }
 
-                    //test if changing the vibrance value is needed
-                    if (_vibranceInfo.affectPrimaryMonitorOnly && !equalsDVCLevel(_vibranceInfo.defaultHandle, _vibranceInfo.userVibranceSettingDefault))
-                    {
-                        if(_gameScreen != null && !_gameScreen.DeviceName.Equals(currentScreen.DeviceName))
-                        {
-                            return;
-                        }
-
-                        setDVCLevel(_vibranceInfo.defaultHandle, _vibranceInfo.userVibranceSettingDefault);
-                    }
-                    else if (!_vibranceInfo.affectPrimaryMonitorOnly && !_vibranceInfo.displayHandles.TrueForAll(handle => equalsDVCLevel(handle, _vibranceInfo.userVibranceSettingDefault)))
-                    {
-                        _vibranceInfo.displayHandles.ForEach(handle => setDVCLevel(handle, _vibranceInfo.userVibranceSettingDefault));
-                    }
+                    setDVCLevel(_vibranceInfo.defaultHandle, _vibranceInfo.userVibranceSettingDefault);
+                }
+                else if (!_vibranceInfo.affectPrimaryMonitorOnly && !_vibranceInfo.displayHandles.TrueForAll(handle => equalsDVCLevel(handle, _vibranceInfo.userVibranceSettingDefault)))
+                {
+                    _vibranceInfo.displayHandles.ForEach(handle => setDVCLevel(handle, _vibranceInfo.userVibranceSettingDefault));
                 }
             }
         }
@@ -285,15 +309,39 @@ namespace vibrance.GUI.NVIDIA
 
         private void EnumerateDisplayHandles()
         {
-            for (int i = 0, displayHandle = 0; displayHandle != -1; i++)
-            {
-                if (_vibranceInfo.displayHandles == null)
-                    _vibranceInfo.displayHandles = new List<int>();
+            _vibranceInfo.displayHandles = EnumerateDisplayHandles(enumerateNvidiaDisplayHandle);
+        }
 
-                displayHandle = enumerateNvidiaDisplayHandle(i);
-                if (displayHandle != -1)
-                    _vibranceInfo.displayHandles.Add(displayHandle);
+        // The loop body on its own, taking the enumerator as a delegate instead of calling the
+        // P/Invoke directly, so StabilityFixture can drive it with a stub and cover the bound and
+        // the dedupe without the real DLL.
+        //
+        // Bounded at NvapiMaxDisplays (issue #138): the prebuilt vibranceDLL.dll never returns -1
+        // when no NVIDIA GPU is present, so an unbounded loop here spun forever. A legitimate
+        // enumeration can never reach NvapiMaxDisplays, so the bound never cuts off real displays.
+        //
+        // Deduped: a driver stuck returning the same handle repeatedly would otherwise fill the
+        // list with copies of it, each one then getting its own setDVCLevel call on every restore
+        // (OnWinEventHook's displayHandles.ForEach(...) below). That is a latent cost on the
+        // restore path now that the loop above is bounded - it did not cause #138: pre-fix, the
+        // unbounded loop kept InitializeProxy() from ever returning, so OnWinEventHook was never
+        // even subscribed and the restore path could not run regardless of duplicates.
+        //
+        // Always returns an allocated (possibly empty) list, never null: OnWinEventHook calls
+        // TrueForAll/ForEach on _vibranceInfo.displayHandles unconditionally on the restore path.
+        internal static List<int> EnumerateDisplayHandles(Func<int, int> enumerateDisplayHandle)
+        {
+            List<int> displayHandles = new List<int>();
+            for (int i = 0; i < NvapiMaxDisplays; i++)
+            {
+                int displayHandle = enumerateDisplayHandle(i);
+                if (displayHandle == -1)
+                    break;
+
+                if (!displayHandles.Contains(displayHandle))
+                    displayHandles.Add(displayHandle);
             }
+            return displayHandles;
         }
 
         private static int GetApplicationDisplayHandle(IntPtr hWnd)

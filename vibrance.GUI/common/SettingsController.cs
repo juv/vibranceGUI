@@ -32,6 +32,7 @@ namespace vibrance.GUI.common
         const string SzKeyNameRefreshRate = "refreshRate";
         const string SzKeyNameAffectPrimaryMonitorOnly = "affectPrimaryMonitorOnly";
         const string SzKeyNameNeverSwitchResolution = "neverSwitchResolution";
+        const string SzKeyNameGraphicsAdapter = "graphicsAdapter";
 
         private string _fileName = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToString() + "\\vibranceGUI\\vibranceGUI.ini";
         private string _fileNameApplicationSettings = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).ToString() + "\\vibranceGUI\\applicationData.xml";
@@ -76,6 +77,54 @@ namespace vibrance.GUI.common
             WritePrivateProfileString(SzSectionName, szKeyName, value.ToString(), _fileName);
 
             return (Marshal.GetLastWin32Error() == 0);
+        }
+
+        /// <summary>
+        /// The GPU vendor the user picked when both drivers were installed, or Unknown when the
+        /// INI holds no preference - which is what every existing installation looks like, and
+        /// what an INI written by an older version looks like too.
+        /// Read on its own because it is needed before the main form and the application settings
+        /// XML exist, so it must not go through ReadVibranceSettings.
+        /// </summary>
+        public GraphicsAdapter ReadGraphicsAdapterPreference()
+        {
+            if (!IsFileExisting(_fileName))
+            {
+                return GraphicsAdapter.Unknown;
+            }
+
+            StringBuilder szValueGraphicsAdapter = new StringBuilder(1024);
+            GetPrivateProfileString(SzSectionName,
+                SzKeyNameGraphicsAdapter,
+                "",
+                szValueGraphicsAdapter,
+                Convert.ToUInt32(szValueGraphicsAdapter.Capacity),
+                _fileName);
+
+            string szGraphicsAdapter = szValueGraphicsAdapter.ToString().Trim();
+            if (string.Equals(szGraphicsAdapter, GraphicsAdapter.Nvidia.ToString(), StringComparison.OrdinalIgnoreCase))
+            {
+                return GraphicsAdapter.Nvidia;
+            }
+            if (string.Equals(szGraphicsAdapter, GraphicsAdapter.Amd.ToString(), StringComparison.OrdinalIgnoreCase))
+            {
+                return GraphicsAdapter.Amd;
+            }
+            return GraphicsAdapter.Unknown;
+        }
+
+        /// <summary>
+        /// Stores the vendor the user picked. Only the two supported vendors are ever written, so
+        /// that the key can never be turned into a value the reader would have to guess about.
+        /// </summary>
+        public bool SetGraphicsAdapterPreference(GraphicsAdapter graphicsAdapter)
+        {
+            if (graphicsAdapter != GraphicsAdapter.Nvidia && graphicsAdapter != GraphicsAdapter.Amd)
+            {
+                return false;
+            }
+
+            return SetVibranceSetting(SzKeyNameGraphicsAdapter, graphicsAdapter.ToString());
         }
 
         private bool PrepareFile()

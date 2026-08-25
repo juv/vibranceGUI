@@ -127,6 +127,13 @@
     <Compile Include="common\WinEventHookEventArgs.cs" />
     <Compile Include="common\Definitions.cs" />
     <Compile Include="common\GraphicsAdapter.cs" />
+    <Compile Include="common\GraphicsAdapterChooser.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="common\GraphicsAdapterChooser.Designer.cs">
+      <DependentUpon>GraphicsAdapterChooser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="common\GraphicsAdapterFixture.cs" />
     <Compile Include="common\IRegistryController.cs" />
     <Compile Include="common\ISettingsController.cs" />
     <Compile Include="common\IVibranceProxy.cs" />

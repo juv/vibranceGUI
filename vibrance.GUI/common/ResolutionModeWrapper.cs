@@ -54,5 +54,28 @@ namespace vibrance.GUI.common
             }
             return false;
         }
+
+        // Used by ResolutionHelper.ChangeResolutionEx/IsResolutionChangeNeeded to decide whether a
+        // mode change is still needed and whether one that was just attempted actually landed -
+        // deliberately comparing only the four fields a change actually declares and can verify
+        // (DmPelsWidth, DmPelsHeight, DmBitsPerPel, DmDisplayFrequency), NOT DmDisplayFixedOutput,
+        // unlike Equals above. DmDisplayFixedOutput (the "(Center)"/"(Stretch)" scaling choice) is
+        // only honoured by ChangeDisplaySettingsEx when DM_DISPLAYFIXEDOUTPUT survives into the
+        // achieved mode's own dmFields, which is driver-dependent - some drivers apply the four
+        // real fields correctly but silently pin this one to their own default regardless of what
+        // was requested. Basing the "does this still need changing?" guard on a field a driver is
+        // free to never honour is what let a user's "(Center)" mode selection re-fire a real mode
+        // set and registry write on every single foreground event, forever, even though the mode
+        // had genuinely already been achieved on every field the driver actually supports.
+        // Equals/ToString above are intentionally untouched by this - the combo box in
+        // VibranceSettings and the applicationData.xml round trip both depend on all five fields
+        // matching exactly.
+        public bool MatchesAchievedMode(Devmode mode)
+        {
+            return this.DmPelsWidth == mode.dmPelsWidth &&
+                this.DmPelsHeight == mode.dmPelsHeight &&
+                this.DmBitsPerPel == mode.dmBitsPerPel &&
+                this.DmDisplayFrequency == mode.dmDisplayFrequency;
+        }
     }
 }

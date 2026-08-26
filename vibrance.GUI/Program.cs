@@ -19,6 +19,7 @@ namespace vibrance.GUI
         private const string ErrorGraphicsAdapterUnknown = "Failed to determine your Graphic GraphicsAdapter type (NVIDIA/AMD). Make sure you have installed a proper GPU driver. Intel laptops are not supported as stated on the website. When installing your GPU driver did not work, please contact @juvlarN at twitter. Press Yes to open twitter in your browser now. Error: ";
         private const string ErrorGraphicsAdapterAmbiguous = "Both NVIDIA and AMD graphic drivers have been found on your system. This can happen when you recently switched your graphic card and did not uninstall the old drivers. Make sure to uninstall unused graphic drivers to keep your system safe and stable. Use the program \"Display Driver Uninstaller\" to uninstall your old drivers!\n\nPress Yes to open \"Display Driver Uninstaller\" download website now.\nPress No to quit vibranceGUI.";
         private const string MessageBoxCaption = "vibranceGUI Error";
+        private const string ResolutionSelfTestMessageBoxCaption = "vibranceGUI resolution change self test";
 
         [STAThread]
         static void Main(string[] args)
@@ -33,6 +34,21 @@ namespace vibrance.GUI
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+
+            // Runs before the GPU vendor detection below on purpose: ResolutionChangeFixture only
+            // ever drives ChangeResolutionEx through a fake IDisplayModeDevice, so it needs no
+            // driver and stays runnable on a machine GetAdapter() cannot resolve and would exit
+            // from. There is deliberately no hardware variant of this self test, and there must
+            // never be one - a display mode has no guaranteed undo, and a mode the panel cannot
+            // show would leave a user unable to even see a dialog asking them to confirm it, which
+            // is literally what issue #114 reports.
+            if (args.Contains("--selftest-resolution"))
+            {
+                MessageBox.Show(string.Join(Environment.NewLine, ResolutionChangeFixture.Run().ToArray()),
+                    ResolutionSelfTestMessageBoxCaption, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
             NativeMethods.SetDllDirectory(CommonUtils.GetVibrance_GUI_AppDataPath());
 
             GraphicsAdapter adapter = GraphicsAdapterHelper.GetAdapter();
@@ -96,6 +112,21 @@ namespace vibrance.GUI
             Application.Run(vibranceGui);
 
             GC.KeepAlive(mutex);
+        }
+
+        // Internal rather than private: ResolutionHelper's WinEvent-reachable failure-recording
+        // path (ChangeResolutionEx) reuses this so a broken log write (e.g. File.AppendText
+        // failing) cannot itself throw an exception across the native WinEvent callback frame.
+        internal static void LogSafely(string message)
+        {
+            try
+            {
+                VibranceGUI.Log(message);
+            }
+            catch (Exception)
+            {
+                // Logging must never be the reason a resolution change fails to complete.
+            }
         }
     }
 }

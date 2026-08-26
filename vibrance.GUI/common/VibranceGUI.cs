@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
+using Microsoft.Win32;
 using Application = System.Windows.Forms.Application;
 using MessageBox = System.Windows.Forms.MessageBox;
 
@@ -52,24 +53,34 @@ namespace vibrance.GUI.common
             trackBarWindowsLevel.Maximum = maxTrackBarValue;
 
             _windowsResolutionSettings = new Dictionary<string, Tuple<ResolutionModeWrapper, List<ResolutionModeWrapper>>>();
-            foreach(Screen screen in Screen.AllScreens)
+            RebuildWindowsResolutionSettings(true);
+
+            // _supportedResolutionList is readonly, so it can only be assigned from inside a
+            // constructor body - not from a method the constructor merely calls, even a private
+            // one - which is why this is pulled back out of RebuildWindowsResolutionSettings
+            // (shared with the refresh path below) instead of living inside it. Equivalent to the
+            // old "if (screen.Primary) { _supportedResolutionList = availableResolutions; }": if
+            // the primary screen's own read failed, it never made it into the dictionary either,
+            // and this is left null exactly as it was before.
+            Screen primaryScreen = Screen.PrimaryScreen;
+            Tuple<ResolutionModeWrapper, List<ResolutionModeWrapper>> primaryEntry;
+            if (primaryScreen != null && _windowsResolutionSettings.TryGetValue(primaryScreen.DeviceName, out primaryEntry))
             {
-                Devmode currentResolutionMode;
-                if (ResolutionHelper.GetCurrentResolutionSettings(out currentResolutionMode, screen.DeviceName))
-                {
-                    List<ResolutionModeWrapper> availableResolutions = ResolutionHelper.EnumerateSupportedResolutionModes(screen.DeviceName);
-                    if(screen.Primary)
-                    {
-                        _supportedResolutionList = availableResolutions;
-                    }
-                    var tuple = new Tuple<ResolutionModeWrapper, List<ResolutionModeWrapper>>(new ResolutionModeWrapper(currentResolutionMode), availableResolutions);
-                    _windowsResolutionSettings.Add(screen.DeviceName, tuple);                    
-                }
-                else
-                {
-                    MessageBox.Show("Current resolution mode could not be determined. Switching back to your Windows resolution will not work.");
-                }
+                _supportedResolutionList = primaryEntry.Item2;
             }
+
+            // Subscribed here - after _windowsResolutionSettings exists, before getProxy hands it
+            // to the vendor proxy - and unsubscribed in CleanUp(). ResolutionChangeFailed lets the
+            // resolution-change fix (see ResolutionHelper.ChangeResolutionEx) report a give-up
+            // without ever showing a MessageBox from inside the WinEvent callback thread.
+            // SystemEvents.DisplaySettingsChanged keeps _windowsResolutionSettings from going stale
+            // when the user changes their desktop resolution directly in Windows - unsubscribing it
+            // is mandatory (not just good practice): SystemEvents holds a strong reference to this
+            // handler on its own dedicated thread, and leaving it subscribed leaks this form and can
+            // fault at shutdown.
+            ResolutionHelper.ResolutionChangeFailed += OnResolutionChangeFailed;
+            SystemEvents.DisplaySettingsChanged += OnDisplaySettingsChanged;
+
             _applicationSettings = new List<ApplicationSetting>();
             _v = getProxy(_applicationSettings, _windowsResolutionSettings);
 
@@ -329,6 +340,159 @@ namespace vibrance.GUI.common
             {
                 Log(ex);
             }
+            finally
+            {
+                // In a finally, not just after the try: these must run even if the block above
+                // throws. SystemEvents.DisplaySettingsChanged above all - see the ctor's own
+                // comment for why leaving it subscribed leaks this form and can fault at shutdown.
+                SystemEvents.DisplaySettingsChanged -= OnDisplaySettingsChanged;
+                ResolutionHelper.ResolutionChangeFailed -= OnResolutionChangeFailed;
+            }
+        }
+
+        /// <summary>
+        /// (Re)populates _windowsResolutionSettings from the currently attached screens, mutating
+        /// the existing Dictionary instance in place (Clear() then re-add) rather than replacing
+        /// it - both proxies hold a reference to this very instance (NVIDIA's is static), so only
+        /// in-place mutation is visible to them. Shared by the constructor (showFailureDialog:
+        /// true) and OnDisplaySettingsChanged below (showFailureDialog: false) - see that method
+        /// for why the dialog must never fire from the refresh path.
+        /// </summary>
+        private void RebuildWindowsResolutionSettings(bool showFailureDialog)
+        {
+            // This is the single most dangerous line in the resolution-change fix: if a refresh
+            // runs while a game's resolution change is currently applied, a live read of "the
+            // current mode" for the game's own screen returns the GAME's mode, not the desktop's.
+            // Overwriting the captured "Windows resolution" (Item1) with that would strand the
+            // desktop at the game's resolution forever - the revert path compares against Item1, so
+            // once it has silently become the game's own mode, "reverting" turns into a no-op that
+            // still reports success. A game going fullscreen is exactly the kind of change that
+            // fires DisplaySettingsChanged, so this is not a rare interleaving to guard against.
+            //
+            // While a resolution change is applied, every screen this dictionary already has an
+            // entry for keeps its previously captured Item1 untouched, and only Item2 (the
+            // device's supported-mode list, a property of the device rather than of whichever mode
+            // happens to be active right now) is refreshed. A screen with no previous entry still
+            // needs one captured fresh - it cannot be the screen the game is running on, since that
+            // one is already recorded.
+            bool preserveCapturedMode = _v != null && _v.GetVibranceInfo().isResolutionChangeApplied;
+
+            Dictionary<string, Tuple<ResolutionModeWrapper, List<ResolutionModeWrapper>>> previous =
+                new Dictionary<string, Tuple<ResolutionModeWrapper, List<ResolutionModeWrapper>>>(_windowsResolutionSettings);
+
+            _windowsResolutionSettings.Clear();
+            foreach (Screen screen in Screen.AllScreens)
+            {
+                Tuple<ResolutionModeWrapper, List<ResolutionModeWrapper>> existing;
+                bool hasExisting = previous.TryGetValue(screen.DeviceName, out existing);
+
+                // Item2 is a property of the device's capability, not of whichever mode happens to
+                // be active right now (the comment above already relies on that to justify reusing
+                // it while a game's own change is applied) - so a device this dictionary already
+                // has an entry for reuses that SAME List<ResolutionModeWrapper> instance rather than
+                // re-enumerating. Two reasons this matters beyond the obvious P/Invoke cost (up to
+                // several hundred EnumDisplaySettings calls per screen, on the UI thread): first,
+                // vibranceGUI's OWN resolution changes also fire DisplaySettingsChanged, so an
+                // unconditional re-enumerate here would run twice per alt-tab cycle; second, reusing
+                // the identical instance (not a fresh copy) is what keeps _supportedResolutionList -
+                // captured once, in the constructor, and readonly - from silently going stale after
+                // a refresh, since it then still points at the very list being kept up to date here.
+                List<ResolutionModeWrapper> availableResolutions = hasExisting
+                    ? existing.Item2
+                    : ResolutionHelper.EnumerateSupportedResolutionModes(screen.DeviceName);
+
+                if (preserveCapturedMode && hasExisting)
+                {
+                    _windowsResolutionSettings.Add(screen.DeviceName,
+                        new Tuple<ResolutionModeWrapper, List<ResolutionModeWrapper>>(existing.Item1, availableResolutions));
+                    continue;
+                }
+
+                Devmode currentResolutionMode;
+                if (ResolutionHelper.GetCurrentResolutionSettings(out currentResolutionMode, screen.DeviceName))
+                {
+                    _windowsResolutionSettings.Add(screen.DeviceName,
+                        new Tuple<ResolutionModeWrapper, List<ResolutionModeWrapper>>(new ResolutionModeWrapper(currentResolutionMode), availableResolutions));
+                }
+                else if (showFailureDialog)
+                {
+                    MessageBox.Show("Current resolution mode could not be determined. Switching back to your Windows resolution will not work.");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Keeps _windowsResolutionSettings current when the user changes their desktop resolution
+        /// (or a monitor is hot-plugged) outside of vibranceGUI itself - without this, the revert
+        /// path drags the desktop back to whatever mode was active at startup, with every API call
+        /// still reporting success.
+        /// </summary>
+        private void OnDisplaySettingsChanged(object sender, EventArgs e)
+        {
+            // Raised on SystemEvents' own dedicated thread, not necessarily the UI thread that owns
+            // this form and that OnWinEventHook's callbacks arrive through - marshal onto it before
+            // touching _windowsResolutionSettings, which that hook handler reads with no locking of
+            // its own. InvokeRequired is NOT sufficient on its own: it returns false whenever the
+            // form has no window handle yet (Control.InvokeRequired falls through to
+            // FindMarshalingControl(), which returns false if !IsHandleCreated) - and the handle
+            // genuinely does not exist for the whole span of the constructor's NvAPI/ADL
+            // initialisation after this handler is subscribed (backgroundWorker_DoWork busy-waits
+            // on !IsHandleCreated), which is exactly when a SystemEvents notification is likely at
+            // autostart, as monitors settle. Without the explicit IsHandleCreated check this method
+            // would run its dictionary mutation directly on the SystemEvents thread in that window.
+            // IsDisposed also guards the symmetric case at shutdown: CleanUp()'s unsubscribe cannot
+            // cover a notification already in flight, which could otherwise find the handle
+            // destroyed (same wrong-thread mutation) or the form disposed (BeginInvoke throwing
+            // ObjectDisposedException on the SystemEvents thread, with nothing there to catch it).
+            if (this.IsDisposed || !this.IsHandleCreated)
+            {
+                return;
+            }
+            if (this.InvokeRequired)
+            {
+                this.BeginInvoke((MethodInvoker)delegate { OnDisplaySettingsChanged(sender, e); });
+                return;
+            }
+
+            // showFailureDialog: false - a MessageBox popping up on every hot-plug or resolution
+            // change, potentially over a fullscreen game, is exactly the modal-on-the-callback-
+            // thread mistake this whole fix removes. The constructor's own one-time build above
+            // still shows it once, at startup, where the user is looking at the window and can act
+            // on it immediately.
+            RebuildWindowsResolutionSettings(false);
+        }
+
+        /// <summary>
+        /// Reports a resolution change ChangeResolutionEx has given up on, via a balloon tip instead
+        /// of the modal MessageBox the pre-fix code raised from inside the WinEvent callback thread
+        /// (see ResolutionHelper.cs). ResolutionHelper only ever raises this once it has given up -
+        /// never on a single transient failure - so there is no "still retrying" wording here; see
+        /// ResolutionHelper.RecordFailure.
+        /// </summary>
+        private void OnResolutionChangeFailed(object sender, ResolutionFailureEventArgs e)
+        {
+            // Same reasoning as OnDisplaySettingsChanged above - this is also raised from
+            // ResolutionHelper's own call stack, which for the WinEvent-driven cases below runs on
+            // the UI thread already, but ResolutionHelper offers no guarantee of that in general.
+            if (this.IsDisposed || !this.IsHandleCreated)
+            {
+                return;
+            }
+            if (this.InvokeRequired)
+            {
+                this.BeginInvoke((MethodInvoker)delegate { OnResolutionChangeFailed(sender, e); });
+                return;
+            }
+
+            this.notifyIcon.BalloonTipIcon = ToolTipIcon.Warning;
+            // The desktop is now stuck at the game's resolution (revert) or the game never got its
+            // requested resolution (apply) with nothing else in the program that will ever retry
+            // it, so this has to name the device and, for a revert, point the user at where they
+            // can fix it themselves.
+            this.notifyIcon.BalloonTipText = e.IsRevert
+                ? string.Format("vibranceGUI could not switch display {0} back to your Windows resolution and has stopped trying. Check Windows Display settings.", e.DeviceName)
+                : string.Format("vibranceGUI could not change display {0} to this game's resolution and has stopped trying.", e.DeviceName);
+            this.notifyIcon.ShowBalloonTip(250);
         }
 
         public static void Log(Exception ex)

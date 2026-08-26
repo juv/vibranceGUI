@@ -219,13 +219,23 @@ namespace vibrance.GUI.NVIDIA
                     {
                         //test if a resolution change is needed
                         Screen screen = Screen.FromHandle(e.Handle);
-                        if (_vibranceInfo.neverChangeResolution == false && 
-                            applicationSetting.IsResolutionChangeNeeded && 
-                            IsResolutionChangeNeeded(screen, applicationSetting.ResolutionSettings) &&
+                        if (_vibranceInfo.neverChangeResolution == false &&
+                            applicationSetting.IsResolutionChangeNeeded &&
+                            ResolutionHelper.IsResolutionChangeNeeded(screen.DeviceName, applicationSetting.ResolutionSettings) &&
                             _windowsResolutionSettings.ContainsKey(screen.DeviceName) &&
                             _windowsResolutionSettings[screen.DeviceName].Item2.Contains(applicationSetting.ResolutionSettings))
                         {
-                            PerformResolutionChange(screen, applicationSetting.ResolutionSettings);
+                            ResolutionHelper.ResolutionChangeResult result = ResolutionHelper.ChangeResolutionEx(
+                                applicationSetting.ResolutionSettings, screen.DeviceName, false);
+                            // AppliedUnverified means CDS_UPDATEREGISTRY itself reported success but
+                            // the post-apply readback did not confirm it - the mode most likely DID
+                            // change, so this still counts as applied for the purpose of a later
+                            // revert attempt. Treating it as "not applied" would both strand the
+                            // desktop at whatever this change actually produced AND tell the user the
+                            // opposite of what happened.
+                            _vibranceInfo.isResolutionChangeApplied =
+                                result == ResolutionHelper.ResolutionChangeResult.Applied ||
+                                result == ResolutionHelper.ResolutionChangeResult.AppliedUnverified;
                         }
                         _gameScreen = screen;
                         _vibranceInfo.defaultHandle = displayHandle;
@@ -241,13 +251,25 @@ namespace vibrance.GUI.NVIDIA
                     
                     //test if a resolution change is needed
                     Screen currentScreen = Screen.FromHandle(processHandle);
-                    if (_vibranceInfo.neverChangeResolution == false && 
-                        _gameScreen != null && 
-                        _gameScreen.Equals(currentScreen) && 
+                    if (_vibranceInfo.neverChangeResolution == false &&
+                        _gameScreen != null &&
+                        _gameScreen.Equals(currentScreen) &&
                         _windowsResolutionSettings.ContainsKey(currentScreen.DeviceName) &&
-                        IsResolutionChangeNeeded(currentScreen, _windowsResolutionSettings[currentScreen.DeviceName].Item1))
+                        ResolutionHelper.IsResolutionChangeNeeded(currentScreen.DeviceName, _windowsResolutionSettings[currentScreen.DeviceName].Item1))
                     {
-                        PerformResolutionChange(currentScreen, _windowsResolutionSettings[currentScreen.DeviceName].Item1);
+                        ResolutionHelper.ResolutionChangeResult result = ResolutionHelper.ChangeResolutionEx(
+                            _windowsResolutionSettings[currentScreen.DeviceName].Item1, currentScreen.DeviceName, true);
+                        // A failed (or unverified) revert must leave the flag true, or the next
+                        // foreground event would never retry it - AppliedUnverified here means the
+                        // revert's own CDS_UPDATEREGISTRY reported success but the readback did not
+                        // confirm the desktop is really back, so it is treated the same as Failed:
+                        // still worth another attempt. Suppressed (the give-up state) deliberately
+                        // still clears it: once ChangeResolutionEx has stopped calling the driver at
+                        // all, holding this true would retry forever with the device call skipped
+                        // every time.
+                        if (result != ResolutionHelper.ResolutionChangeResult.Failed &&
+                            result != ResolutionHelper.ResolutionChangeResult.AppliedUnverified)
+                            _vibranceInfo.isResolutionChangeApplied = false;
                     }
 
                     //test if changing the vibrance value is needed
@@ -266,21 +288,6 @@ namespace vibrance.GUI.NVIDIA
                     }
                 }
             }
-        }
-
-        private static bool IsResolutionChangeNeeded(Screen screen, ResolutionModeWrapper resolutionSettings)
-        {
-            Devmode mode;            
-            if (resolutionSettings != null && ResolutionHelper.GetCurrentResolutionSettings(out mode, screen.DeviceName) && !resolutionSettings.Equals(mode))
-            {
-                return true;
-            }
-            return false;
-        }
-
-        private static void PerformResolutionChange(Screen screen, ResolutionModeWrapper resolutionSettings)
-        {
-            ResolutionHelper.ChangeResolutionEx(resolutionSettings, screen.DeviceName);
         }
 
         private void EnumerateDisplayHandles()

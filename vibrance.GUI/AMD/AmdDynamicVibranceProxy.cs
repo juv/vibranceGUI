@@ -114,14 +114,21 @@ namespace vibrance.GUI.AMD
                 {
                     //test if a resolution change is needed
                     Screen screen = Screen.FromHandle(e.Handle);
-                    if (_vibranceInfo.neverChangeResolution == false && 
-                        applicationSetting.IsResolutionChangeNeeded && 
-                        IsResolutionChangeNeeded(screen, applicationSetting.ResolutionSettings) &&
+                    if (_vibranceInfo.neverChangeResolution == false &&
+                        applicationSetting.IsResolutionChangeNeeded &&
+                        ResolutionHelper.IsResolutionChangeNeeded(screen.DeviceName, applicationSetting.ResolutionSettings) &&
                         _windowsResolutionSettings.ContainsKey(screen.DeviceName) &&
                         _windowsResolutionSettings[screen.DeviceName].Item2.Contains(applicationSetting.ResolutionSettings))
                     {
                         _gameScreen = screen;
-                        PerformResolutionChange(screen, applicationSetting.ResolutionSettings);
+                        ResolutionHelper.ResolutionChangeResult result = ResolutionHelper.ChangeResolutionEx(
+                            applicationSetting.ResolutionSettings, screen.DeviceName, false);
+                        // AppliedUnverified means CDS_UPDATEREGISTRY itself reported success but the
+                        // post-apply readback did not confirm it - see the matching comment in
+                        // NvidiaDynamicVibranceProxy's OnWinEventHook.
+                        _vibranceInfo.isResolutionChangeApplied =
+                            result == ResolutionHelper.ResolutionChangeResult.Applied ||
+                            result == ResolutionHelper.ResolutionChangeResult.AppliedUnverified;
                     }
 
                     _amdAdapter.SetSaturationOnAllDisplays(_vibranceInfo.userVibranceSettingDefault);
@@ -142,32 +149,25 @@ namespace vibrance.GUI.AMD
 
                     //test if a resolution change is needed
                     Screen screen = Screen.FromHandle(processHandle);
-                    if (_vibranceInfo.neverChangeResolution == false && 
-                        _gameScreen != null && _gameScreen.Equals(screen) && 
+                    if (_vibranceInfo.neverChangeResolution == false &&
+                        _gameScreen != null && _gameScreen.Equals(screen) &&
                         _windowsResolutionSettings.ContainsKey(screen.DeviceName) &&
-                        IsResolutionChangeNeeded(screen, _windowsResolutionSettings[screen.DeviceName].Item1))
+                        ResolutionHelper.IsResolutionChangeNeeded(screen.DeviceName, _windowsResolutionSettings[screen.DeviceName].Item1))
                     {
-                        PerformResolutionChange(screen, _windowsResolutionSettings[screen.DeviceName].Item1);
+                        ResolutionHelper.ResolutionChangeResult result = ResolutionHelper.ChangeResolutionEx(
+                            _windowsResolutionSettings[screen.DeviceName].Item1, screen.DeviceName, true);
+                        // A failed (or unverified) revert must leave the flag true so the next
+                        // foreground event retries it; Suppressed (the give-up state) deliberately
+                        // still clears it - see the matching comment in NvidiaDynamicVibranceProxy's
+                        // OnWinEventHook.
+                        if (result != ResolutionHelper.ResolutionChangeResult.Failed &&
+                            result != ResolutionHelper.ResolutionChangeResult.AppliedUnverified)
+                            _vibranceInfo.isResolutionChangeApplied = false;
                     }
 
                     _amdAdapter.SetSaturationOnAllDisplays(_vibranceInfo.userVibranceSettingDefault);
                 }
             }
-        }
-
-        private static bool IsResolutionChangeNeeded(Screen screen, ResolutionModeWrapper resolutionSettings)
-        {
-            Devmode mode;
-            if (resolutionSettings != null && ResolutionHelper.GetCurrentResolutionSettings(out mode, screen.DeviceName) && !resolutionSettings.Equals(mode))
-            {
-                return true;
-            }
-            return false;
-        }
-
-        private static void PerformResolutionChange(Screen screen, ResolutionModeWrapper resolutionSettings)
-        {
-            ResolutionHelper.ChangeResolutionEx(resolutionSettings, screen.DeviceName);
         }
     }
 }

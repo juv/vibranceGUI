@@ -152,7 +152,7 @@
             this.checkBoxPrimaryMonitorOnly.TabIndex = 15;
             this.checkBoxPrimaryMonitorOnly.Text = "Affect Primary Monitor only";
             this.toolTip.SetToolTip(this.checkBoxPrimaryMonitorOnly, "When checking this, VibranceGUI will only change vibrance values on your primary " +
-        "monitor.");
+        "monitor and the monitor the game is running on - no others.");
             this.checkBoxPrimaryMonitorOnly.UseVisualStyleBackColor = true;
             this.checkBoxPrimaryMonitorOnly.CheckedChanged += new System.EventHandler(this.checkBoxPrimaryMonitorOnly_CheckedChanged);
             // 

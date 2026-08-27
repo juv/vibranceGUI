@@ -125,6 +125,8 @@
     <Compile Include="common\ResolutionModeWrapper.cs" />
     <Compile Include="common\WinEventHook.cs" />
     <Compile Include="common\WinEventHookEventArgs.cs" />
+    <Compile Include="common\VibranceRestoreHelper.cs" />
+    <Compile Include="common\VibranceRestoreFixture.cs" />
     <Compile Include="common\Definitions.cs" />
     <Compile Include="common\GraphicsAdapter.cs" />
     <Compile Include="common\IRegistryController.cs" />
